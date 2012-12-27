@@ -68,15 +68,16 @@ if (!defined($output)) {
         my $j = $output->[$i];
         push(@{$tbl},[
             $j->{id},
-            $j->{workspace},
+            $j->{ws},
             $j->{owner},
-            $j->{queuing_command},
+            $j->{status},
             $j->{queuetime},
-            $j->{complete}
+            $j->{starttime},
+            $j->{completetime},
         ]);
     }
 	my $table = Text::Table->new(
-    'ID', 'WS', 'Owner','Cmd','Queue time','Complete'
+    'ID', 'WS', 'Owner','Status','Queue time','Start time','Complete time'
     );
     $table->load(@$tbl);
     print $table;

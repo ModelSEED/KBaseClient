@@ -24,7 +24,8 @@ Module::Build->new(
         'Exporter' => undef,
         'Getopt::Long::Descriptive' => undef,
         'Text::Table' => undef,
-        'JSON::RPC::Client' => undef
+        'JSON::RPC::Client' => undef,
+        'Object::Tiny::RW' => undef
     },
     dist_abstract => 'Client scripts for FBA and workspace',
 )->create_build_script;

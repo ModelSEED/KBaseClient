@@ -12,7 +12,6 @@ src=$2
 dst=$3
 
 cat > $dst <<EOF
-#!/bin/sh
 pushd . > /dev/null
 SCRIPT_DIR="\${BASH_SOURCE[0]}";
 if ([ -h "\${SCRIPT_DIR}" ]) then

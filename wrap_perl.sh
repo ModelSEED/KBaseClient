@@ -21,7 +21,7 @@ fi
 cd \`dirname \${SCRIPT_DIR}\` > /dev/null
 SCRIPT_DIR=\`pwd\`;
 popd  > /dev/null
-perl \$SCRIPT_DIR/../plbin/kbws-login.pl "\$@"
+perl \$SCRIPT_DIR/../$src "\$@"
 EOF
 
 chmod +x $dst

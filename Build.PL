@@ -25,7 +25,8 @@ Module::Build->new(
         'Getopt::Long::Descriptive' => undef,
         'Text::Table' => undef,
         'JSON::RPC::Client' => undef,
-        'Object::Tiny::RW' => undef
+        'Object::Tiny::RW' => undef,
+        'Term::ReadKey' => undef
     },
     dist_abstract => 'Client scripts for FBA and workspace',
 )->create_build_script;

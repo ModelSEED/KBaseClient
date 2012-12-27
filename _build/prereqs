@@ -1,0 +1,28 @@
+do{ my $x = {
+       'build_requires' => {},
+       'conflicts' => {},
+       'requires' => {
+                       'Text::Table' => undef,
+                       'Convert::PEM' => '0.08',
+                       'JSON::RPC::Client' => undef,
+                       'POSIX' => '1',
+                       'LWP::Protocol::https' => '1',
+                       'Getopt::Long::Descriptive' => undef,
+                       'HTTP::Daemon' => '6',
+                       'parent' => undef,
+                       'URI' => '1.37',
+                       'Digest::SHA1' => '2.13',
+                       'Crypt::OpenSSL::RSA' => '0.28',
+                       'Exporter' => undef,
+                       'Exception::Class' => undef,
+                       'Test::More' => '0.94',
+                       'Params::Validate' => undef,
+                       'LWP::UserAgent' => '6.02',
+                       'MIME::Base64' => '3.08',
+                       'URI::URL' => '1',
+                       'JSON' => '2.53',
+                       'HTTP::Request' => '6'
+                     },
+       'recommends' => {}
+     };
+$x; }

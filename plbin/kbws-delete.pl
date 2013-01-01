@@ -23,6 +23,7 @@ my $translation = {
 my ($opt, $usage) = describe_options(
     'kbws-delete <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'workspace|w:s', 'ID for workspace', {"default" => workspace()} ],
+    [ 'permanent|p', 'Permanently delete object', {"default" => 0} ],
     [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]  
 );
@@ -49,12 +50,25 @@ foreach my $key (keys(%{$translation})) {
 }
 #Calling the server
 my $output;
-if ($opt->{showerror} == 0){
-    eval {
-        $output = $serv->$servercommand($params);
-    };
-}else{
-    $output = $serv->$servercommand($params);
+if ($opt->{permanent} == 1) {
+	eval {
+		$output = $serv->delete_object($params);
+	};
+	if ($opt->{showerror} == 0){
+	    eval {
+	        $output = $serv->delete_object_permanently($params);
+	    };
+	}else{
+	    $output = $serv->delete_object_permanently($params);
+	}
+} else {
+	if ($opt->{showerror} == 0){
+	    eval {
+	        $output = $serv->$servercommand($params);
+	    };
+	}else{
+	    $output = $serv->$servercommand($params);
+	}
 }
 #Checking output and report results
 if (!defined($output)) {

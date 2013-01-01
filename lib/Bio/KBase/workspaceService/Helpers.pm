@@ -7,6 +7,9 @@ use parent qw(Exporter);
 our @EXPORT_OK = qw( auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta printWorkspaceMeta);
 our $defaultURL = "http://kbase.us/services/workspace/";
 
+my $CurrentWorkspace;
+my $CurrentURL;
+
 sub get_ws_client {
     return Bio::KBase::workspaceService::Client->new(workspaceURL());
 }
@@ -38,43 +41,88 @@ sub auth {
 
 sub workspace {
     my $set = shift;
-    my $workspace;
-    my $filename = "$ENV{HOME}/.kbase_workspace";
-    if ( defined $set ) {
-        open(my $fh, ">", $filename) || return;
-        print $fh $set;
-        close($fh);
-        $workspace = $set;
-    } elsif( -e $filename ) {
-        open(my $fh, "<", $filename) || return;
-        $workspace = <$fh>;
-        chomp $workspace;
-        close($fh);
+    if (defined($set)) {
+    	$CurrentWorkspace = $set;
+    	my $auth = auth();
+    	if (!defined($auth)) {
+    		if (!defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
+	    		my $filename = "$ENV{HOME}/.kbase_workspace";
+	    		open(my $fh, ">", $filename) || return;
+		        print $fh $CurrentWorkspace;
+		        close($fh);
+    		} elsif ($ENV{KB_WORKSPACE}) {
+    			$ENV{KB_WORKSPACE} = $CurrentWorkspace;
+    		}
+    	} else {
+    		my $client = get_ws_client();
+    		$client->set_user_settings({
+	    		setting => "workspace",
+				value => $set,
+				auth => $auth
+	    	});
+    	}
+    } elsif (!defined($CurrentWorkspace)) {
+    	my $auth = auth();
+    	if (!defined($auth)) {
+    		if (!defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
+	    		my $filename = "$ENV{HOME}/.kbase_workspace";
+	    		if( -e $filename ) {
+		    		open(my $fh, "<", $filename) || return;
+			        $CurrentWorkspace = <$fh>;
+			        chomp $CurrentWorkspace;
+			        close($fh);
+	    		} else {
+	    			$CurrentWorkspace = "default";
+	    		}
+    		} elsif (defined($ENV{KB_WORKSPACE})) {
+	    		$CurrentWorkspace = $ENV{KB_WORKSPACE};
+	    	} else {
+				$CurrentWorkspace = "default";
+    		} 
+    	} else {
+    		my $client = get_ws_client();
+    		my $settings = $client->get_user_settings({
+				auth => $auth
+	    	});
+	    	$CurrentWorkspace = $settings->{workspace};
+    	}
     }
-    return $workspace;
+    return $CurrentWorkspace;
 }
 
 sub workspaceURL {
     my $set = shift;
-    my $url;
-    my $filename = "$ENV{HOME}/.kbase_workspaceURL";
-    if ( defined $set ) {
-        if ($set eq "default") {
+    if (defined($set)) {
+    	if ($set eq "default") {
         	$set = $defaultURL;
         }
-        open(my $fh, ">", $filename) || return;
-        print $fh $set;
-        close($fh);
-        $url = $set;
-    } elsif( -e $filename ) {
-        open(my $fh, "<", $filename) || return;
-        $url = <$fh>;
-        chomp $url;
-        close($fh);
-    } else {
-        $url = $defaultURL;	
+    	$CurrentURL = $set;
+    	if (!defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
+	    	my $filename = "$ENV{HOME}/.kbase_workspaceURL";
+	    	open(my $fh, ">", $filename) || return;
+		    print $fh $CurrentURL;
+		    close($fh);
+    	} elsif ($ENV{KB_WORKSPACEURL}) {
+    		$ENV{KB_WORKSPACEURL} = $CurrentURL;
+    	}
+    } elsif (!defined($CurrentURL)) {
+    	if (!defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
+	    	my $filename = "$ENV{HOME}/.kbase_workspaceURL";
+	    	if( -e $filename ) {
+		   		open(my $fh, "<", $filename) || return;
+		        $CurrentURL = <$fh>;
+		        chomp $CurrentURL;
+		        close($fh);
+	    	} else {
+	    		$CurrentURL = $defaultURL;
+	    	}
+    	} elsif (defined($ENV{KB_WORKSPACEURL})) {
+	    	$CurrentURL = $ENV{KB_WORKSPACEURL};
+	    } else {
+			$CurrentURL = $defaultURL;
+    	} 
     }
-    return $url;
+    return $CurrentURL;
 }
 
 sub parseObjectMeta {

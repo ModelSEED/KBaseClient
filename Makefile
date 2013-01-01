@@ -7,7 +7,8 @@ BIN_PERL = $(addprefix $(BIN_DIR)/,$(basename $(notdir $(SRC_PERL))))
 
 clean:
 	rm $(THIS_DIR)/bin/*
-
+	rm $(THIS_DIR)/iris/*
+	
 gather:
 	rm $(THIS_DIR)/plbin/*
 	rm -rf $(THIS_DIR)/lib/Bio
@@ -32,4 +33,14 @@ all:
 		base=`basename $$src .pl`; \
 		echo install $(THIS_DIR) $$src $$base ; \
 		bash wrap_perl.sh $(THIS_DIR) $$src "bin/$$base" ; \
-	done 
+	done
+	for src in $(SRC_PERL) ; do \
+		basefile=`basename $$src`; \
+		base=`basename $$src .pl`; \
+		echo install $(THIS_DIR) $$src $$base ; \
+		bash wrap_perl_iris.sh $(THIS_DIR) $$src "iris/$$base" ; \
+	done
+	rm $(THIS_DIR)/iris/kbws-url
+	rm $(THIS_DIR)/iris/kbfba-url
+	rm $(THIS_DIR)/iris/kbws-login
+	rm $(THIS_DIR)/iris/kbws-logout

@@ -70,6 +70,7 @@ save_object_params is a reference to a hash where the following keys are defined
 	json has a value which is a bool
 	compressed has a value which is a bool
 	retrieveFromURL has a value which is a bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -109,6 +110,7 @@ save_object_params is a reference to a hash where the following keys are defined
 	json has a value which is a bool
 	compressed has a value which is a bool
 	retrieveFromURL has a value which is a bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -204,9 +206,11 @@ delete_object_params is a reference to a hash where the following keys are defin
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -234,9 +238,11 @@ delete_object_params is a reference to a hash where the following keys are defin
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -327,9 +333,11 @@ delete_object_permanently_params is a reference to a hash where the following ke
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -357,9 +365,11 @@ delete_object_permanently_params is a reference to a hash where the following ke
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -452,9 +462,11 @@ get_object_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is an ObjectData
 	metadata has a value which is an object_metadata
@@ -488,9 +500,11 @@ get_object_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is an ObjectData
 	metadata has a value which is an object_metadata
@@ -588,9 +602,11 @@ get_objectmeta_params is a reference to a hash where the following keys are defi
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -619,9 +635,11 @@ get_objectmeta_params is a reference to a hash where the following keys are defi
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -713,9 +731,11 @@ revert_object_params is a reference to a hash where the following keys are defin
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -744,9 +764,11 @@ revert_object_params is a reference to a hash where the following keys are defin
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -835,6 +857,7 @@ sub revert_object
 $params is a copy_object_params
 $metadata is an object_metadata
 copy_object_params is a reference to a hash where the following keys are defined:
+	new_workspace_url has a value which is a string
 	new_id has a value which is an object_id
 	new_workspace has a value which is a workspace_id
 	source_id has a value which is an object_id
@@ -842,9 +865,11 @@ copy_object_params is a reference to a hash where the following keys are defined
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -868,6 +893,7 @@ workspace_ref is a string
 $params is a copy_object_params
 $metadata is an object_metadata
 copy_object_params is a reference to a hash where the following keys are defined:
+	new_workspace_url has a value which is a string
 	new_id has a value which is an object_id
 	new_workspace has a value which is a workspace_id
 	source_id has a value which is an object_id
@@ -875,9 +901,11 @@ copy_object_params is a reference to a hash where the following keys are defined
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -965,15 +993,18 @@ sub copy_object
 $params is a move_object_params
 $metadata is an object_metadata
 move_object_params is a reference to a hash where the following keys are defined:
+	new_workspace_url has a value which is a string
 	new_id has a value which is an object_id
 	new_workspace has a value which is a workspace_id
 	source_id has a value which is an object_id
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -997,15 +1028,18 @@ workspace_ref is a string
 $params is a move_object_params
 $metadata is an object_metadata
 move_object_params is a reference to a hash where the following keys are defined:
+	new_workspace_url has a value which is a string
 	new_id has a value which is an object_id
 	new_workspace has a value which is a workspace_id
 	source_id has a value which is an object_id
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1197,9 +1231,11 @@ object_history_params is a reference to a hash where the following keys are defi
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1227,9 +1263,11 @@ object_history_params is a reference to a hash where the following keys are defi
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1318,8 +1356,10 @@ create_workspace_params is a reference to a hash where the following keys are de
 	workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -1342,8 +1382,10 @@ create_workspace_params is a reference to a hash where the following keys are de
 	workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -1427,7 +1469,9 @@ $metadata is a workspace_metadata
 get_workspacemeta_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -1450,7 +1494,9 @@ $metadata is a workspace_metadata
 get_workspacemeta_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -1627,7 +1673,9 @@ $metadata is a workspace_metadata
 delete_workspace_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -1650,7 +1698,9 @@ $metadata is a workspace_metadata
 delete_workspace_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -1734,11 +1784,14 @@ $params is a clone_workspace_params
 $metadata is a workspace_metadata
 clone_workspace_params is a reference to a hash where the following keys are defined:
 	new_workspace has a value which is a workspace_id
+	new_workspace_url has a value which is a string
 	current_workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -1759,11 +1812,14 @@ $params is a clone_workspace_params
 $metadata is a workspace_metadata
 clone_workspace_params is a reference to a hash where the following keys are defined:
 	new_workspace has a value which is a workspace_id
+	new_workspace_url has a value which is a string
 	current_workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -1846,6 +1902,8 @@ $params is a list_workspaces_params
 $workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
+	asHash has a value which is a bool
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -1868,6 +1926,8 @@ $params is a list_workspaces_params
 $workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
+	asHash has a value which is a bool
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -1955,6 +2015,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	type has a value which is a string
 	showDeletedObject has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 9 items:
@@ -1986,6 +2047,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	type has a value which is a string
 	showDeletedObject has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 9 items:
@@ -2078,8 +2140,10 @@ set_global_workspace_permissions_params is a reference to a hash where the follo
 	new_permission has a value which is a permission
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 permission is a string
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2102,8 +2166,10 @@ set_global_workspace_permissions_params is a reference to a hash where the follo
 	new_permission has a value which is a permission
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 permission is a string
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2265,6 +2331,190 @@ sub set_workspace_permissions
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method set_workspace_permissions",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'set_workspace_permissions',
+				       );
+    }
+}
+
+
+
+=head2 get_user_settings
+
+  $output = $obj->get_user_settings($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a get_user_settings_params
+$output is a user_settings
+get_user_settings_params is a reference to a hash where the following keys are defined:
+	auth has a value which is a string
+user_settings is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+workspace_id is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a get_user_settings_params
+$output is a user_settings
+get_user_settings_params is a reference to a hash where the following keys are defined:
+	auth has a value which is a string
+user_settings is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+workspace_id is a string
+
+
+=end text
+
+=item Description
+
+Retrieves settings for user account, including currently selected workspace
+
+=back
+
+=cut
+
+sub get_user_settings
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_user_settings (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_user_settings:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_user_settings');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.get_user_settings",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_user_settings',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_user_settings",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_user_settings',
+				       );
+    }
+}
+
+
+
+=head2 set_user_settings
+
+  $output = $obj->set_user_settings($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a set_user_settings_params
+$output is a user_settings
+set_user_settings_params is a reference to a hash where the following keys are defined:
+	setting has a value which is a string
+	value has a value which is a string
+	auth has a value which is a string
+user_settings is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+workspace_id is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a set_user_settings_params
+$output is a user_settings
+set_user_settings_params is a reference to a hash where the following keys are defined:
+	setting has a value which is a string
+	value has a value which is a string
+	auth has a value which is a string
+user_settings is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+workspace_id is a string
+
+
+=end text
+
+=item Description
+
+Retrieves settings for user account, including currently selected workspace
+
+=back
+
+=cut
+
+sub set_user_settings
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function set_user_settings (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to set_user_settings:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'set_user_settings');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.set_user_settings",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'set_user_settings',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method set_user_settings",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'set_user_settings',
 				       );
     }
 }
@@ -3249,6 +3499,43 @@ a reference to a list containing 6 items:
 
 
 
+=head2 user_settings
+
+=over 4
+
+
+
+=item Description
+
+Settings for user accounts stored in the workspace
+
+        workspace_id workspace - the workspace currently selected by the user
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+
+
+=end text
+
+=back
+
+
+
 =head2 save_object_params
 
 =over 4
@@ -3269,6 +3556,7 @@ Input parameters for the "save_objects function.
         bool retrieveFromURL - a flag indicating that the "data" argument contains a URL from which the actual data should be downloaded (an optional argument with default "0")
         bool json - a flag indicating if the input data is encoded as a JSON string (an optional argument with default "0")
         bool compressed - a flag indicating if the input data in zipped (an optional argument with default "0")
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3287,6 +3575,7 @@ auth has a value which is a string
 json has a value which is a bool
 compressed has a value which is a bool
 retrieveFromURL has a value which is a bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -3305,6 +3594,7 @@ auth has a value which is a string
 json has a value which is a bool
 compressed has a value which is a bool
 retrieveFromURL has a value which is a bool
+asHash has a value which is a bool
 
 
 =end text
@@ -3327,6 +3617,7 @@ Input parameters for the "delete_object" function.
         workspace_id workspace - ID of the workspace where the object is to be deleted (an essential argument)
         object_id id - ID of the object to be deleted (an essential argument)
         string auth - the authentication token of the KBase account to associate this deletion command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3339,6 +3630,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3351,6 +3643,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -3373,6 +3666,7 @@ Input parameters for the "delete_object_permanently" function.
         workspace_id workspace - ID of the workspace where the object is to be permanently deleted (an essential argument)
         object_id id - ID of the object to be permanently deleted (an essential argument)
         string auth - the authentication token of the KBase account to associate with this permanent deletion command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3385,6 +3679,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3397,6 +3692,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -3420,6 +3716,7 @@ Input parameters for the "get_object" function.
         object_id id - ID of the object to be retrieved (an essential argument)
         int instance - Version of the object to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current version is retrieved if no version is provides)
         string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3433,6 +3730,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3446,6 +3744,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -3509,6 +3808,7 @@ Input parameters for the "get_objectmeta" function.
         object_id id - ID of the object for which metadata is to be retrieved (an essential argument)
         int instance - Version of the object for which metadata is to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current metadata is retrieved if no version is provides)
         string auth - the authentication token of the KBase account to associate with this object metadata retrieval command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3522,6 +3822,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3535,6 +3836,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -3558,6 +3860,7 @@ Input parameters for the "revert_object" function.
         object_id id - ID of the object to be reverted (an essential argument)
         int instance - Previous version of the object to which the object should be reset (an essential argument)
         string auth - the authentication token of the KBase account to associate with this object reversion command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3571,6 +3874,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3584,6 +3888,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -3608,7 +3913,9 @@ Input parameters for the "copy_object" function.
         int instance - Version of the object to be copied, enabling retrieval of any previous version of an object (an optional argument; the current object is copied if no version is provides)
         workspace_id new_workspace - ID of the workspace the object to be copied to (an essential argument)
         object_id new_id - ID the object is to be copied to (an essential argument)
+        string new_workspace_url - URL of workspace server where object should be copied (an optional argument - object will be saved in the same server if not provided)
         string auth - the authentication token of the KBase account to associate with this object copy command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3617,6 +3924,7 @@ Input parameters for the "copy_object" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
+new_workspace_url has a value which is a string
 new_id has a value which is an object_id
 new_workspace has a value which is a workspace_id
 source_id has a value which is an object_id
@@ -3624,6 +3932,7 @@ instance has a value which is an int
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3632,6 +3941,7 @@ auth has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
+new_workspace_url has a value which is a string
 new_id has a value which is an object_id
 new_workspace has a value which is a workspace_id
 source_id has a value which is an object_id
@@ -3639,6 +3949,7 @@ instance has a value which is an int
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -3662,7 +3973,9 @@ Input parameters for the "move_object" function.
         object_id source_id - ID of the object to be moved (an essential argument)
          workspace_id new_workspace - ID of the workspace the object to be moved to (an essential argument)
         object_id new_id - ID the object is to be moved to (an essential argument)
+        string new_workspace_url - URL of workspace server where object should be copied (an optional argument - object will be saved in the same server if not provided)
         string auth - the authentication token of the KBase account to associate with this object move command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3671,12 +3984,14 @@ Input parameters for the "move_object" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
+new_workspace_url has a value which is a string
 new_id has a value which is an object_id
 new_workspace has a value which is a workspace_id
 source_id has a value which is an object_id
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3685,12 +4000,14 @@ auth has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
+new_workspace_url has a value which is a string
 new_id has a value which is an object_id
 new_workspace has a value which is a workspace_id
 source_id has a value which is an object_id
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -3762,6 +4079,7 @@ Input parameters for the "object_history" function.
         workspace_id workspace - ID of the workspace containing the object to have history printed (an essential argument)
         object_id id - ID of the object to have history printed (an essential argument)
         string auth - the authentication token of the KBase account to associate with this object history command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3774,6 +4092,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3786,6 +4105,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -3807,6 +4127,7 @@ Input parameters for the "create_workspace" function.
         workspace_id workspace - ID of the workspace to be created (an essential argument)
         permission default_permission - Default permissions of the workspace to be created. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
         string auth - the authentication token of the KBase account that will own the created workspace (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3818,6 +4139,7 @@ a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 default_permission has a value which is a permission
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3829,6 +4151,7 @@ a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 default_permission has a value which is a permission
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -3849,6 +4172,7 @@ Input parameters for the "get_workspacemeta" function.
 
         workspace_id workspace - ID of the workspace for which metadata should be returned (an essential argument)
         string auth - the authentication token of the KBase account accessing workspace metadata (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3859,6 +4183,7 @@ Input parameters for the "get_workspacemeta" function.
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3869,6 +4194,7 @@ auth has a value which is a string
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -3929,6 +4255,7 @@ Input parameters for the "delete_workspace" function.
 
         workspace_id workspace - ID of the workspace to be deleted (an essential argument)
         string auth - the authentication token of the KBase account deleting the workspace; must be the workspace owner (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3939,6 +4266,7 @@ Input parameters for the "delete_workspace" function.
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3949,6 +4277,7 @@ auth has a value which is a string
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -3969,8 +4298,10 @@ Input parameters for the "clone_workspace" function.
 
         workspace_id current_workspace - ID of the workspace to be cloned (an essential argument)
         workspace_id new_workspace - ID of the workspace to which the cloned workspace will be copied (an essential argument)
+        string new_workspace_url - URL of workspace server where workspace should be cloned (an optional argument - workspace will be cloned in the same server if not provided)
         permission default_permission - Default permissions of the workspace created by the cloning process. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
         string auth - the authentication token of the KBase account that will own the cloned workspace (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -3980,9 +4311,11 @@ Input parameters for the "clone_workspace" function.
 <pre>
 a reference to a hash where the following keys are defined:
 new_workspace has a value which is a workspace_id
+new_workspace_url has a value which is a string
 current_workspace has a value which is a workspace_id
 default_permission has a value which is a permission
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -3992,9 +4325,11 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 new_workspace has a value which is a workspace_id
+new_workspace_url has a value which is a string
 current_workspace has a value which is a workspace_id
 default_permission has a value which is a permission
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4014,6 +4349,7 @@ auth has a value which is a string
 Input parameters for the "list_workspaces" function.
 
         string auth - the authentication token of the KBase account accessing the list of workspaces (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4023,6 +4359,7 @@ Input parameters for the "list_workspaces" function.
 <pre>
 a reference to a hash where the following keys are defined:
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4032,6 +4369,7 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4054,6 +4392,7 @@ Input parameters for the "list_workspace_objects" function.
         string type - type of the objects to be listed (an optional argument; all object types will be listed if left unspecified)
         bool showDeletedObject - a flag that, if set to '1', causes any deleted objects to be included in the output (an optional argument; default is '0')
         string auth - the authentication token of the KBase account listing workspace objects; must have at least 'read' privelages (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4066,6 +4405,7 @@ workspace has a value which is a workspace_id
 type has a value which is a string
 showDeletedObject has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4078,6 +4418,7 @@ workspace has a value which is a workspace_id
 type has a value which is a string
 showDeletedObject has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4099,6 +4440,7 @@ Input parameters for the "set_global_workspace_permissions" function.
         workspace_id workspace - ID of the workspace for which permissions will be set (an essential argument)
         permission new_permission - New default permissions to which the workspace should be set. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
         string auth - the authentication token of the KBase account changing workspace default permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4110,6 +4452,7 @@ a reference to a hash where the following keys are defined:
 new_permission has a value which is a permission
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4121,6 +4464,7 @@ a reference to a hash where the following keys are defined:
 new_permission has a value which is a permission
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4166,6 +4510,86 @@ a reference to a hash where the following keys are defined:
 users has a value which is a reference to a list where each element is a username
 new_permission has a value which is a permission
 workspace has a value which is a workspace_id
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 get_user_settings_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "get_user_settings" function.
+
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 set_user_settings_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "set_user_settings" function.
+
+        string setting - the setting to be set (an essential argument)
+        string value - new value to be set (an essential argument)
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+setting has a value which is a string
+value has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+setting has a value which is a string
+value has a value which is a string
 auth has a value which is a string
 
 

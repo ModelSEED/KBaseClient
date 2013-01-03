@@ -7,7 +7,7 @@ use Text::Table;
 use Bio::KBase::fbaModelServices::Client;
 use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
 use parent qw(Exporter);
-our @EXPORT_OK = qw( fbaURL get_fba_client printJobData runFBACommand universalFBAScriptCode );
+our @EXPORT_OK = qw( fbaURL get_fba_client printJobData runFBACommand universalFBAScriptCode fbaTranslation );
 our $defaultURL = "http://kbase.us/services/fbaServices/";
 my $CurrentURL;
 

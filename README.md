@@ -6,7 +6,9 @@ INSTALLATION
 
 To install this application, run the following commands:
 
-1.) Install perlbrew (perlbrew… is awesome!)
+Steps 1-2 are optional. Skip to step 3. If you have trouble install Carton in your native perl, then return to step 1 and install perlbrew.
+
+1.) Install perlbrew 
 
 curl -kL http://install.perlbrew.pl | bash
 

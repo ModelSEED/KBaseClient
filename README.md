@@ -6,7 +6,7 @@ INSTALLATION
 
 To install this application, run the following commands:
 
-Steps 1-2 are optional. Skip to step 3. If you have trouble install Carton in your native perl, then return to step 1 and install perlbrew.
+Steps 1-2 are optional. Skip to step 3. If you have trouble installing Carton in your native perl, then return to step 1 and install perlbrew.
 
 1.) Install perlbrew 
 

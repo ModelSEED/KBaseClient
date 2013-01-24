@@ -12,14 +12,6 @@ src=$2
 dst=$3
 
 cat > $dst <<EOF
-pushd . > /dev/null
-SCRIPT_DIR="\${BASH_SOURCE[0]}";
-if ([ -h "\${SCRIPT_DIR}" ]) then
-while([ -h "\${SCRIPT_DIR}" ]) do cd \`dirname "\$SCRIPT_DIR"\`; SCRIPT_PATH=\`readlink "\${SCRIPT_DIR}"\`; done
-fi
-cd \`dirname \${SCRIPT_DIR}\` > /dev/null
-SCRIPT_DIR=\`pwd\`;
-popd  > /dev/null
 source /home/chenry/perl5/perlbrew/etc/bashrc
 source /home/chenry/kbase/KBaseClient/user-env.sh
 if [ ! -z "\$KB_AUTH_TOKEN" ]; then
@@ -30,7 +22,7 @@ fi
 export KB_NO_FILE_ENVIRONMENT="1"
 export KB_WORKSPACEURL="http://bio-data-1.mcs.anl.gov/services/fba_gapfill"
 export KB_FBAURL="http://bio-data-1.mcs.anl.gov/services/fba"
-perl \$SCRIPT_DIR/../$src "\$@"
+perl /home/chenry/kbase/KBaseClient/$src "\$@"
 EOF
 
 chmod +x $dst

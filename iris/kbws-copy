@@ -1,11 +1,11 @@
 source /home/chenry/perl5/perlbrew/etc/bashrc
 source /home/chenry/kbase/KBaseClient/user-env.sh
-if [ ! -z "$KB_AUTH_TOKEN" ]; then
-if [ -z "$KB_IRIS_FOLDER" ]; then
+if [ ! $KB_AUTH_TOKEN ]; then
+if [ $KB_IRIS_FOLDER ]; then
 export KB_AUTH_TOKEN=IRIS-$KB_IRIS_FOLDER
 fi
 fi
-export KB_NO_FILE_ENVIRONMENT="1"
-export KB_WORKSPACEURL="http://bio-data-1.mcs.anl.gov/services/fba_gapfill"
-export KB_FBAURL="http://bio-data-1.mcs.anl.gov/services/fba"
+export KB_NO_FILE_ENVIRONMENT=1
+export KB_WORKSPACEURL=http://bio-data-1.mcs.anl.gov/services/fba_gapfill
+export KB_FBAURL=http://bio-data-1.mcs.anl.gov/services/fba
 perl /home/chenry/kbase/KBaseClient/plbin/kbws-copy.pl "$@"

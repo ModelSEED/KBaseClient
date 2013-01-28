@@ -11,6 +11,10 @@ my $CurrentWorkspace;
 my $CurrentURL;
 
 sub get_ws_client {
+	if (workspaceURL() eq "impl") {
+		require "Bio/KBase/workspaceService/Impl.pm";
+		return Bio::KBase::workspaceService::Impl->new();
+	}
     return Bio::KBase::workspaceService::Client->new(workspaceURL());
 }
 
@@ -27,7 +31,7 @@ sub auth {
         }
     } else {
     	my $filename = "$ENV{HOME}/.kbase_auth";
-    	if (defined($ENV{KB_NO_FILE_ENVIRONMENT}) && defined($ENV{KB_AUTH_TOKEN})) {
+    	if (defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
         	$token = $ENV{KB_AUTH_TOKEN};
         } elsif ( -e $filename ) {
         	open(my $fh, "<", $filename) || return;
@@ -50,7 +54,7 @@ sub workspace {
 	    		open(my $fh, ">", $filename) || return;
 		        print $fh $CurrentWorkspace;
 		        close($fh);
-    		} elsif ($ENV{KB_WORKSPACE}) {
+    		} else {
     			$ENV{KB_WORKSPACE} = $CurrentWorkspace;
     		}
     	} else {

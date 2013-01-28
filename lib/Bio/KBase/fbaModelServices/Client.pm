@@ -400,6 +400,8 @@ bool is an int
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -419,6 +421,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 term is a reference to a list containing 3 items:
 	0: a float
 	1: a string
@@ -501,6 +504,8 @@ bool is an int
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -520,6 +525,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 term is a reference to a list containing 3 items:
 	0: a float
 	1: a string
@@ -681,6 +687,8 @@ GapfillingFormulation is a reference to a hash where the following keys are defi
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -700,6 +708,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 term is a reference to a list containing 3 items:
 	0: a float
 	1: a string
@@ -788,6 +797,8 @@ GapfillingFormulation is a reference to a hash where the following keys are defi
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -807,6 +818,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 term is a reference to a list containing 3 items:
 	0: a float
 	1: a string
@@ -944,6 +956,8 @@ GapgenFormulation is a reference to a hash where the following keys are defined:
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -963,6 +977,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 term is a reference to a list containing 3 items:
 	0: a float
 	1: a string
@@ -1036,6 +1051,8 @@ GapgenFormulation is a reference to a hash where the following keys are defined:
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -1055,6 +1072,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 term is a reference to a list containing 3 items:
 	0: a float
 	1: a string
@@ -2493,6 +2511,294 @@ sub genome_to_fbamodel
 
 
 
+=head2 import_fbamodel
+
+  $modelMeta = $obj->import_fbamodel($input)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$input is an import_fbamodel_params
+$modelMeta is an object_metadata
+import_fbamodel_params is a reference to a hash where the following keys are defined:
+	genome has a value which is a genome_id
+	genome_workspace has a value which is a workspace_id
+	biomassEquation has a value which is a string
+	reactions has a value which is a reference to a list where each element is a reference to a list containing 4 items:
+	0: a string
+	1: a string
+	2: a string
+	3: a string
+
+	model has a value which is a fbamodel_id
+	workspace has a value which is a workspace_id
+	auth has a value which is a string
+	overwrite has a value which is a bool
+genome_id is a string
+workspace_id is a string
+fbamodel_id is a string
+bool is an int
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$input is an import_fbamodel_params
+$modelMeta is an object_metadata
+import_fbamodel_params is a reference to a hash where the following keys are defined:
+	genome has a value which is a genome_id
+	genome_workspace has a value which is a workspace_id
+	biomassEquation has a value which is a string
+	reactions has a value which is a reference to a list where each element is a reference to a list containing 4 items:
+	0: a string
+	1: a string
+	2: a string
+	3: a string
+
+	model has a value which is a fbamodel_id
+	workspace has a value which is a workspace_id
+	auth has a value which is a string
+	overwrite has a value which is a bool
+genome_id is a string
+workspace_id is a string
+fbamodel_id is a string
+bool is an int
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+
+=end text
+
+=item Description
+
+Import a model from an input table of model and gene IDs
+
+=back
+
+=cut
+
+sub import_fbamodel
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function import_fbamodel (received $n, expecting 1)");
+    }
+    {
+	my($input) = @args;
+
+	my @_bad_arguments;
+        (ref($input) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"input\" (value was \"$input\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to import_fbamodel:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'import_fbamodel');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "fbaModelServices.import_fbamodel",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'import_fbamodel',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method import_fbamodel",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'import_fbamodel',
+				       );
+    }
+}
+
+
+
+=head2 genome_to_probfbamodel
+
+  $modelMeta = $obj->genome_to_probfbamodel($input)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$input is a genome_to_probfbamodel_params
+$modelMeta is an object_metadata
+genome_to_probfbamodel_params is a reference to a hash where the following keys are defined:
+	genome has a value which is a genome_id
+	genome_workspace has a value which is a workspace_id
+	probanno has a value which is a probanno_id
+	probanno_workspace has a value which is a workspace_id
+	model has a value which is a fbamodel_id
+	workspace has a value which is a workspace_id
+	auth has a value which is a string
+genome_id is a string
+workspace_id is a string
+probanno_id is a string
+fbamodel_id is a string
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$input is a genome_to_probfbamodel_params
+$modelMeta is an object_metadata
+genome_to_probfbamodel_params is a reference to a hash where the following keys are defined:
+	genome has a value which is a genome_id
+	genome_workspace has a value which is a workspace_id
+	probanno has a value which is a probanno_id
+	probanno_workspace has a value which is a workspace_id
+	model has a value which is a fbamodel_id
+	workspace has a value which is a workspace_id
+	auth has a value which is a string
+genome_id is a string
+workspace_id is a string
+probanno_id is a string
+fbamodel_id is a string
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+
+=end text
+
+=item Description
+
+Build a probabilistic genome-scale metabolic model based on annotations in an input genome and probabilistic annotation
+
+=back
+
+=cut
+
+sub genome_to_probfbamodel
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function genome_to_probfbamodel (received $n, expecting 1)");
+    }
+    {
+	my($input) = @args;
+
+	my @_bad_arguments;
+        (ref($input) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"input\" (value was \"$input\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to genome_to_probfbamodel:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'genome_to_probfbamodel');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "fbaModelServices.genome_to_probfbamodel",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'genome_to_probfbamodel',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method genome_to_probfbamodel",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'genome_to_probfbamodel',
+				       );
+    }
+}
+
+
+
 =head2 export_fbamodel
 
   $output = $obj->export_fbamodel($input)
@@ -3155,6 +3461,8 @@ workspace_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -3174,6 +3482,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -3237,6 +3546,8 @@ workspace_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -3256,6 +3567,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -3629,6 +3941,8 @@ phenotypeSet_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -3648,6 +3962,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -3709,6 +4024,8 @@ phenotypeSet_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -3728,6 +4045,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -4090,6 +4408,8 @@ workspace_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -4109,6 +4429,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -4173,6 +4494,8 @@ workspace_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -4192,6 +4515,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -4338,6 +4662,8 @@ GapfillingFormulation is a reference to a hash where the following keys are defi
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -4357,6 +4683,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -4444,6 +4771,8 @@ GapfillingFormulation is a reference to a hash where the following keys are defi
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -4463,6 +4792,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -4599,6 +4929,8 @@ GapgenFormulation is a reference to a hash where the following keys are defined:
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -4618,6 +4950,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -4690,6 +5023,8 @@ GapgenFormulation is a reference to a hash where the following keys are defined:
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -4709,6 +5044,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -4838,6 +5174,8 @@ workspace_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -4857,6 +5195,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -4958,6 +5297,8 @@ workspace_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -4977,6 +5318,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -5140,6 +5482,8 @@ workspace_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -5159,6 +5503,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -5260,6 +5605,8 @@ workspace_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -5279,6 +5626,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -5440,6 +5788,8 @@ workspace_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -5459,6 +5809,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -5558,6 +5909,8 @@ workspace_id is a string
 FBAFormulation is a reference to a hash where the following keys are defined:
 	media has a value which is a media_id
 	additionalcpds has a value which is a reference to a list where each element is a compound_id
+	prommodel has a value which is a prommodel_id
+	prommodel_workspace has a value which is a workspace_id
 	media_workspace has a value which is a workspace_id
 	objfraction has a value which is a float
 	allreversible has a value which is a bool
@@ -5577,6 +5930,7 @@ FBAFormulation is a reference to a hash where the following keys are defined:
 	minthermoerror has a value which is a bool
 media_id is a string
 compound_id is a string
+prommodel_id is a string
 bool is an int
 term is a reference to a list containing 3 items:
 	0: a float
@@ -6407,6 +6761,37 @@ a string
 =item Description
 
 A string identifier for a genome in KBase. e.g. "kb|g.0" is the ID for E. coli
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 prommodel_id
+
+=over 4
+
+
+
+=item Description
+
+A string identifier for a prommodel in KBase.
 
 
 =item Definition
@@ -8850,6 +9235,8 @@ Data structures for gapfilling solution
 
 media_id media - ID of media formulation to be used
 list<compound_id> additionalcpds - list of additional compounds to allow update
+prommodel_id prommodel - ID of prommodel
+workspace_id prommodel_workspace - workspace containing prommodel
 workspace_id media_workspace - workspace containing media for FBA study
 float objfraction - fraction of objective to use for constraints
 bool allreversible - flag indicating if all reactions should be reversible
@@ -8877,6 +9264,8 @@ bool minthermoerror - flag indicating if error should be minimized in thermodyna
 a reference to a hash where the following keys are defined:
 media has a value which is a media_id
 additionalcpds has a value which is a reference to a list where each element is a compound_id
+prommodel has a value which is a prommodel_id
+prommodel_workspace has a value which is a workspace_id
 media_workspace has a value which is a workspace_id
 objfraction has a value which is a float
 allreversible has a value which is a bool
@@ -8904,6 +9293,8 @@ minthermoerror has a value which is a bool
 a reference to a hash where the following keys are defined:
 media has a value which is a media_id
 additionalcpds has a value which is a reference to a list where each element is a compound_id
+prommodel has a value which is a prommodel_id
+prommodel_workspace has a value which is a workspace_id
 media_workspace has a value which is a workspace_id
 objfraction has a value which is a float
 allreversible has a value which is a bool
@@ -10765,6 +11156,128 @@ coremodel has a value which is a bool
 workspace has a value which is a workspace_id
 auth has a value which is a string
 overwrite has a value which is a bool
+
+
+=end text
+
+=back
+
+
+
+=head2 import_fbamodel_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "genome_to_fbamodel" function.
+
+        genome_id genome - ID of the genome for which a model is to be built (a required argument)
+        workspace_id genome_workspace - ID of the workspace containing the target genome (an optional argument; default is the workspace argument)
+        string biomassEquation - biomass equation for model (an essential argument)
+        list<tuple<string id,string direction,string compartment,string gpr> reactions - list of reactions to appear in imported model (an essential argument)
+        fbamodel_id model - ID that should be used for the newly imported model (an optional argument; default is 'undef')
+        workspace_id workspace - ID of the workspace where the newly developed model will be stored; also the default assumed workspace for input objects (a required argument)
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+genome has a value which is a genome_id
+genome_workspace has a value which is a workspace_id
+biomassEquation has a value which is a string
+reactions has a value which is a reference to a list where each element is a reference to a list containing 4 items:
+0: a string
+1: a string
+2: a string
+3: a string
+
+model has a value which is a fbamodel_id
+workspace has a value which is a workspace_id
+auth has a value which is a string
+overwrite has a value which is a bool
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+genome has a value which is a genome_id
+genome_workspace has a value which is a workspace_id
+biomassEquation has a value which is a string
+reactions has a value which is a reference to a list where each element is a reference to a list containing 4 items:
+0: a string
+1: a string
+2: a string
+3: a string
+
+model has a value which is a fbamodel_id
+workspace has a value which is a workspace_id
+auth has a value which is a string
+overwrite has a value which is a bool
+
+
+=end text
+
+=back
+
+
+
+=head2 genome_to_probfbamodel_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "genome_to_fbamodel" function.
+
+        genome_id genome - ID of the genome for which a model is to be built (a required argument)
+        workspace_id genome_workspace - ID of the workspace containing the target genome (an optional argument; default is the workspace argument)
+        probanno_id probanno - ID of the probabilistic annotation to be used in building the model (an optional argument; default is 'undef')
+        workspace_id probanno_workspace - ID of the workspace containing the probabilistic annotation (an optional argument; default is the workspace argument)
+        fbamodel_id model - ID that should be used for the newly constructed model (an optional argument; default is 'undef')
+        workspace_id workspace - ID of the workspace where the newly developed model will be stored; also the default assumed workspace for input objects (a required argument)
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+genome has a value which is a genome_id
+genome_workspace has a value which is a workspace_id
+probanno has a value which is a probanno_id
+probanno_workspace has a value which is a workspace_id
+model has a value which is a fbamodel_id
+workspace has a value which is a workspace_id
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+genome has a value which is a genome_id
+genome_workspace has a value which is a workspace_id
+probanno has a value which is a probanno_id
+probanno_workspace has a value which is a workspace_id
+model has a value which is a fbamodel_id
+workspace has a value which is a workspace_id
+auth has a value which is a string
 
 
 =end text

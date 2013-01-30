@@ -141,6 +141,8 @@ sub parseObjectMeta {
     	owner => $object->[6],
     	workspace => $object->[7],
     	reference => $object->[8],
+    	chsum => $object->[9],
+    	metadata => $object->[10]
     };
     return $hash;
 }
@@ -157,6 +159,12 @@ sub printObjectMeta {
     print "Last cmd: ".$obj->{command}."\n";
     print "Modified by: ".$obj->{lastmodifier}."\n";
     print "Perm ref: ".$obj->{reference}."\n";
+    print "Checksum: ".$obj->{chsum}."\n";
+    if (defined($obj->{metadata})) {
+    	foreach my $key (keys(%{$obj->{metadata}})) {
+    		print $key.": ".$obj->{metadata}->{$key}."\n";
+    	}
+    }
 }
 
 sub parseWorkspaceMeta {

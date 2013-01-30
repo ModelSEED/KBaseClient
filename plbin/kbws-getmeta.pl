@@ -62,5 +62,7 @@ if ($opt->{showerror} == 0){
 if (!defined($output)) {
 	print "Object metadata could not be retrieved!\n";
 } else {
-	print "Object metadata retrieved:\n".printObjectMeta($output)."\n";
+	print "Object metadata retrieved:\n";
+	printObjectMeta($output);
+	print "\n";
 }

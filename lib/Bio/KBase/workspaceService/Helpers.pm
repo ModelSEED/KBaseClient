@@ -21,7 +21,7 @@ sub get_ws_client {
 sub auth {
     my $token = shift;
     if ( defined $token ) {
-        if (defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
+        if (defined($ENV{KB_RUNNING_IN_IRIS})) {
         	$ENV{KB_AUTH_TOKEN} = $token;
         } else {
         	my $filename = "$ENV{HOME}/.kbase_auth";
@@ -31,7 +31,7 @@ sub auth {
         }
     } else {
     	my $filename = "$ENV{HOME}/.kbase_auth";
-    	if (defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
+    	if (defined($ENV{KB_RUNNING_IN_IRIS})) {
         	$token = $ENV{KB_AUTH_TOKEN};
         } elsif ( -e $filename ) {
         	open(my $fh, "<", $filename) || return;
@@ -49,7 +49,7 @@ sub workspace {
     	$CurrentWorkspace = $set;
     	my $auth = auth();
     	if (!defined($auth)) {
-    		if (!defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
+    		if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
 	    		my $filename = "$ENV{HOME}/.kbase_workspace";
 	    		open(my $fh, ">", $filename) || return;
 		        print $fh $CurrentWorkspace;
@@ -68,7 +68,7 @@ sub workspace {
     } elsif (!defined($CurrentWorkspace)) {
     	my $auth = auth();
     	if (!defined($auth)) {
-    		if (!defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
+    		if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
 	    		my $filename = "$ENV{HOME}/.kbase_workspace";
 	    		if( -e $filename ) {
 		    		open(my $fh, "<", $filename) || return;
@@ -101,7 +101,7 @@ sub workspaceURL {
         	$set = $defaultURL;
         }
     	$CurrentURL = $set;
-    	if (!defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
+    	if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
 	    	my $filename = "$ENV{HOME}/.kbase_workspaceURL";
 	    	open(my $fh, ">", $filename) || return;
 		    print $fh $CurrentURL;
@@ -110,7 +110,7 @@ sub workspaceURL {
     		$ENV{KB_WORKSPACEURL} = $CurrentURL;
     	}
     } elsif (!defined($CurrentURL)) {
-    	if (!defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
+    	if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
 	    	my $filename = "$ENV{HOME}/.kbase_workspaceURL";
 	    	if( -e $filename ) {
 		   		open(my $fh, "<", $filename) || return;
@@ -123,8 +123,9 @@ sub workspaceURL {
     	} elsif (defined($ENV{KB_WORKSPACEURL})) {
 	    	$CurrentURL = $ENV{KB_WORKSPACEURL};
 	    } else {
-			$CurrentURL = $defaultURL;
-    	} 
+			$CurrentURL = "http://bio-data-1.mcs.anl.gov/services/fba_gapfill";
+    		#$CurrentURL = $defaultURL;
+    	}
     }
     return $CurrentURL;
 }

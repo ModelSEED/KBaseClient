@@ -66,7 +66,7 @@ if (!defined($output)) {
     my $tbl = [];
     for (my $i=0; $i < @{$output};$i++) {
         my $r = $output->[$i];
-        push(@{$tbl},[$r->[0],$r->[1],$r->[7],$r->[3],$r->[6],$r->[5],$r->[4],$r->[5]]);
+        push(@{$tbl},[$r->[0],$r->[1],$r->[2],$r->[3],$r->[6],$r->[5],$r->[4],$r->[5]]);
     }
 	my $table = Text::Table->new(
     'ID', 'Type', 'WS','Vers','Owner','Last modby','Cmd','Moddate'

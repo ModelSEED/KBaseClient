@@ -3035,6 +3035,7 @@ $success is a bool
 queue_job_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
 	auth has a value which is a string
+	state has a value which is a string
 bool is an int
 
 </pre>
@@ -3048,6 +3049,7 @@ $success is a bool
 queue_job_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
 	auth has a value which is a string
+	state has a value which is a string
 bool is an int
 
 
@@ -3125,6 +3127,7 @@ set_job_status_params is a reference to a hash where the following keys are defi
 	jobid has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
+	currentStatus has a value which is a string
 bool is an int
 
 </pre>
@@ -3139,6 +3142,7 @@ set_job_status_params is a reference to a hash where the following keys are defi
 	jobid has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
+	currentStatus has a value which is a string
 bool is an int
 
 
@@ -5271,6 +5275,7 @@ Input parameters for the "queue_job" function.
 
         string jobid - ID of the job to be queued (an essential argument)
         string auth - the authentication token of the KBase account queuing the job; must have access to the job being queued (an optional argument; user is "public" if auth is not provided)
+        string state - the initial state to assign to the job being queued (an optional argument; default is "queued")
 
 
 =item Definition
@@ -5281,6 +5286,7 @@ Input parameters for the "queue_job" function.
 a reference to a hash where the following keys are defined:
 jobid has a value which is a string
 auth has a value which is a string
+state has a value which is a string
 
 </pre>
 
@@ -5291,6 +5297,7 @@ auth has a value which is a string
 a reference to a hash where the following keys are defined:
 jobid has a value which is a string
 auth has a value which is a string
+state has a value which is a string
 
 
 =end text
@@ -5312,6 +5319,7 @@ Input parameters for the "set_job_status" function.
         string jobid - ID of the job to be have status changed (an essential argument)
         string status - Status to which job should be changed; accepted values are 'queued', 'running', and 'done' (an essential argument)
         string auth - the authentication token of the KBase account requesting job status; only status for owned jobs can be retrieved (an optional argument; user is "public" if auth is not provided)
+        string currentStatus - Indicates the current statues of the selected job (an optional argument; default is "undef")
 
 
 =item Definition
@@ -5323,6 +5331,7 @@ a reference to a hash where the following keys are defined:
 jobid has a value which is a string
 status has a value which is a string
 auth has a value which is a string
+currentStatus has a value which is a string
 
 </pre>
 
@@ -5334,6 +5343,7 @@ a reference to a hash where the following keys are defined:
 jobid has a value which is a string
 status has a value which is a string
 auth has a value which is a string
+currentStatus has a value which is a string
 
 
 =end text

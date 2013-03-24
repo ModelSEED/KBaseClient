@@ -21,7 +21,8 @@ my $translation = {
 my ($opt, $usage) = describe_options(
     'kbws-jobs %o',
     [ 'status|s:s', 'Job status (queued,running,done)' ],
-    [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
+    [ 'showqsub|q', 'Use flag to show qsub ID for jobs',{"default"=>0}],
+    [ 'showerror|e', 'Use flag to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
 );
 if (defined($opt->{help})) {
@@ -66,19 +67,30 @@ if (!defined($output)) {
 	my $tbl = [];
     for (my $i=0; $i < @{$output};$i++) {
         my $j = $output->[$i];
-        push(@{$tbl},[
+        my $row = [
             $j->{id},
             $j->{ws},
             $j->{owner},
             $j->{status},
             $j->{queuetime},
             $j->{starttime},
-            $j->{completetime},
-        ]);
+            $j->{completetime}
+        ];
+        if ($opt->{showqsub} == 1) {
+        	push(@{$row},$j->{jobdata}->{qsubid});
+        }
+        push(@{$tbl},$row);
     }
-	my $table = Text::Table->new(
-    'ID', 'WS', 'Owner','Status','Queue time','Start time','Complete time'
-    );
+    my $table;
+    if ($opt->{showqsub} == 1) {
+    	$table = Text::Table->new(
+    		'ID', 'WS', 'Owner','Status','Queue time','Start time','Complete time','Qsub ID'
+    	);
+    } else {
+    	$table = Text::Table->new(
+	    	'ID', 'WS', 'Owner','Status','Queue time','Start time','Complete time'
+	    );
+    }
     $table->load(@$tbl);
     print $table;
 }

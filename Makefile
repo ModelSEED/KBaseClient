@@ -10,7 +10,7 @@ clean:
 	rm $(THIS_DIR)/iris/*
 	
 gather:
-	rm $(THIS_DIR)/plbin/*
+	rm $(THIS_DIR)/plbin/kb*
 	rm -rf $(THIS_DIR)/lib/Bio
 	cp $(THIS_DIR)/../KBaseFBAModeling/scripts/kbfba-* $(THIS_DIR)/plbin/
 	cp $(THIS_DIR)/../workspace_service/scripts/kbws-* $(THIS_DIR)/plbin/

@@ -57,13 +57,13 @@ if (!defined($output)) {
     if ($opt->{showerror} == 0){
 	    eval {
 	        $jobdata = $serv->get_object_by_ref({
-	        	workspace_ref => $output->[0]->{id},
+	        	reference => $output->[0]->{id},
 	        	auth => auth()
 	        });
 	    };
 	}else{
 	    $jobdata = $serv->get_object_by_ref({
-        	workspace_ref => $output->[0]->{id},
+        	reference => $output->[0]->{id},
         	auth => auth()
         });
 	}
@@ -72,12 +72,14 @@ if (!defined($output)) {
 	}
     print "Job ID:".$output->[0]->{id}."\n";   
     if (defined($fbajob)) {
-    	print "Model:".$fbajob->{postprocess_args}->{model_workspace}."/".$fbajob->{postprocess_args}->{model}."\n";
+    	print "Model:".$fbajob->{postprocess_args}->[0]->{model_workspace}."/".$fbajob->{postprocess_args}->[0]->{model}."\n";
     	print "Command:".$fbajob->{queuing_command}."\n";
-    	if (defined($fbajob->{clusterjobs}->[0]->{mediawss}->[0])) {
-       		print "Media:".$fbajob->{clusterjobs}->[0]->{mediawss}->[0]."/".$fbajob->{clusterjobs}->[0]->{mediaids}->[0]."\n";
-    	} else {
-    		print "Media:Complete";
+    	if (defined($fbajob->{postprocess_args}->[0]->{formulation})) {
+    		if (defined($fbajob->{postprocess_args}->[0]->{formulation}->{formulation}->{media})) {
+    			print "Media:".$fbajob->{postprocess_args}->[0]->{formulation}->{formulation}->{media}."\n";
+    		} elsif (defined($fbajob->{postprocess_args}->[0]->{formulation}->{media})) {
+    			print "Media:".$fbajob->{postprocess_args}->[0]->{formulation}->{media}."\n";
+    		}
     	}
     	print "Is complete:".$fbajob->{complete}."\n";
     }
@@ -90,6 +92,10 @@ if (!defined($output)) {
        print "Qsub ID:".$output->[0]->{jobdata}->{qsubid}."\n";
 	}
 	if ($opt->{joberror} == 1) {
-       print "Error output:\n".$output->[0]->{jobdata}->{error}."\n";
+		if (defined($output->[0]->{jobdata}->{error})) {
+			print "Error output:\n".$output->[0]->{jobdata}->{error}."\n";
+    	} else {
+    		print "Error output: none\n";
+    	}
 	}
 }

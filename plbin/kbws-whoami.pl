@@ -12,11 +12,15 @@ my $auth = auth();
 if (!defined($auth)) {
 	print "Logged in as:\npublic\n";
 } else {
-	my $token = Bio::KBase::AuthToken->new(token => auth());
-	if (!defined($token->token())) {
-		print "Previous token expired or invalid. Now logged in as:\npublic\n";
-		unlink $ENV{HOME}."/.kbase_auth";
+	if (auth() =~ m/^(\w+)\t(\S+)$/) {
+		print "Logged in as:\n".$1."\n";  
 	} else {
-		print "Logged in as:\n".$token->user_id()."\n";
-	}	
+		my $token = Bio::KBase::AuthToken->new(token => auth());
+		if (!defined($token->user_id())) {
+			print "Previous token expired or invalid. Now logged in as:\npublic\n";
+			unlink $ENV{HOME}."/.kbase_auth";
+		} else {
+			print "Logged in as:\n".$token->user_id()."\n";
+		}
+	}
 }

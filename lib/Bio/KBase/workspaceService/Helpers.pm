@@ -4,7 +4,7 @@ use warnings;
 use Bio::KBase::workspaceService::Client;
 use Exporter;
 use parent qw(Exporter);
-our @EXPORT_OK = qw( auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta printWorkspaceMeta);
+our @EXPORT_OK = qw(loadTableFile printJobData auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta printWorkspaceMeta);
 our $defaultURL = "http://kbase.us/services/workspace/";
 
 my $CurrentWorkspace;
@@ -190,6 +190,59 @@ sub printWorkspaceMeta {
     print "Objects: ".$obj->{objects}."\n";
     print "User permission: ".$obj->{user_permission}."\n";
     print "Global permission:".$obj->{global_permission}."\n";
+}
+
+sub printJobData {
+    my $job = shift;
+    print "Job ID: ".$job->{id}."\n";
+    print "Job Type: ".$job->{type}."\n";
+    print "Job Owner: ".$job->{owner}."\n";
+    print "Command: ".$job->{queuecommand}."\n";
+    print "Queue time: ".$job->{queuetime}."\n";
+    if (defined($job->{starttime})) {
+    	print "Start time: ".$job->{starttime}."\n";
+    }
+    if (defined($job->{completetime})) {
+    	print "Complete time: ".$job->{completetime}."\n";
+    }
+    print "Job Status: ".$job->{status}."\n";
+    if (defined($job->{jobdata}->{postprocess_args}->[0]->{model_workspace})) {
+    	print "Model: ".$job->{jobdata}->{postprocess_args}->[0]->{model_workspace}."/".$job->{jobdata}->{postprocess_args}->[0]->{model}."\n";
+    }
+    if (defined($job->{jobdata}->{postprocess_args}->[0]->{formulation}->{formulation}->{media})) {
+    	print "Media: ".$job->{jobdata}->{postprocess_args}->[0]->{formulation}->{formulation}->{media}."\n";
+    }
+    if (defined($job->{jobdata}->{postprocess_args}->[0]->{formulation}->{media})) {
+    	print "Media: ".$job->{jobdata}->{postprocess_args}->[0]->{formulation}->{media}."\n";
+    }
+    if (defined($job->{jobdata}->{qsubid})) {
+    	print "Qsub ID: ".$job->{jobdata}->{qsubid}."\n";
+    }
+    if (defined($job->{jobdata}->{error})) {
+    	print "Error: ".$job->{jobdata}->{error}."\n";
+    }    
+}
+
+sub loadTableFile {
+	my ($filename) = @_;
+	if (!-e $filename) {
+		print "Could not open table file ".$filename."!\n";
+		exit();
+	}
+	open(my $fh, "<", $filename) || return;
+	my $headingline = <$fh>;
+	my $tbl;
+	chomp($headingline);
+	my $headings = [split(/\t/,$headingline)];
+	for (my $i=0; $i < @{$headings}; $i++) {
+		$tbl->{headings}->{$headings->[$i]} = $i;
+	}
+	while (my $line = <$fh>) {
+		chomp($line);
+		push(@{$tbl->{data}},[split(/\t/,$line)]);
+	}
+	close($fh);
+	return $tbl;
 }
 
 1;

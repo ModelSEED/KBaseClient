@@ -3430,7 +3430,7 @@ sub set_user_settings
 
 =head2 queue_job
 
-  $jobid = $obj->queue_job($params)
+  $job = $obj->queue_job($params)
 
 =over 4
 
@@ -3440,12 +3440,25 @@ sub set_user_settings
 
 <pre>
 $params is a queue_job_params
-$jobid is a string
+$job is a JobObject
 queue_job_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
 	state has a value which is a string
 	type has a value which is a string
+	queuecommand has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+JobObject is a reference to a hash where the following keys are defined:
+	id has a value which is a job_id
+	type has a value which is a string
+	auth has a value which is a string
+	status has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+	queuetime has a value which is a string
+	starttime has a value which is a string
+	completetime has a value which is a string
+	owner has a value which is a string
+	queuecommand has a value which is a string
+job_id is a string
 
 </pre>
 
@@ -3454,12 +3467,25 @@ queue_job_params is a reference to a hash where the following keys are defined:
 =begin text
 
 $params is a queue_job_params
-$jobid is a string
+$job is a JobObject
 queue_job_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
 	state has a value which is a string
 	type has a value which is a string
+	queuecommand has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+JobObject is a reference to a hash where the following keys are defined:
+	id has a value which is a job_id
+	type has a value which is a string
+	auth has a value which is a string
+	status has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+	queuetime has a value which is a string
+	starttime has a value which is a string
+	completetime has a value which is a string
+	owner has a value which is a string
+	queuecommand has a value which is a string
+job_id is a string
 
 
 =end text
@@ -3467,7 +3493,6 @@ queue_job_params is a reference to a hash where the following keys are defined:
 =item Description
 
 Queues a new job in the workspace.
-Workspace job queues handles jobs that don't get submitted to large clusters.
 
 =back
 
@@ -3521,7 +3546,7 @@ sub queue_job
 
 =head2 set_job_status
 
-  $success = $obj->set_job_status($params)
+  $job = $obj->set_job_status($params)
 
 =over 4
 
@@ -3531,14 +3556,25 @@ sub queue_job
 
 <pre>
 $params is a set_job_status_params
-$success is a bool
+$job is a JobObject
 set_job_status_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
 	currentStatus has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
-bool is an int
+JobObject is a reference to a hash where the following keys are defined:
+	id has a value which is a job_id
+	type has a value which is a string
+	auth has a value which is a string
+	status has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+	queuetime has a value which is a string
+	starttime has a value which is a string
+	completetime has a value which is a string
+	owner has a value which is a string
+	queuecommand has a value which is a string
+job_id is a string
 
 </pre>
 
@@ -3547,14 +3583,25 @@ bool is an int
 =begin text
 
 $params is a set_job_status_params
-$success is a bool
+$job is a JobObject
 set_job_status_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
 	currentStatus has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
-bool is an int
+JobObject is a reference to a hash where the following keys are defined:
+	id has a value which is a job_id
+	type has a value which is a string
+	auth has a value which is a string
+	status has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+	queuetime has a value which is a string
+	starttime has a value which is a string
+	completetime has a value which is a string
+	owner has a value which is a string
+	queuecommand has a value which is a string
+job_id is a string
 
 
 =end text
@@ -3626,14 +3673,24 @@ sub set_job_status
 
 <pre>
 $params is a get_jobs_params
-$jobs is a reference to a list where each element is an ObjectData
+$jobs is a reference to a list where each element is a JobObject
 get_jobs_params is a reference to a hash where the following keys are defined:
 	jobids has a value which is a reference to a list where each element is a string
 	type has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
-ObjectData is a reference to a hash where the following keys are defined:
-	version has a value which is an int
+JobObject is a reference to a hash where the following keys are defined:
+	id has a value which is a job_id
+	type has a value which is a string
+	auth has a value which is a string
+	status has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+	queuetime has a value which is a string
+	starttime has a value which is a string
+	completetime has a value which is a string
+	owner has a value which is a string
+	queuecommand has a value which is a string
+job_id is a string
 
 </pre>
 
@@ -3642,14 +3699,24 @@ ObjectData is a reference to a hash where the following keys are defined:
 =begin text
 
 $params is a get_jobs_params
-$jobs is a reference to a list where each element is an ObjectData
+$jobs is a reference to a list where each element is a JobObject
 get_jobs_params is a reference to a hash where the following keys are defined:
 	jobids has a value which is a reference to a list where each element is a string
 	type has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
-ObjectData is a reference to a hash where the following keys are defined:
-	version has a value which is an int
+JobObject is a reference to a hash where the following keys are defined:
+	id has a value which is a job_id
+	type has a value which is a string
+	auth has a value which is a string
+	status has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+	queuetime has a value which is a string
+	starttime has a value which is a string
+	completetime has a value which is a string
+	owner has a value which is a string
+	queuecommand has a value which is a string
+job_id is a string
 
 
 =end text
@@ -4130,6 +4197,37 @@ an int
 
 
 
+=head2 job_id
+
+=over 4
+
+
+
+=item Description
+
+ID of a job object
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
 =head2 workspace_id
 
 =over 4
@@ -4496,6 +4594,70 @@ a reference to a list containing 6 items:
 3: (objects) an int
 4: (user_permission) a permission
 5: (global_permission) a permission
+
+
+=end text
+
+=back
+
+
+
+=head2 JobObject
+
+=over 4
+
+
+
+=item Description
+
+Data structures for a job object
+
+job_id id - ID of the job object
+string type - type of the job
+string auth - authentication token of job owner
+string status - current status of job
+mapping<string,string> jobdata;
+string queuetime - time when job was queued
+string starttime - time when job started running
+string completetime - time when the job was completed
+string owner - owner of the job
+string queuecommand - command used to queue job
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a job_id
+type has a value which is a string
+auth has a value which is a string
+status has a value which is a string
+jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+queuetime has a value which is a string
+starttime has a value which is a string
+completetime has a value which is a string
+owner has a value which is a string
+queuecommand has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a job_id
+type has a value which is a string
+auth has a value which is a string
+status has a value which is a string
+jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+queuetime has a value which is a string
+starttime has a value which is a string
+completetime has a value which is a string
+owner has a value which is a string
+queuecommand has a value which is a string
 
 
 =end text
@@ -5956,6 +6118,7 @@ a reference to a hash where the following keys are defined:
 auth has a value which is a string
 state has a value which is a string
 type has a value which is a string
+queuecommand has a value which is a string
 jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 
 </pre>
@@ -5968,6 +6131,7 @@ a reference to a hash where the following keys are defined:
 auth has a value which is a string
 state has a value which is a string
 type has a value which is a string
+queuecommand has a value which is a string
 jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 
 

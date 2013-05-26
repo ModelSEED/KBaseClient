@@ -10,8 +10,10 @@ use Crypt::OpenSSL::RSA;
 use Convert::PEM;
 use MIME::Base64;
 use URI;
-#use URI::QueryParam;
 use POSIX;
+use MongoDB;
+use DateTime;
+use Bio::KBase::SSHAgent::Agent;
 
 # We use Object::Tiny::RW to generate getters/setters for the attributes
 # and save ourselves some tedium
@@ -20,16 +22,75 @@ use Object::Tiny::RW qw {
     user_id
     password
     client_secret
+    sshagent_keys
+    sshagent_keyname
 };
 
-our @trust_token_signers = ( 'https://graph.api.go.sandbox.globuscs.info/goauth/keys/');
+# Pull the INI files based configs in
+our %Conf = %Bio::KBase::Auth::AuthConf;
+
+our $VERSION = $Bio::KBase::Auth::VERSION;
+
+our @trust_token_signers = ( 'https://graph.api.go.sandbox.globuscs.info/goauth/keys/',
+			     'https://nexus.api.globusonline.org/goauth/keys');
 # Tokens (last time we checked) had a 24 hour lifetime, this value can be
 # used to add extra time to the lifetime of tokens. The unit is seconds.
 # This can be be overridden  with a parameter passed into the validate() function.
 our $token_lifetime = 0;
 our $authrc = glob "~/.authrc";
-our @attrs = ( 'user_id', 'auth_token','client_secret', 'keyfile',
-	       'keyfile_passphrase','password');
+our @attrs = ( 'user_id', 'token','client_secret', 'keyfile',
+	       'keyfile_passphrase','password','sshagent_keys',
+	       'sshagent_keyname');
+
+# Some hashes to cache tokens and Token Signers we have seen before
+our $SignerCache;
+our $SignerCacheSize = exists($Conf{'authentication.signer_cache_size'}) ?
+                              $Conf{'authentication.signer_cache_size'} : 12;
+# For long running processes, like a server, we use a fixed length cache
+# to limit the number of entries we cache. The token cache only stores
+# the user_id and sha1 of the token, and not the actual token
+our $TokenCache;
+our $TokenCacheSize = exists($Conf{'authentication.token_cache_size'}) ?
+                             $Conf{'authentication.token_cache_size'} : 50;
+
+# Pickup the cache hashing salt from configs
+our $CacheKeySalt = exists($Conf{'authentication.cache_salt'}) ?
+                           $Conf{'Authentication.cache_salt'} : "NaCl";
+
+# If enabled, create some shared memory hashes for our cache.
+# Make them only readable/writeable by ourselves
+if ($Conf{'authentication.shm_cache'}) {
+}
+
+$TokenCache = "";
+$SignerCache = "";
+
+# This is the name of the environment variable that contains a
+# pregenerated token
+our $TokenEnv = exists($Conf{'authentication.tokenvar'}) ?
+    $Conf{'authentication.tokenvar'} : "KB_AUTH_TOKEN";
+
+# If we have a MongDB connection in the configs, bind $authz_db to it to , otherwise
+# leave it undef. 
+our $AuthzDB = undef;
+if (defined $Conf{'authentication.authzdb'}) {
+
+    eval {
+	my $db = quotemeta( $Conf{'authentication.authzdb'} );
+	if ( grep { /$db/ } $Bio::KBase::Auth::MongoDB->database_names() ) {
+	    $AuthzDB = $Bio::KBase::Auth::MongoDB->get_database($Conf{'authentication.authzdb'});
+	} else {
+	    die "Database $db not found on ".$Conf{'authentication.mongodb'};
+	}
+    };
+    if ($@) {
+	printf STDERR "Error connecting to MongoDB database %s on %s: %s/nSessionID lookups are *not* enabled\n",
+	$Conf{'authentication.authzdb'}, $Bio::KBase::Auth::MongoDB,
+	$@;
+	$AuthzDB = undef; # Should be undef already, just being paranoid
+    }
+}
+    
 
 # Your typical constructor - takes a hash that specifies the initial values to
 # plug into the object.
@@ -47,14 +108,43 @@ sub new {
     );
 
     eval {
+	# make ignore_kbase_config an alias for ignore_authrc if it isn't specified
+	if ( !exists( $self->{'ignore_kbase_config'}) &&
+	     exists( $self->{'ignore_authrc'})) {
+	    $self->{'ignore_kbase_config'} = $self->{'ignore_authrc'};
+	}
+
+	# Do we have any default attributes from the $Conf hash?
+	my %c = %Bio::KBase::Auth::AuthConf;
+	my $def_attr = scalar( grep { exists( $c{ 'authentication.'.$_}) } @attrs);
+			    
+	# Load any available ssh-agent keys into the sshagent_keys hash
+	$self->get_agent_rsakeys();
+
 	# If we were given a token, try set that using the formal setter
 	# elsif we have appropriate login credentials, try to get a
 	# token
 	if ($self->{'token'}) {
 	    $self->token( $self->{'token'});
 	} elsif ($self->{'user_id'} && 
-		 ($self->{'password'} || $self->{'client_secret'} || $self->{'keyfile'})) {
+		 ($self->{'password'} || $self->{'client_secret'} || $self->{'keyfile'} || $self->{sshagent_keyname})) {
 	    $self->get();
+	} elsif ( defined( $ENV{$TokenEnv})) {
+	    $self->token($ENV{$TokenEnv});
+	} elsif (! $self->{'ignore_kbase_config'} && $def_attr ) {
+	    # If we get a token, use that immediately and ignore the rest,
+	    # otherwise set the other attributes and fetch the token
+	    if (exists( $c{ 'authentication.token'})) {
+		$self->token( $c{'authentication.token'});
+		$self->validate();
+	    } else {
+		foreach my $attr ( @attrs) {
+		    if (exists( $c{ 'authentication.'.$attr })) {
+			$self->{ $attr } = $c{ 'authentication.'.$attr };
+		    }
+		}
+		$self->get();
+	    }
 	} elsif ( -e $authrc && ! $self->{'ignore_authrc'}) {
 	    my %creds = read_authrc( $authrc);
 	    $self->get( %creds );
@@ -64,6 +154,59 @@ sub new {
 	$self->error_message("Failed to acquire token: $@");
     }
     return($self);
+}
+
+# Caches are implemented as a largish string structures in CSV
+# format with the following entries per line:
+# last_seen,key:lookup_key,value:cached_value
+# This is to simplify storage in memory for a shared memory
+# segment, and also to allow the use of fast regex functions
+# to manage the cache
+
+# fetch something from the cache
+# cache_get( cache, key)
+# cache is a reference to the string used to store the cache
+# key is the value of the object to compare to see if there is
+#  a cache hit
+# returns true or false for if the key is found
+sub cache_get {
+    my($cache, $key) = @_;
+
+    # Convert the key to a salted sha1 hash
+    my $keyhash = sha1_base64( $key.$CacheKeySalt);
+    my $key2 = quotemeta( $keyhash);
+    if ($$cache =~ m/^(\d+),key:($key2),value:(.+)$/m ) {
+	my $last = $1;
+	$key = $2;
+	my $value = $3;
+	# Update last seen time
+	my $now = time();
+	$$cache =~ s/^$last,key:$key2/$now,key:$key/m;
+	return($value);
+    } else {
+	return( undef );
+    }
+}
+
+# cache_set( cache, maxrows, key, value)
+# cache is a reference to the string used for the cache
+# maxrows is the maximum number of rows that can be in the cache
+# key is the value of the object to use for future comparison
+# value is the value to be stored there - it is expected to be a scalar
+# The cache is ordered by last seen time and anything more than the
+# maxrows is dropped
+# returns the value stored if successful
+sub cache_set {
+    my($cache, $maxrows, $key, $value) = @_;
+    my($keyhash) = sha1_base64( $key.$CacheKeySalt);
+    my(@cache) = split /\n/, $$cache;
+    push @cache, sprintf("%d,key:%s,value:%s",time(),$keyhash,$value);
+    my(@new) = sort {$b cmp $a} @cache;
+    if ($#new >= $maxrows) {
+	@new = @new[0..($maxrows-1)];
+    }
+    $$cache = join "\n", @new;
+    return $value;
 }
 
 # getter/setter for token, if we are given a token, parse it out
@@ -81,7 +224,10 @@ sub token {
 	$self->{'token'} = $token;
 	($self->{'user_id'}) = $token =~ /un=(\w+)/;
 	unless ($self->{'user_id'}) {
-	    die "Cannot parse user_id from token - illegal token";
+	    # Could this be a sessionid hash?
+	    unless ( $self->{token} =~ m/^[0-9a-fA-F]{64}$/) {
+		die "Cannot parse user_id from token - illegal token";
+	    }
 	}
     };
     if ($@) {
@@ -100,6 +246,10 @@ sub token {
 # client_id => user name recognized on globus online for login
 # client_secret => the RSA private key used for signing
 # password => Globus online password
+# sshagent_name => the comment associated with the key in the ssh-agent to use for
+#           authentication. Typically this is the path to the private key
+# sshagent_name => the keyname associated with an ssh-agent loaded key. Must be a
+#           a key in the $self->ssh_keys hash
 # Throws an exception if either invalid set of creds or failed login
 
 sub get {
@@ -143,15 +293,18 @@ sub get {
 	if ($p{'client_secret'}) {
 	    $self->client_secret($p{'client_secret'});
 	}
+	if ($p{sshagent_keyname}) {
+	    $self->{sshagent_keyname} = $p{sshagent_keyname};
+	}
 	if ($p{'password'}) {
 	    $self->password($p{'password'});
 	}
 
 	# Make sure we have the right combo of creds
-	if ($self->{'user_id'} && ($self->{'client_secret'} || $self->{'password'})) {
+	if ($self->{'user_id'} && ($self->{'client_secret'} || $self->{'password'} || $self->{sshagent_keyname})) {
 	    # no op
 	} else {
-	    die("Need either (user_id, client_secret || password) or (client_id, client_secret) to be defined.");
+	    die("Need either (user_id, client_secret || password || sshagent_keyname)  to be defined.");
 	}
 	
 	my $u = URI->new($url);
@@ -169,12 +322,17 @@ sub get {
 	    $headers->authorization_basic( $self->{'user_id'}, $self->{'password'});
 	    $headers{'Authorization'} = $headers->header('Authorization');
 	} else {
-	    my %p2 = ( rsakey => $self->{'client_secret'},
-		       path => $path,
+	    my %p2 = ( path => $path,
 		       method => $method,
 		       user_id => $self->{'user_id'},
 		       query => $query,
 		       body => $self->{'body'} );
+	    if ( $self->{client_secret}) {
+		$p2{rsakey} = $self->{client_secret};
+	    } else {
+		$p2{agent} = $self->{sshagent};
+		$p2{sshagent_keyname} = $self->{sshagent_keyname};
+	    }
 	    
 	    %headers = sign_with_rsa( %p2);
 	}
@@ -235,9 +393,23 @@ sub sign_with_rsa {
 			    sha1_base64_padded($p{query}),
 			    $timestamp,
 			    $headers{'X-Globus-UserId'});
-	my $pkey = Crypt::OpenSSL::RSA->new_private_key($p{rsakey});
-	$pkey->use_sha1_hash();
-	my $sig = $pkey->sign($to_sign);
+	# We can sign either with sshagent_keyname or with an explicit rsakey
+	my $sig;
+	my $key;
+	if ( $p{rsakey} ) {
+	    my $pkey = Crypt::OpenSSL::RSA->new_private_key($p{rsakey});
+	    $pkey->use_sha1_hash();
+	    $sig = $pkey->sign($to_sign);
+	} elsif ( $p{sshagent_keyname} && $p{agent}) {
+	    my $keys = $p{agent}->keys();
+	    unless ($key = $keys->{$p{sshagent_keyname}}) {
+		die( sprintf "Key %s was not found among ssh-agent keys.", $p{sshagent_keyname});
+	    }
+	    $sig = $p{agent}->sign_with_keyblob( $key, $to_sign);
+	} else {
+	    die "No RSA key specified";
+	}
+
 	my $sig_base64 = encode_base64( $sig);
 	my @sig_base64 = split( '\n', $sig_base64);
 	foreach my $x (0..$#sig_base64) {
@@ -262,6 +434,11 @@ sub canonical_time {
 
 # Function that returns if the token is valid or not
 # optionally accepts hash as parameters
+# If the token is a 64 byte hex string, then it treats it as
+# a kbase_sessionid and will attempt to retrieve the actual token
+# from a mongodb session collection. This only works if the
+# sessiondb is enabled
+#
 # lifetime => seconds The number of seconds to use for token
 #                     lifetime, overrides the class variable
 #                     $token_lifetime 
@@ -269,10 +446,20 @@ sub validate {
     my $self = shift;
     my %p = @_;
     my $verify;
+    my $tok_sha1;
 
     eval {
 	unless ($self->{'token'}) {
 	    die "No token.";
+	}
+
+	# Check for kbase session id, if found, fetch it and replace
+	# the token with that value
+	if ( $self->{token} =~ m/^[0-9a-fA-F]{64}$/ && $AuthzDB) {
+	    my $token = get_sessDB_token( $self->{token});
+	    unless ($token) {
+		die "Session ID does not refer to a legitimate session";
+	    }
 	}
 	my ($sig_data) = $self->{'token'} =~ /^(.*)\|sig=/;
 	unless ($sig_data) {
@@ -292,23 +479,43 @@ sub validate {
 	unless ( $vars{'SigningSubject'} =~ /^\Q$Bio::KBase::Auth::AuthSvcHost\E/) {
 	    die "Token signed by unrecognized source: ".$vars{'SigningSubject'};
 	}
-	my $binary_sig = pack('H*',$vars{'sig'});
-
-	my $client = LWP::UserAgent->new();
-	$client->ssl_opts(verify_hostname => 0);
-	$client->timeout(5);
-	my $response = $client->get( $vars{'SigningSubject'});
-
-	my $data = from_json( $response->content());
-	$data = $self->_SquashJSONBool( $data);
-	unless ($data->{'valid'}) {
-	    die "Signing key is not valid:".$response->content();
+	unless (length($vars{'sig'}) == 256) {
+	    die "Token has malformed signature field";
 	}
+	# Check the token cache first
+	my $cached = cache_get( \$TokenCache, $self->{'token'});
+	if ( $cached && $cached eq $vars{'un'} ) {
+	    $verify = 1;
+	} else {
+	    # Check cache for signer public key
+	    my($response, $binary_sig, $client);
+	    my $data = cache_get( \$SignerCache, $vars{'SigningSubject'});
+	    unless ($data) {
+		$binary_sig = pack('H*',$vars{'sig'});
+		$client = LWP::UserAgent->new();
+		$client->ssl_opts(verify_hostname => 0);
+		$client->timeout(5);
+		$response = $client->get( $vars{'SigningSubject'});
+		$data = from_json( $response->content());
+		cache_set( \$SignerCache, $SignerCacheSize, $vars{'SigningSubject'}, encode_base64( $response->content(), ''));
+	    } else {
+		$data = from_json(decode_base64( $data));
+	    }
+	    $data = $self->_SquashJSONBool( $data);
+	    unless ($data->{'valid'}) {
+		die "Signing key is not valid:".$response->content();
+	    }
 
-	my $rsa = Crypt::OpenSSL::RSA->new_public_key( $data->{'pubkey'});
-	$rsa->use_sha1_hash();
+	    my $rsa = Crypt::OpenSSL::RSA->new_public_key( $data->{'pubkey'});
+	    $rsa->use_sha1_hash();
 
-	$verify = $rsa->verify($sig_data,$binary_sig);
+	    $verify = $rsa->verify($sig_data,$binary_sig);
+	    if ($verify) {
+		# write the sha1 hash of the token into the cache
+		# we don't actually want to store the tokens themselves
+		cache_set( \$TokenCache, $TokenCacheSize, $self->{'token'}, $vars{'un'});
+	    }
+	}
     };
     if ($@) {
 	$self->error_message("Failed to verify token: $@");
@@ -459,6 +666,60 @@ sub decryptPEM {
   }
 }
 
+# Try to fetch the globus token associated with the session id passed
+# in as the only param. If the session is expired, or the lookup fails,
+# return undef
+
+sub get_sessDB_token {
+    my( $ssid) = shift @_;
+    my( $session) = undef;
+
+    my $token = undef;
+
+    if ( $AuthzDB ) {
+	$session = $AuthzDB->sessions->find_one( { kbase_sessionid => $ssid } );
+	if ($session && DateTime->compare($session->{expiration}, DateTime->now()) <= 0) {
+	    $token = $session->{token};
+	}
+    }
+    return( $token);
+}
+
+# Check to see if we have an active ssh-agent session, and if so, examine the keys
+# that are being stored, and return a hashref containing only the RSA keys. The hash
+# is keyed on the comment for the key (ssh-agent seems to use the key's path as the
+# comment) and the value is the 'key' handle that is returned. Note that the key handle
+# is not actually the private key, but just a handle that can be passed back to ssh-agent
+# when requesting that a private key operation be performed. Assumes that SSH_AUTH_SOCK and
+# all that stuff is properly configured
+sub get_agent_rsakeys {
+    my( $self ) = shift;
+    my( %p) = @_;
+    my( $keys ) = {};
+
+    unless ($self->{sshagent}) {
+	$self->{sshagent} = Bio::KBase::SSHAgent::Agent->new(2);
+    }
+    
+    # If the agent wasn't there, or there are no keys, just bail
+    return $keys unless ($self->{sshagent} && $self->{sshagent}->num_identities()); 
+    $keys = $self->{sshagent}->keys();
+    # Walk through keys and delete any that aren't of type "ssh-rsa"
+    foreach my $name ( keys %$keys) {
+	my $key = $keys->{ $name };
+	unless (substr($key,4,7) eq 'ssh-rsa') {
+	    delete $keys->{$name};
+	}
+    }
+    # if there is only a single RSA key, then make that the default
+    # sshagent_keyname
+    if (length(keys %$keys) == 1) {
+	my @keys = keys %$keys;
+	$self->{sshagent_keyname} = $keys[0];
+    }
+    return ($self->{sshagent_keys} = $keys);
+}
+
 
 1;
 
@@ -487,21 +748,47 @@ http://globusonline.github.com/nexus-docs/api.html
    my $token3 = Bio::KBase::AuthToken->new( 'user_id' => 'mrbig', 'keyfile' => $keyfile,
                                             'keyfile_passphrase' => 'testing');
 
-   # any parameters got credentials/login that can be passed in to the new() method can
-   # be a JSON formatted declaration in the authrc file ( typically in ~/.authrc
-   # see ~Bio::KBase::AuthToken::authrc )
-   # This is triggered by not providing any parameters to the new() method
-   # if ~/.authrc contains {"keyfile":"/Users/sychan/.ssh/id_rsa",","user_id":"kbasetest"} you
-   # can simply use:
+   # If you have a token in the shell environment variable $KB_AUTH_TOKEN you can
+   # just instantiate an object with no parameters and it will use that as if it
+   # were passed in as a token => %ENV{ KB_AUTH_TOKEN } among the params. This
+   # will also work if there are no legit combinations of credential information
+   # passed in
+   my $tok = Bio::KBase::AuthToken->new( token => 'very long token string');
+   # is the same as
+   $ENV{ 'KB_AUTH_TOKEN'} = 'very long token string';
+   my $tok = Bio::KBase::AuthToken->new()
+   
+   # any parameters for a credential/login that can be passed in to the new() method can
+   # be put in the [authentication] section of the INI file specified in
+   # $Bio::KBase::Auth::ConfPath ( defaults to ~/.kbase_config ) will be used to
+   # initialize the object unless the ignore_kbase_config is set to a true value in the
+   # call to new()
+   # 
+   # This is triggered by not providing any parameters to the new() method and not
+   # having a $ENV{ KB_AUTH_TOKEN } defined.
+   #
+   # if ~/.kbase_config contains:
+   # [authentication]
+   # user_id=figaro
+   # password=mamamia_mamamia
+   #
+   # Then the constructor will try to acquire a token with the user_id and password
+   # settings provided.
+   # Currently this library recognizes user_id, token,client_secret,keyfile,
+   #	       keyfile_passphrase,password
+   #
+   # To login as jqpublic with an ssh key in ~jqpublic/.ssh/id_kbase that has the passphrase
+   # "MostlySecret" you can set this in the .kbase_config file:
+   # [authentication]
+   # user_id=jqpublic
+   # keyfile=/Users/jqpublic/.ssh/id_kbase
+   # keyfile_passphrase=MostlySecret
+   # 
+   # and then execute the following
    my $token4 = Bio::KBase::AuthToken->new();
 
-   # instead of
-   my $token4 = Bio::KBase::AuthToken->new( "keyfile" => "/Users/sychan/.ssh/id_rsa",
-                                            "user_id" => "kbasetest");
-
-   # It is possible to ignore the authrc file by setting ignore_authrc as an arg to new.
-   # This will ignore the authrc file even if it contains valid contents
-   my $token5 = Bio::KBase::AuthToken->new( ignore_authrc => 1 );
+   # To disable this and just return an empty token object user
+   my $token5 = Bio::KBase::AuthToken->new( ignore_kbase_config => 1 );
 
    # If you have a token in $tok, and wish to check if it is valid
    my $token3 = Bio::KBase::AuthToken->new( 'token' => $tok);
@@ -521,21 +808,59 @@ http://globusonline.github.com/nexus-docs/api.html
 
 =over
 
-=item B<trust_token_signers> list
+=item B<%Conf>
+
+This contains the configuration directives from the user's ~/.kbase_config under the section header "authentication". All the config settings can be accessed via $Bio::KBase::AuthUser::Conf{ 'authentication.NAME'}, where NAME is found in the config file under the section heading "authentication".
+
+=item B<@trust_token_signers>
 
 An array that contains prefixes for trusted signing URLs in the SigningSubject field of tokens.
 
-=item B<token_lifetime> numeric
+=item B<$token_lifetime>
 
 Additional seconds to add to the expiration time of tokens. Tokens currently issued with a default 24 hour lifetime, but modifying this value will change when the validate() function will no longer accept the token. The units are in seconds.
 
-=item B<authrc> string
+=item B<$authrc>
 
 This file contains JSON formatted attributes for the AuthToken object related to acquiring credentials. When no parameters are passed into the new() method, it will default to reading in parameters from the authrc file to initialize the token. The default value is glob( "~/.authrc")
 
-=item B<attrs> list
+=item B<@attrs>
 
 List of strings that enumerate the attributes allowed to be read from the B<authrc> file.
+
+=item B<$VERSION>
+
+This is the version string (pulled from the Bio::KBase::Auth module)
+
+=item B<$TokenCache,$SignerCache>
+
+These are CSV formatted strings for the Token and TokenSigner caches that contain 3 fields: last seen time, hash key, value
+
+The last seen time is the output from time() when the record was last request or loaded
+
+The hash key is a salted SHA1 hash of the token string (for the TokenCache) or the Signer URL (for the SignerCache)
+
+The value is the username associated with the token (for TokenCache) or the JSON document at the Signer URL (for the SignerCache)
+
+Entries are not expired due to any TTL, but are pushed out based on their last access time.
+
+The cache is searched and timestamps are updated using perl regex functions to achieve good performance. New entries are added and deleted using split(), sort() and join() for performance as well. When the Shared memory caching option is enabled ( with authentication.shm_cache in the config file), this string is tied into an IPC::Shareable memory region.
+
+=item B<$TokenCacheSize,$SignerCacheSize> integer
+
+This is maximum the number of token validations or signer URL JSON docs that are kept in the cache. Each time that a new token/signer is added, the entries are sorted in descending time order, and any entries above this number are dropped. This can be configured via the authentication.token_cache_size and authentication.signer_cache_size directive.
+
+=item B<$CacheKeySalt>
+
+String used to salt the sha1 hash calculated for cache keys. Set using authentication.cache_salt
+
+=item B<$TokenVar>
+
+Shell environment variable that may contain a token to be used as a default token value, defaults to "KB_AUTH_TOKEN". This environment variable can be overridden by authentication.tokenvar in the .kbase_config file
+
+=item B<$AuthzDB>
+
+MongoDB::Database reference that is initialized by the authentication.authzdb value from the kbase_config file. The value in the configuration must refer to an existing database in the MongoDB instance referenced by $Bio::KBase::Auth::MongoDB. If authentication.authzdb is declared but the authentication.mongodb setting is invalid, or if the database does not exist, then an exception will be thrown at module load time. Do not set this unless you really know what you are doing.
 
 =back
 
@@ -577,6 +902,14 @@ File containing a B<client_secret> (typically something like ~user/.ssh/id_rsa).
 
 The passphrase used to decrypt the RSA private specified in B<keyfile>. See the ssh-keygen man page for information and setting/clering the passphrase.
 
+=item B<sshagent_keys> (hashref keynames => ssh_agent_keys)
+
+Hashref with keyname => rsa_sshkey pairs. The keyname is generated by ssh-agent and is the path to the private. Only RSA keys are exposed.
+
+=item B<sshagent_keyname> (string)
+
+String specifying which key in the sshagent to use for authentication. Must match one of the keys in sshagent_keys - format is typically the path to the private key
+
 =item B<error_message> (string)
 
 contains error messages, if any, from most recent method call.
@@ -614,7 +947,8 @@ returns the user_id associated with the token, if any. If a single string value 
 
 =item B<validate>()
 
-attempts to verify the signature on the token, and returns a boolean value signifying whether the token is legit
+attempts to verify the signature on the token, and returns a boolean value signifying whether the token is legit. If the value in the token attribute is a legitimate kbase session ID hash and a session database has been enabled (by the $AuthzDB database handle), the session ID will be replaced by the associated token, and then validated - this is only relevant for installations where the session service has been enabled.
+
 
 =back
 

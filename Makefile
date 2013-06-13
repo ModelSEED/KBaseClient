@@ -18,9 +18,11 @@ gather:
 	mkdir $(THIS_DIR)/lib/Bio/KBase/workspaceService
 	mkdir $(THIS_DIR)/lib/Bio/KBase/fbaModelServices
 	mkdir $(THIS_DIR)/lib/Bio/KBase/GenomeAnnotation
+	mkdir $(THIS_DIR)/lib/Bio/KBase/probabilistic_annotation
 	mkdir $(THIS_DIR)/lib/Bio/KBase/SSHAgent
-	mkdir -p $(THIS_DIR)/lib/ModelSEED/Client
+	mkdir -p $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer
 	mkdir -p $(THIS_DIR)/lib/myRAST
+	cp $(THIS_DIR)/../probabilistic_annotation/lib/Bio/KBase/probabilistic_annotation/Client.pm $(THIS_DIR)/lib/Bio/KBase/probabilistic_annotation/Client.pm
 	cp $(THIS_DIR)/../workspace_service/lib/Bio/KBase/workspaceService/Client.pm $(THIS_DIR)/lib/Bio/KBase/workspaceService/Client.pm
 	cp $(THIS_DIR)/../workspace_service/lib/Bio/KBase/workspaceService/Helpers.pm $(THIS_DIR)/lib/Bio/KBase/workspaceService/Helpers.pm
 	cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/Client.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/Client.pm
@@ -30,7 +32,7 @@ gather:
 	cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/AuthToken.pm $(THIS_DIR)/lib/Bio/KBase/AuthToken.pm
 	cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/Auth.pm $(THIS_DIR)/lib/Bio/KBase/Auth.pm
 	cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/SSHAgent/*.pm $(THIS_DIR)/lib/Bio/KBase/SSHAgent/
-	cp $(THIS_DIR)/../ModelSEED/lib/ModelSEED/Client/MSSeedSupport.pm $(THIS_DIR)/lib/ModelSEED/Client
+	cp $(THIS_DIR)/../MSSeedSupportServer/lib/Bio/ModelSEED/MSSeedSupportServer/Client.pm $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer/Client.pm
 	cp $(THIS_DIR)/../ModelSEED/lib/myRAST/ClientTHing.pm $(THIS_DIR)/lib/myRAST
 	cp $(THIS_DIR)/../genome_annotation/lib/Bio/KBase/GenomeAnnotation/Client.pm $(THIS_DIR)/lib/Bio/KBase/GenomeAnnotation/Client.pm	
 

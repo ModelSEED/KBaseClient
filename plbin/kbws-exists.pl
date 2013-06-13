@@ -63,8 +63,8 @@ if (!defined($output)) {
 	print "Could not determine status of object!\n";
 } else {
 	if ($output == 1) {
-        $opt->{workspace}."/".$opt->{"Object type"}."/".$opt->{"Object ID"}." exists!\n";
+        print $opt->{workspace}."/".$opt->{"Object type"}."/".$opt->{"Object ID"}." exists!\n";
     } else {
-        $opt->{workspace}."/".$opt->{"Object type"}."/".$opt->{"Object ID"}." does not exist!\n";
+        print $opt->{workspace}."/".$opt->{"Object type"}."/".$opt->{"Object ID"}." does not exist!\n";
     }
 }

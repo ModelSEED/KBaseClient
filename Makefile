@@ -10,7 +10,9 @@ clean:
 	
 gather:
 	rm $(THIS_DIR)/plbin/kb*
+	rm $(THIS_DIR)/plbin/pa*
 	rm -rf $(THIS_DIR)/lib/Bio
+	cp $(THIS_DIR)/../probabilistic_annotation/scripts/pa-* $(THIS_DIR)/plbin/
 	cp $(THIS_DIR)/../KBaseFBAModeling/scripts/kbfba-* $(THIS_DIR)/plbin/
 	cp $(THIS_DIR)/../workspace_service/scripts/kbws-* $(THIS_DIR)/plbin/
 	mkdir $(THIS_DIR)/lib/Bio
@@ -23,6 +25,7 @@ gather:
 	mkdir -p $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer
 	mkdir -p $(THIS_DIR)/lib/myRAST
 	cp $(THIS_DIR)/../probabilistic_annotation/lib/Bio/KBase/probabilistic_annotation/Client.pm $(THIS_DIR)/lib/Bio/KBase/probabilistic_annotation/Client.pm
+	cp $(THIS_DIR)/../probabilistic_annotation/lib/Bio/KBase/probabilistic_annotation/Helpers.pm $(THIS_DIR)/lib/Bio/KBase/probabilistic_annotation/Helpers.pm
 	cp $(THIS_DIR)/../workspace_service/lib/Bio/KBase/workspaceService/Client.pm $(THIS_DIR)/lib/Bio/KBase/workspaceService/Client.pm
 	cp $(THIS_DIR)/../workspace_service/lib/Bio/KBase/workspaceService/Helpers.pm $(THIS_DIR)/lib/Bio/KBase/workspaceService/Helpers.pm
 	cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/Client.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/Client.pm

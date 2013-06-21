@@ -1387,6 +1387,190 @@ sub get_compounds
 
 
 
+=head2 get_alias
+
+  $output = $obj->get_alias($input)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$input is a get_alias_params
+$output is a reference to a list where each element is a get_alias_outputs
+get_alias_params is a reference to a hash where the following keys are defined:
+	object_type has a value which is a string
+	input_id_type has a value which is a string
+	output_id_type has a value which is a string
+	input_ids has a value which is a reference to a list where each element is a string
+	auth has a value which is a string
+get_alias_outputs is a reference to a hash where the following keys are defined:
+	original_id has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$input is a get_alias_params
+$output is a reference to a list where each element is a get_alias_outputs
+get_alias_params is a reference to a hash where the following keys are defined:
+	object_type has a value which is a string
+	input_id_type has a value which is a string
+	output_id_type has a value which is a string
+	input_ids has a value which is a reference to a list where each element is a string
+	auth has a value which is a string
+get_alias_outputs is a reference to a hash where the following keys are defined:
+	original_id has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=item Description
+
+Turns one compound I into another of a different type
+
+=back
+
+=cut
+
+sub get_alias
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_alias (received $n, expecting 1)");
+    }
+    {
+	my($input) = @args;
+
+	my @_bad_arguments;
+        (ref($input) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"input\" (value was \"$input\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_alias:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_alias');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "fbaModelServices.get_alias",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_alias',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_alias",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_alias',
+				       );
+    }
+}
+
+
+
+=head2 get_aliassets
+
+  $aliassets = $obj->get_aliassets($input)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$input is a get_aliassets_params
+$aliassets is a reference to a list where each element is a string
+get_aliassets_params is a reference to a hash where the following keys are defined:
+	object_type has a value which is a string
+	auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$input is a get_aliassets_params
+$aliassets is a reference to a list where each element is a string
+get_aliassets_params is a reference to a hash where the following keys are defined:
+	object_type has a value which is a string
+	auth has a value which is a string
+
+
+=end text
+
+=item Description
+
+Get possible types of aliases (alias sets)
+
+=back
+
+=cut
+
+sub get_aliassets
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_aliassets (received $n, expecting 1)");
+    }
+    {
+	my($input) = @args;
+
+	my @_bad_arguments;
+        (ref($input) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"input\" (value was \"$input\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_aliassets:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_aliassets');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "fbaModelServices.get_aliassets",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_aliassets',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_aliassets",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_aliassets',
+				       );
+    }
+}
+
+
+
 =head2 get_media
 
   $out_media = $obj->get_media($input)
@@ -6850,6 +7034,394 @@ sub role_to_reactions
 
 
 
+=head2 fasta_to_contigs
+
+  $output = $obj->fasta_to_contigs($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a fasta_to_contigs_params
+$output is an object_metadata
+fasta_to_contigs_params is a reference to a hash where the following keys are defined:
+	contigid has a value which is a string
+	fasta has a value which is a string
+	workspace has a value which is a workspace_id
+	auth has a value which is a string
+	source has a value which is a string
+	genetic_code has a value which is a string
+	domain has a value which is a string
+	scientific_name has a value which is a string
+workspace_id is a string
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a fasta_to_contigs_params
+$output is an object_metadata
+fasta_to_contigs_params is a reference to a hash where the following keys are defined:
+	contigid has a value which is a string
+	fasta has a value which is a string
+	workspace has a value which is a workspace_id
+	auth has a value which is a string
+	source has a value which is a string
+	genetic_code has a value which is a string
+	domain has a value which is a string
+	scientific_name has a value which is a string
+workspace_id is a string
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+
+=end text
+
+=item Description
+
+Loads a fasta file as a Contigs object in the workspace
+
+=back
+
+=cut
+
+sub fasta_to_contigs
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function fasta_to_contigs (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to fasta_to_contigs:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'fasta_to_contigs');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "fbaModelServices.fasta_to_contigs",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'fasta_to_contigs',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method fasta_to_contigs",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'fasta_to_contigs',
+				       );
+    }
+}
+
+
+
+=head2 contigs_to_genome
+
+  $job = $obj->contigs_to_genome($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a contigs_to_genome_params
+$job is a JobObject
+contigs_to_genome_params is a reference to a hash where the following keys are defined:
+	contigid has a value which is a string
+	contig_workspace has a value which is a workspace_id
+	workspace has a value which is a workspace_id
+	genomeid has a value which is a string
+	auth has a value which is a string
+workspace_id is a string
+JobObject is a reference to a hash where the following keys are defined:
+	id has a value which is a job_id
+	type has a value which is a string
+	auth has a value which is a string
+	status has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+	queuetime has a value which is a string
+	starttime has a value which is a string
+	completetime has a value which is a string
+	owner has a value which is a string
+	queuecommand has a value which is a string
+job_id is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a contigs_to_genome_params
+$job is a JobObject
+contigs_to_genome_params is a reference to a hash where the following keys are defined:
+	contigid has a value which is a string
+	contig_workspace has a value which is a workspace_id
+	workspace has a value which is a workspace_id
+	genomeid has a value which is a string
+	auth has a value which is a string
+workspace_id is a string
+JobObject is a reference to a hash where the following keys are defined:
+	id has a value which is a job_id
+	type has a value which is a string
+	auth has a value which is a string
+	status has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+	queuetime has a value which is a string
+	starttime has a value which is a string
+	completetime has a value which is a string
+	owner has a value which is a string
+	queuecommand has a value which is a string
+job_id is a string
+
+
+=end text
+
+=item Description
+
+Annotates contigs object creating a genome object
+
+=back
+
+=cut
+
+sub contigs_to_genome
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function contigs_to_genome (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to contigs_to_genome:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'contigs_to_genome');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "fbaModelServices.contigs_to_genome",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'contigs_to_genome',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method contigs_to_genome",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'contigs_to_genome',
+				       );
+    }
+}
+
+
+
+=head2 add_stimuli
+
+  $output = $obj->add_stimuli($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is an add_stimuli_params
+$output is an object_metadata
+add_stimuli_params is a reference to a hash where the following keys are defined:
+	biochemid has a value which is a string
+	stimuliid has a value which is a string
+	name has a value which is a string
+	abbreviation has a value which is a string
+	type has a value which is a string
+	description has a value which is a string
+	compounds has a value which is a reference to a list where each element is a string
+	workspace has a value which is a string
+	authl has a value which is a string
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_id is a string
+workspace_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is an add_stimuli_params
+$output is an object_metadata
+add_stimuli_params is a reference to a hash where the following keys are defined:
+	biochemid has a value which is a string
+	stimuliid has a value which is a string
+	name has a value which is a string
+	abbreviation has a value which is a string
+	type has a value which is a string
+	description has a value which is a string
+	compounds has a value which is a reference to a list where each element is a string
+	workspace has a value which is a string
+	authl has a value which is a string
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_id is a string
+workspace_ref is a string
+
+
+=end text
+
+=item Description
+
+Adds a stimuli either to the central database or as an object in a workspace
+
+=back
+
+=cut
+
+sub add_stimuli
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function add_stimuli (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to add_stimuli:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'add_stimuli');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "fbaModelServices.add_stimuli",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'add_stimuli',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method add_stimuli",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'add_stimuli',
+				       );
+    }
+}
+
+
+
 sub version {
     my ($self) = @_;
     my $result = $self->{client}->call($self->{url}, {
@@ -6861,16 +7433,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'role_to_reactions',
+                method_name => 'add_stimuli',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method role_to_reactions",
+            error => "Error invoking method add_stimuli",
             status_line => $self->{client}->status_line,
-            method_name => 'role_to_reactions',
+            method_name => 'add_stimuli',
         );
     }
 }
@@ -11602,11 +12174,10 @@ id_type has a value which is a string
 
 =item Description
 
-Input parameters for the "get_compounds" function.
-
-        list<compound_id> compounds - a list of the compound IDs for the compounds to be returned (a required argument)
-        string id_type - the type of ID that should be used in the output data (a optional argument; default is 'ModelSEED')
-        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+Input parameters for the "get_compounds" function.        
+list<compound_id> compounds - a list of the compound IDs for the compounds to be returned (a required argument)
+string id_type - the type of ID that should be used in the output data (a optional argument; default is 'ModelSEED')
+string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -11629,6 +12200,135 @@ a reference to a hash where the following keys are defined:
 compounds has a value which is a reference to a list where each element is a compound_id
 auth has a value which is a string
 id_type has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 get_alias_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the get_alias function
+
+                string object_type    - The type of object (e.g. Compound or Reaction)
+                string input_id_type - The type (e.g. ModelSEED) of alias to be inputted
+                string output_id_type - The type (e.g. KEGG) of alias to be outputted
+                list<string> input_ids - A list of input IDs
+                string auth; - The authentication token of the KBase account (optional)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+object_type has a value which is a string
+input_id_type has a value which is a string
+output_id_type has a value which is a string
+input_ids has a value which is a reference to a list where each element is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+object_type has a value which is a string
+input_id_type has a value which is a string
+output_id_type has a value which is a string
+input_ids has a value which is a reference to a list where each element is a string
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 get_alias_outputs
+
+=over 4
+
+
+
+=item Description
+
+Output for get_alias function
+
+              string original_id - The original ID
+              list<string> aliases - Aliases for the original ID in the new format
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+original_id has a value which is a string
+aliases has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+original_id has a value which is a string
+aliases has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 get_aliassets_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the get_aliassets function
+
+              string auth; - The authentication token of the KBase account (optional)
+              string object_type; - The type of object (e.g. Compound or Reaction)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+object_type has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+object_type has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -13608,6 +14308,162 @@ auth has a value which is a string
 a reference to a hash where the following keys are defined:
 templateModel has a value which is a template_id
 auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fasta_to_contigs_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "fasta_to_contigs" function.
+
+        string contigid - ID to be assigned to the contigs object created (optional)
+        string fasta - string with sequence data from fasta file (required argument)
+        workspace_id workspace - ID of workspace for storing objects (optional argument, default is current workspace)
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+contigid has a value which is a string
+fasta has a value which is a string
+workspace has a value which is a workspace_id
+auth has a value which is a string
+source has a value which is a string
+genetic_code has a value which is a string
+domain has a value which is a string
+scientific_name has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+contigid has a value which is a string
+fasta has a value which is a string
+workspace has a value which is a workspace_id
+auth has a value which is a string
+source has a value which is a string
+genetic_code has a value which is a string
+domain has a value which is a string
+scientific_name has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 contigs_to_genome_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "contigs_to_genome" function.
+
+        string contigid - ID to be assigned to the contigs object created (optional)
+        workspace_id contigws - ID of workspace with contigs (optional argument, default is value of workspace argument)
+        workspace_id workspace - ID of workspace for storing objects (optional argument, default is current workspace)
+        string genomeid - ID to use for genome object (required argument)
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+contigid has a value which is a string
+contig_workspace has a value which is a workspace_id
+workspace has a value which is a workspace_id
+genomeid has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+contigid has a value which is a string
+contig_workspace has a value which is a workspace_id
+workspace has a value which is a workspace_id
+genomeid has a value which is a string
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 add_stimuli_params
+
+=over 4
+
+
+
+=item Description
+
+********************************************************************************
+    Code relating to reconstruction, import, and analysis of regulatory models
+   	********************************************************************************
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+biochemid has a value which is a string
+stimuliid has a value which is a string
+name has a value which is a string
+abbreviation has a value which is a string
+type has a value which is a string
+description has a value which is a string
+compounds has a value which is a reference to a list where each element is a string
+workspace has a value which is a string
+authl has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+biochemid has a value which is a string
+stimuliid has a value which is a string
+name has a value which is a string
+abbreviation has a value which is a string
+type has a value which is a string
+description has a value which is a string
+compounds has a value which is a reference to a list where each element is a string
+workspace has a value which is a string
+authl has a value which is a string
 
 
 =end text

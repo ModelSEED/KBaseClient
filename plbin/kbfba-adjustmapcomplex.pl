@@ -34,7 +34,7 @@ my ($opt,$params) = universalFBAScriptCode($specs,$script,$primaryArgs,$translat
 if (defined($opt->{rolesToAdd})) {
 	foreach my $role (@{$opt->{rolesToAdd}}) {
 		my $rolelist = [split(/;/,$role)];
-		foreach my $roleitem (@{$rolelist) {
+		foreach my $roleitem (@{$rolelist}) {
 			push(@{$params->{rolesToAdd}},[split(/:/,$roleitem)]);
 		}
 	}

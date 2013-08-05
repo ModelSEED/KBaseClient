@@ -489,15 +489,19 @@ sub validate {
 	} else {
 	    # Check cache for signer public key
 	    my($response, $binary_sig, $client);
+	    $binary_sig = pack('H*',$vars{'sig'});
 	    my $data = cache_get( \$SignerCache, $vars{'SigningSubject'});
 	    unless ($data) {
-		$binary_sig = pack('H*',$vars{'sig'});
 		$client = LWP::UserAgent->new();
 		$client->ssl_opts(verify_hostname => 0);
 		$client->timeout(5);
 		$response = $client->get( $vars{'SigningSubject'});
-		$data = from_json( $response->content());
-		cache_set( \$SignerCache, $SignerCacheSize, $vars{'SigningSubject'}, encode_base64( $response->content(), ''));
+		if ($response->is_success) {
+		    $data = from_json( $response->content());
+		    cache_set( \$SignerCache, $SignerCacheSize, $vars{'SigningSubject'}, encode_base64( $response->content(), ''));
+		} else {
+		    die "Failed to get signing subject: " . $response->status_line;
+		}
 	    } else {
 		$data = from_json(decode_base64( $data));
 	    }
@@ -521,7 +525,7 @@ sub validate {
 	$self->error_message("Failed to verify token: $@");
 	return( undef);
     } else {
-	$self->{'error_message'} = undef;
+	$self->{'error_message'} = $verify ? undef : "Token failed RSA signature verification";
 	return( $verify);
     }
 }

@@ -54,6 +54,7 @@ sub LoadConfig {
 
     my $c = Config::Simple->new( $newConfPath);
     %Conf = $c ? $c->vars() : {};
+    %AuthConf = map { $_, $Conf{ $_} } grep /^authentication\./, keys( %Conf);
     $AuthSvcHost = $Conf{'authentication.servicehost'} ?
 	$Conf{'authentication.servicehost'} : $AuthSvcHost;
     

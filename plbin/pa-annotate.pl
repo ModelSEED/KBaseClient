@@ -18,10 +18,21 @@ SYNOPSIS
       pa-annotate <Genome ID> <ProbAnno ID> [OPTIONS]
 
 DESCRIPTION
-      Submit a job to generate a probabilistic annotation for a genome. 
+      Generate alternative annotations for every gene in a genome together
+      with their likelihoods.  The current method for calculating likelihoods
+      is based on similarity (BLAST) to genes in subsystems and genes with
+      literature evidence.
+      
+      This command takes a significant amount of time to run (since it has to
+      run BLAST against a large database), so it is placed on a queue and 
+      returns a job ID.  Use the kbws-checkjob command to see if your job has
+      finished.  When it is done the results are saved in a ProbAnno typed
+      object with the specified ID.
+      
+      The ProbAnno object can be used as input to gapfilling a metabolic model
+      using the --probanno option for the kbfba-gapfill command.
       
       Options:
-      -d, --debug        Keep intermediate files for debug purposes
       -e, --showerror    Show any errors in execution
       --genomews         ID of workspace where Genome object is stored
       -h, --help         Display this help message, ignore all arguments
@@ -30,8 +41,15 @@ DESCRIPTION
       -w, --probannows   ID of workspace where ProbAnno object is saved
 
 EXAMPLES
-      Annotate:
-      > pa-annotate kb\|g.0 kb\|g.0
+      Generate probabilistic annotation for E. coli K12 genome:
+      > pa-annotate kb\|g.0.genome kb\|g.0.probanno
+      
+SEE ALSO
+      pa-calculate
+      pa-url
+      kbws-checkjob
+      kbws-jobs
+      kbfba-gapfill
       
 AUTHORS
       Matt Benedict, Mike Mundy
@@ -44,7 +62,6 @@ my ( $opt, $usage ) = describe_options(
     [ 'probannows|w=s', 'ID of workspace where ProbAnno object is saved', { "default" => workspace() } ],
     [ 'genomews=s', 'ID of workspace where Genome object is stored', { "default" => "KBaseCDMGenomes" } ],
     [ 'overwrite|o:i', "Overwrite existing ProbAnno object with same name", { "default" => 0 } ],
-    [ 'debug|d:i', "Keep intermediate files for debug purposes", { "default" => 0 } ],
     [ 'showerror|e:i', 'Show any errors in execution', { "default" => 0 } ],
     [ 'verbose|v:i', 'Print verbose messages', { "default" => 0 } ],
     [ 'help|h', 'Show help text' ],
@@ -78,7 +95,6 @@ my $translation = {
     genomews      => "genome_workspace",
     probannows    => "probanno_workspace",
     overwrite     => "overwrite",
-    debug         => "debug"
 };
 
 # Instantiate parameters for function.

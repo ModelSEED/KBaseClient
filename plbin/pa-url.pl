@@ -30,15 +30,15 @@ EXAMPLES
       Current URL is:
       http://kbase.us/services/probabilistic annotation
       
-      Reset to the default URL:
-      > pa-url default
-      Current URL is:
-      http://kbase.us/services/probabilistic annotation
-      
       Use a new URL:
       > pa-url http://localhost:7073
       Current URL is:
       http://localhost:7073
+      
+      Reset to the default URL:
+      > pa-url default
+      Current URL is:
+      http://kbase.us/services/probabilistic annotation
       
 AUTHORS
       Matt Benedict, Mike Mundy
@@ -61,6 +61,5 @@ if (defined($opt->{usage})) {
 }
 
 # Display or update the URL endpoint.
-my $url = get_probanno_url($ARGV[0]);
-print "Current URL is:\n".$url."\n";
+print "Current URL is:\n".get_probanno_url($ARGV[0])."\n";
 exit 0;

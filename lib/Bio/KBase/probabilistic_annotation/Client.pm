@@ -18,7 +18,19 @@ Bio::KBase::probabilistic_annotation::Client
 =head1 DESCRIPTION
 
 
+The purpose of the Probabilistic Annotation service is to provide users with
+alternative annotations for genes, each attached to a likelihood score, and to
+translate these likelihood scores into likelihood scores for the existence of
+reactions in metabolic models.
 
+- Allows users to quickly assess the quality of an annotation.
+- Reaction likelihood computations allow users to estimate the quality of
+  metabolic networks generated using the automated reconstruction tools in
+  other services.
+- Combining reaction likelihoods with gapfilling both directly incorporates
+  available genetic evidence into the gapfilling process and provides putative
+  gene annotations automatically, reducing the effort needed to search for
+  evidence for gapfilled reactions.
 
 
 =cut
@@ -56,21 +68,21 @@ sub new
 =begin html
 
 <pre>
-$input is an annotate_params
-$jobid is a string
-annotate_params is a reference to a hash where the following keys are defined:
+$input is an AnnotateParams
+$jobid is a job_id
+AnnotateParams is a reference to a hash where the following keys are defined:
 	genome has a value which is a genome_id
 	genome_workspace has a value which is a workspace_id
 	probanno has a value which is a probanno_id
 	probanno_workspace has a value which is a workspace_id
 	overwrite has a value which is a bool
-	debug has a value which is a bool
 	verbose has a value which is a bool
 	auth has a value which is a string
 genome_id is a string
 workspace_id is a string
 probanno_id is a string
 bool is an int
+job_id is a string
 
 </pre>
 
@@ -78,28 +90,30 @@ bool is an int
 
 =begin text
 
-$input is an annotate_params
-$jobid is a string
-annotate_params is a reference to a hash where the following keys are defined:
+$input is an AnnotateParams
+$jobid is a job_id
+AnnotateParams is a reference to a hash where the following keys are defined:
 	genome has a value which is a genome_id
 	genome_workspace has a value which is a workspace_id
 	probanno has a value which is a probanno_id
 	probanno_workspace has a value which is a workspace_id
 	overwrite has a value which is a bool
-	debug has a value which is a bool
 	verbose has a value which is a bool
 	auth has a value which is a string
 genome_id is a string
 workspace_id is a string
 probanno_id is a string
 bool is an int
+job_id is a string
 
 
 =end text
 
 =item Description
 
-
+Generate alternative annotations for every gene in a genome together with
+their likelihoods.  Results are stored in a ProbAnno object. Returns the
+job ID of the submitted job.
 
 =back
 
@@ -162,16 +176,15 @@ sub annotate
 =begin html
 
 <pre>
-$input is a calculate_params
+$input is a CalculateParams
 $output is an object_metadata
-calculate_params is a reference to a hash where the following keys are defined:
+CalculateParams is a reference to a hash where the following keys are defined:
 	probanno has a value which is a probanno_id
 	probanno_workspace has a value which is a workspace_id
 	template_model has a value which is a template_id
 	template_model_workspace has a value which is a workspace_id
 	rxnprobs has a value which is a rxnprobs_id
 	rxnprobs_workspace has a value which is a workspace_id
-	debug has a value which is a bool
 	verbose has a value which is a bool
 	auth has a value which is a string
 probanno_id is a string
@@ -203,16 +216,15 @@ workspace_ref is a string
 
 =begin text
 
-$input is a calculate_params
+$input is a CalculateParams
 $output is an object_metadata
-calculate_params is a reference to a hash where the following keys are defined:
+CalculateParams is a reference to a hash where the following keys are defined:
 	probanno has a value which is a probanno_id
 	probanno_workspace has a value which is a workspace_id
 	template_model has a value which is a template_id
 	template_model_workspace has a value which is a workspace_id
 	rxnprobs has a value which is a rxnprobs_id
 	rxnprobs_workspace has a value which is a workspace_id
-	debug has a value which is a bool
 	verbose has a value which is a bool
 	auth has a value which is a string
 probanno_id is a string
@@ -243,8 +255,9 @@ workspace_ref is a string
 
 =item Description
 
-Compute reaction probabilities from probabilistic annotation and a template model.
-Returns metadata for the reaction probability object
+Calculate reaction likelihoods from a probabilistic annotation and a
+template model.  Results are stored in a RxnProbs object.  Returns the
+metadata for the reaction probability object.
 
 =back
 
@@ -393,6 +406,37 @@ an int
 =item Description
 
 A string identifier for a probabilistic annotation object.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 job_id
+
+=over 4
+
+
+
+=item Description
+
+A string identifier for a job object.
 
 
 =item Definition
@@ -824,7 +868,7 @@ a reference to a list containing 11 items:
 
 
 
-=head2 FunctionProbability
+=head2 function_probability
 
 =over 4
 
@@ -880,8 +924,8 @@ Object to carry alternative functions and probabilities for genes in a genome
         probanno_id id - ID of the probabilistic annotation object    
         genome_id genome - ID of the genome the probabilistic annotation was built for
         workspace_id genome_workspace - ID of the workspace containing genome
-        mapping<feature_id, list<FunctionProbability>> rolesetProbabilities - mapping of features to list of alternative FunctionProbability objects
-        list<feature_id> skippedFeatures - list of features in genome with no probability
+        mapping<feature_id, list<function_probability>> roleset_probabilities - mapping of features to list of alternative function_probability objects
+        list<feature_id> skipped_features - list of features in genome with no probability
 
 
 =item Definition
@@ -893,8 +937,8 @@ a reference to a hash where the following keys are defined:
 id has a value which is a probanno_id
 genome has a value which is a genome_id
 genome_workspace has a value which is a workspace_id
-rolesetProbabilities has a value which is a reference to a hash where the key is a feature_id and the value is a reference to a list where each element is a FunctionProbability
-skippedFeatures has a value which is a reference to a list where each element is a feature_id
+roleset_probabilities has a value which is a reference to a hash where the key is a feature_id and the value is a reference to a list where each element is a function_probability
+skipped_features has a value which is a reference to a list where each element is a feature_id
 
 </pre>
 
@@ -906,8 +950,8 @@ a reference to a hash where the following keys are defined:
 id has a value which is a probanno_id
 genome has a value which is a genome_id
 genome_workspace has a value which is a workspace_id
-rolesetProbabilities has a value which is a reference to a hash where the key is a feature_id and the value is a reference to a list where each element is a FunctionProbability
-skippedFeatures has a value which is a reference to a list where each element is a feature_id
+roleset_probabilities has a value which is a reference to a hash where the key is a feature_id and the value is a reference to a list where each element is a function_probability
+skipped_features has a value which is a reference to a list where each element is a feature_id
 
 
 =end text
@@ -916,7 +960,7 @@ skippedFeatures has a value which is a reference to a list where each element is
 
 
 
-=head2 ReactionProbability
+=head2 reaction_probability
 
 =over 4
 
@@ -975,8 +1019,8 @@ a reference to a list containing 5 items:
 
 Object to hold reaction probabilities for a genome.
 
-        genome_id genome;
-        list<ReactionProbability> reactionProbabilities;
+        genome_id genome - ID of the genome the reaction probabilities was built for
+        list<reaction_probability> reaction_probabilities - list of reaction probabilities
 
 
 =item Definition
@@ -986,7 +1030,7 @@ Object to hold reaction probabilities for a genome.
 <pre>
 a reference to a hash where the following keys are defined:
 genome has a value which is a genome_id
-reactionProbabilities has a value which is a reference to a list where each element is a ReactionProbability
+reaction_probabilities has a value which is a reference to a list where each element is a reaction_probability
 
 </pre>
 
@@ -996,7 +1040,7 @@ reactionProbabilities has a value which is a reference to a list where each elem
 
 a reference to a hash where the following keys are defined:
 genome has a value which is a genome_id
-reactionProbabilities has a value which is a reference to a list where each element is a ReactionProbability
+reaction_probabilities has a value which is a reference to a list where each element is a reaction_probability
 
 
 =end text
@@ -1005,7 +1049,7 @@ reactionProbabilities has a value which is a reference to a list where each elem
 
 
 
-=head2 annotate_params
+=head2 AnnotateParams
 
 =over 4
 
@@ -1020,7 +1064,6 @@ Input parameters for the "annotate" function.
        probanno_id probanno - ID of ProbAnno object
        workspace_id probanno_workspace - ID workspace where ProbAnno object is saved
        bool overwrite - True to overwrite existing ProbAnno object with same name
-       bool debug - True to keep intermediate files for debug purposes
            bool verbose - True to print verbose messages
        string auth - Authentication token of KBase user
 
@@ -1036,7 +1079,6 @@ genome_workspace has a value which is a workspace_id
 probanno has a value which is a probanno_id
 probanno_workspace has a value which is a workspace_id
 overwrite has a value which is a bool
-debug has a value which is a bool
 verbose has a value which is a bool
 auth has a value which is a string
 
@@ -1052,7 +1094,6 @@ genome_workspace has a value which is a workspace_id
 probanno has a value which is a probanno_id
 probanno_workspace has a value which is a workspace_id
 overwrite has a value which is a bool
-debug has a value which is a bool
 verbose has a value which is a bool
 auth has a value which is a string
 
@@ -1063,7 +1104,7 @@ auth has a value which is a string
 
 
 
-=head2 calculate_params
+=head2 CalculateParams
 
 =over 4
 
@@ -1075,7 +1116,6 @@ Input parameters for the "calculate" function.
 
             probanno_id probanno - ID of ProbAnno object
             workspace_id probanno_workspace - ID of workspace where ProbAnno object is stored
-            bool debug - True to keep intermediate files for debug purposes
             bool verbose - True to print verbose messages
             string auth - Authentication token of KBase user
 
@@ -1092,7 +1132,6 @@ template_model has a value which is a template_id
 template_model_workspace has a value which is a workspace_id
 rxnprobs has a value which is a rxnprobs_id
 rxnprobs_workspace has a value which is a workspace_id
-debug has a value which is a bool
 verbose has a value which is a bool
 auth has a value which is a string
 
@@ -1109,7 +1148,6 @@ template_model has a value which is a template_id
 template_model_workspace has a value which is a workspace_id
 rxnprobs has a value which is a rxnprobs_id
 rxnprobs_workspace has a value which is a workspace_id
-debug has a value which is a bool
 verbose has a value which is a bool
 auth has a value which is a string
 

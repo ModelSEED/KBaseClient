@@ -9,10 +9,11 @@ clean:
 	rm $(THIS_DIR)/bin/*
 	
 gather:
-	rm $(THIS_DIR)/plbin/kb*
-	rm $(THIS_DIR)/plbin/pa*
 	rm -rf $(THIS_DIR)/lib/Bio
 	cp $(THIS_DIR)/../probabilistic_annotation/scripts/pa-* $(THIS_DIR)/plbin/
+	cp $(THIS_DIR)/../KBaseFBAModeling/scripts/ga-* $(THIS_DIR)/plbin/
+	cp $(THIS_DIR)/../KBaseFBAModeling/scripts/fba-* $(THIS_DIR)/plbin/
+	cp $(THIS_DIR)/../workspace_service/scripts/ws-* $(THIS_DIR)/plbin/
 	cp $(THIS_DIR)/../KBaseFBAModeling/scripts/kbfba-* $(THIS_DIR)/plbin/
 	cp $(THIS_DIR)/../workspace_service/scripts/kbws-* $(THIS_DIR)/plbin/
 	mkdir $(THIS_DIR)/lib/Bio

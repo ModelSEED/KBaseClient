@@ -441,6 +441,192 @@ sub load_model_to_modelseed
 
 
 
+=head2 create_plantseed_job
+
+  $success = $obj->create_plantseed_job($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a create_plantseed_job_params
+$success is an int
+create_plantseed_job_params is a reference to a hash where the following keys are defined:
+	username has a value which is a string
+	password has a value which is a string
+	fasta has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a create_plantseed_job_params
+$success is an int
+create_plantseed_job_params is a reference to a hash where the following keys are defined:
+	username has a value which is a string
+	password has a value which is a string
+	fasta has a value which is a string
+
+
+=end text
+
+=item Description
+
+Creates a plant seed job for the input fasta file
+
+=back
+
+=cut
+
+sub create_plantseed_job
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function create_plantseed_job (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to create_plantseed_job:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'create_plantseed_job');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "MSSeedSupportServer.create_plantseed_job",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'create_plantseed_job',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method create_plantseed_job",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'create_plantseed_job',
+				       );
+    }
+}
+
+
+
+=head2 get_plantseed_genomes
+
+  $output = $obj->get_plantseed_genomes($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a get_plantseed_genomes_params
+$output is a reference to a list where each element is a plantseed_genomes
+get_plantseed_genomes_params is a reference to a hash where the following keys are defined:
+	username has a value which is a string
+	password has a value which is a string
+plantseed_genomes is a reference to a hash where the following keys are defined:
+	owner has a value which is a string
+	genome has a value which is a string
+	contigs has a value which is a string
+	model has a value which is a string
+	status has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a get_plantseed_genomes_params
+$output is a reference to a list where each element is a plantseed_genomes
+get_plantseed_genomes_params is a reference to a hash where the following keys are defined:
+	username has a value which is a string
+	password has a value which is a string
+plantseed_genomes is a reference to a hash where the following keys are defined:
+	owner has a value which is a string
+	genome has a value which is a string
+	contigs has a value which is a string
+	model has a value which is a string
+	status has a value which is a string
+
+
+=end text
+
+=item Description
+
+Retrieves a list of plantseed genomes owned by user
+
+=back
+
+=cut
+
+sub get_plantseed_genomes
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_plantseed_genomes (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_plantseed_genomes:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_plantseed_genomes');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "MSSeedSupportServer.get_plantseed_genomes",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_plantseed_genomes',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_plantseed_genomes",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_plantseed_genomes',
+				       );
+    }
+}
+
+
+
 sub version {
     my ($self) = @_;
     my $result = $self->{client}->call($self->{url}, {
@@ -452,16 +638,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'load_model_to_modelseed',
+                method_name => 'get_plantseed_genomes',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method load_model_to_modelseed",
+            error => "Error invoking method get_plantseed_genomes",
             status_line => $self->{client}->status_line,
-            method_name => 'load_model_to_modelseed',
+            method_name => 'get_plantseed_genomes',
         );
     }
 }
@@ -773,6 +959,138 @@ owner has a value which is a string
 genome has a value which is a string
 reactions has a value which is a reference to a list where each element is a string
 biomass has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 create_plantseed_job_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "create_plantseed_job" function.
+
+        string username - username of owner of new genome
+        string password - password of owner of new genome
+        string fasta - fasta file data
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+username has a value which is a string
+password has a value which is a string
+fasta has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+username has a value which is a string
+password has a value which is a string
+fasta has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 get_plantseed_genomes_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "get_plantseed_genomes" function.
+
+        string username - username of owner of new genome
+        string password - password of owner of new genome
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+username has a value which is a string
+password has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+username has a value which is a string
+password has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 plantseed_genomes
+
+=over 4
+
+
+
+=item Description
+
+Output for the "get_plantseed_genomes" function.
+
+        string owner - owner of the plantseed genome
+        string genome - ID of the plantseed genome
+        string contigs - ID of the contigs for plantseed genome
+        string model - ID of model for PlantSEED genome
+        string status - status of plantseed genome
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+owner has a value which is a string
+genome has a value which is a string
+contigs has a value which is a string
+model has a value which is a string
+status has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+owner has a value which is a string
+genome has a value which is a string
+contigs has a value which is a string
+model has a value which is a string
+status has a value which is a string
 
 
 =end text

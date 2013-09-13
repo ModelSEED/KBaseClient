@@ -10,7 +10,7 @@ use Bio::KBase::workspaceService::Helpers qw(printJobData auth get_ws_client wor
 use Bio::KBase::fbaModelServices::Helpers qw(get_fba_client runFBACommand universalFBAScriptCode );
 #Defining globals describing behavior
 my $primaryArgs = ["Contigs ID"];
-my $servercommand = "contigs_to_genome";
+my $servercommand = "_to_genome";
 my $script = "ga-contigs_to_genome";
 my $translation = {
 	"Contigs ID" => "contigid",

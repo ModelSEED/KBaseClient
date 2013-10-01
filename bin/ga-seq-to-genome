@@ -6,4 +6,4 @@ fi
 cd `dirname ${SCRIPT_DIR}` > /dev/null
 SCRIPT_DIR=`pwd`;
 popd  > /dev/null
-perl $SCRIPT_DIR/../plbin/ga-contigs_to_genome.pl "$@"
+perl $SCRIPT_DIR/../plbin/ga-seq-to-genome.pl "$@"

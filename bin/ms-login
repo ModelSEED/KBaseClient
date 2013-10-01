@@ -6,4 +6,4 @@ fi
 cd `dirname ${SCRIPT_DIR}` > /dev/null
 SCRIPT_DIR=`pwd`;
 popd  > /dev/null
-perl $SCRIPT_DIR/../plbin/ga-fasta_to_sequences.pl "$@"
+perl $SCRIPT_DIR/../plbin/ms-login.pl "$@"

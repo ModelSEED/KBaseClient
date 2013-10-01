@@ -7,7 +7,6 @@
 use strict;
 use warnings;
 use Getopt::Long::Descriptive;
-use Bio::KBase::AuthToken;
 use Term::ReadKey;
 use ModelSEED::Client::MSSeedSupport;
 use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
@@ -15,7 +14,7 @@ use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace worksp
 my $primaryArgs = ["Username"];
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'msws-login <'.join("> <",@{$primaryArgs}).'> %o',
+    'ms-login <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'password|p:s', 'User password' ],
     [ 'help|h|?', 'Print this usage information' ],
 );
@@ -34,21 +33,18 @@ if (defined($opt->{password})) {
 } else {
 	$pswd = get_pass();
 }
-my $token = $user."\t".$pswd;
 my $newtoken;
 eval {
 	my $svr = ModelSEED::Client::MSSeedSupport->new();
-	$newtoken = $svr->authenticate({
-		token => $token
+	$newtoken = $svr->kblogin({
+		kblogin => $user,
+		kbpassword => $pswd
 	});
 };
-my $pattern = "^".$user."\\s";
-if (!defined($newtoken) || $newtoken =~ m/ERROR:/) {
-	print $newtoken."\n";
+if (!defined($newtoken)) {
 	print "Login failed. Now logged in as:\npublic\n";
 	unlink $ENV{HOME}."/.kbase_auth";
 } else {
-	$newtoken =~ s/\s/\t/;
 	auth($newtoken);
 	print "Login successful. Now logged in as:\n".$user."\n";
 }

@@ -443,7 +443,7 @@ sub load_model_to_modelseed
 
 =head2 create_plantseed_job
 
-  $success = $obj->create_plantseed_job($params)
+  $output = $obj->create_plantseed_job($params)
 
 =over 4
 
@@ -453,11 +453,22 @@ sub load_model_to_modelseed
 
 <pre>
 $params is a create_plantseed_job_params
-$success is an int
+$output is a plantseed_job_data
 create_plantseed_job_params is a reference to a hash where the following keys are defined:
 	username has a value which is a string
 	password has a value which is a string
 	fasta has a value which is a string
+	contigid has a value which is a string
+	source has a value which is a string
+	genetic_code has a value which is a string
+	domain has a value which is a string
+	scientific_name has a value which is a string
+plantseed_job_data is a reference to a hash where the following keys are defined:
+	owner has a value which is a string
+	genome has a value which is a string
+	contigs has a value which is a string
+	model has a value which is a string
+	status has a value which is a string
 
 </pre>
 
@@ -466,11 +477,22 @@ create_plantseed_job_params is a reference to a hash where the following keys ar
 =begin text
 
 $params is a create_plantseed_job_params
-$success is an int
+$output is a plantseed_job_data
 create_plantseed_job_params is a reference to a hash where the following keys are defined:
 	username has a value which is a string
 	password has a value which is a string
 	fasta has a value which is a string
+	contigid has a value which is a string
+	source has a value which is a string
+	genetic_code has a value which is a string
+	domain has a value which is a string
+	scientific_name has a value which is a string
+plantseed_job_data is a reference to a hash where the following keys are defined:
+	owner has a value which is a string
+	genome has a value which is a string
+	contigs has a value which is a string
+	model has a value which is a string
+	status has a value which is a string
 
 
 =end text
@@ -627,6 +649,176 @@ sub get_plantseed_genomes
 
 
 
+=head2 kblogin
+
+  $authtoken = $obj->kblogin($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a kblogin_params
+$authtoken is a string
+kblogin_params is a reference to a hash where the following keys are defined:
+	kblogin has a value which is a string
+	kbpassword has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a kblogin_params
+$authtoken is a string
+kblogin_params is a reference to a hash where the following keys are defined:
+	kblogin has a value which is a string
+	kbpassword has a value which is a string
+
+
+=end text
+
+=item Description
+
+Login for specified kbase account
+
+=back
+
+=cut
+
+sub kblogin
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function kblogin (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to kblogin:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'kblogin');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "MSSeedSupportServer.kblogin",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'kblogin',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method kblogin",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'kblogin',
+				       );
+    }
+}
+
+
+
+=head2 kblogin_from_token
+
+  $login = $obj->kblogin_from_token($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a kblogin_from_token_params
+$login is a string
+kblogin_from_token_params is a reference to a hash where the following keys are defined:
+	authtoken has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a kblogin_from_token_params
+$login is a string
+kblogin_from_token_params is a reference to a hash where the following keys are defined:
+	authtoken has a value which is a string
+
+
+=end text
+
+=item Description
+
+Login for specified kbase auth token
+
+=back
+
+=cut
+
+sub kblogin_from_token
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function kblogin_from_token (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to kblogin_from_token:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'kblogin_from_token');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "MSSeedSupportServer.kblogin_from_token",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'kblogin_from_token',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method kblogin_from_token",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'kblogin_from_token',
+				       );
+    }
+}
+
+
+
 sub version {
     my ($self) = @_;
     my $result = $self->{client}->call($self->{url}, {
@@ -638,16 +830,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'get_plantseed_genomes',
+                method_name => 'kblogin_from_token',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method get_plantseed_genomes",
+            error => "Error invoking method kblogin_from_token",
             status_line => $self->{client}->status_line,
-            method_name => 'get_plantseed_genomes',
+            method_name => 'kblogin_from_token',
         );
     }
 }
@@ -991,6 +1183,11 @@ a reference to a hash where the following keys are defined:
 username has a value which is a string
 password has a value which is a string
 fasta has a value which is a string
+contigid has a value which is a string
+source has a value which is a string
+genetic_code has a value which is a string
+domain has a value which is a string
+scientific_name has a value which is a string
 
 </pre>
 
@@ -1002,6 +1199,58 @@ a reference to a hash where the following keys are defined:
 username has a value which is a string
 password has a value which is a string
 fasta has a value which is a string
+contigid has a value which is a string
+source has a value which is a string
+genetic_code has a value which is a string
+domain has a value which is a string
+scientific_name has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 plantseed_job_data
+
+=over 4
+
+
+
+=item Description
+
+Output for the "create_plantseed_job" function.
+
+        string owner - owner of the plantseed genome
+        string genomeid - ID of the plantseed genome
+        string contigid - ID of the contigs for plantseed genome
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+owner has a value which is a string
+genome has a value which is a string
+contigs has a value which is a string
+model has a value which is a string
+status has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+owner has a value which is a string
+genome has a value which is a string
+contigs has a value which is a string
+model has a value which is a string
+status has a value which is a string
 
 
 =end text
@@ -1091,6 +1340,84 @@ genome has a value which is a string
 contigs has a value which is a string
 model has a value which is a string
 status has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 kblogin_params
+
+=over 4
+
+
+
+=item Description
+
+Input for "kblogin" function.
+
+        string kblogin - KBase username
+        string kbpassword - KBase password
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+kblogin has a value which is a string
+kbpassword has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+kblogin has a value which is a string
+kbpassword has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 kblogin_from_token_params
+
+=over 4
+
+
+
+=item Description
+
+Input for "kblogin" function.
+
+        string kblogin - KBase username
+        string kbpassword - KBase password
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+authtoken has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+authtoken has a value which is a string
 
 
 =end text

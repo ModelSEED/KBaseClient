@@ -65,7 +65,6 @@ if (defined($opt->{"delete"}) && $opt->{"delete"} == 1) {
 for (my $i=0; $i < @{$output};$i++) {
 	if ($output->[$i]->{id} eq $params->{jobid}) {
 		$params->{currentStatus} = $output->[$i]->{status};
-		print $params->{currentStatus}."\n";
 		last;
 	}
 }

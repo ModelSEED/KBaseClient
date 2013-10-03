@@ -71,6 +71,7 @@ if (!defined($output)) {
             $j->{id},
             $j->{owner},
             $j->{status},
+            $j->{type},
             $j->{queuetime},
             $j->{starttime},
             $j->{completetime}
@@ -83,11 +84,11 @@ if (!defined($output)) {
     my $table;
     if ($opt->{showqsub} == 1) {
     	$table = Text::Table->new(
-    		'ID', 'Owner','Status','Queue time','Start time','Complete time','Qsub ID'
+    		'ID', 'Owner','Status','Type','Queue time','Start time','Complete time','Qsub ID'
     	);
     } else {
     	$table = Text::Table->new(
-	    	'ID', 'Owner','Status','Queue time','Start time','Complete time'
+	    	'ID', 'Owner','Status','Type','Queue time','Start time','Complete time'
 	    );
     }
     $table->load(@$tbl);

@@ -453,7 +453,7 @@ sub load_model_to_modelseed
 
 <pre>
 $params is a create_plantseed_job_params
-$output is a plantseed_job_data
+$output is a string
 create_plantseed_job_params is a reference to a hash where the following keys are defined:
 	username has a value which is a string
 	password has a value which is a string
@@ -463,12 +463,6 @@ create_plantseed_job_params is a reference to a hash where the following keys ar
 	genetic_code has a value which is a string
 	domain has a value which is a string
 	scientific_name has a value which is a string
-plantseed_job_data is a reference to a hash where the following keys are defined:
-	owner has a value which is a string
-	genome has a value which is a string
-	contigs has a value which is a string
-	model has a value which is a string
-	status has a value which is a string
 
 </pre>
 
@@ -477,7 +471,7 @@ plantseed_job_data is a reference to a hash where the following keys are defined
 =begin text
 
 $params is a create_plantseed_job_params
-$output is a plantseed_job_data
+$output is a string
 create_plantseed_job_params is a reference to a hash where the following keys are defined:
 	username has a value which is a string
 	password has a value which is a string
@@ -487,12 +481,6 @@ create_plantseed_job_params is a reference to a hash where the following keys ar
 	genetic_code has a value which is a string
 	domain has a value which is a string
 	scientific_name has a value which is a string
-plantseed_job_data is a reference to a hash where the following keys are defined:
-	owner has a value which is a string
-	genome has a value which is a string
-	contigs has a value which is a string
-	model has a value which is a string
-	status has a value which is a string
 
 
 =end text
@@ -1212,53 +1200,6 @@ scientific_name has a value which is a string
 
 
 
-=head2 plantseed_job_data
-
-=over 4
-
-
-
-=item Description
-
-Output for the "create_plantseed_job" function.
-
-        string owner - owner of the plantseed genome
-        string genomeid - ID of the plantseed genome
-        string contigid - ID of the contigs for plantseed genome
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-owner has a value which is a string
-genome has a value which is a string
-contigs has a value which is a string
-model has a value which is a string
-status has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-owner has a value which is a string
-genome has a value which is a string
-contigs has a value which is a string
-model has a value which is a string
-status has a value which is a string
-
-
-=end text
-
-=back
-
-
-
 =head2 get_plantseed_genomes_params
 
 =over 4
@@ -1398,8 +1339,7 @@ kbpassword has a value which is a string
 
 Input for "kblogin" function.
 
-        string kblogin - KBase username
-        string kbpassword - KBase password
+        string authtoken - KBase token
 
 
 =item Definition

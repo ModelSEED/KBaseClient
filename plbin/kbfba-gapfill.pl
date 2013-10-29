@@ -31,6 +31,7 @@ my $translation = {
 	solver => "solver"
 };
 my $gfTranslation = {
+	rxnsensitivity => "sensitivity_analysis",
 	numsol => "num_solutions",
 	nomediahyp => "nomediahyp",
 	nobiomasshyp => "nobiomasshyp",
@@ -70,9 +71,11 @@ my $specs = [
     [ 'modelout:s', 'ID for output model in workspace' ],
     [ 'intsol', 'Automatically integrate solution', { "default" => 0 } ],
     [ 'iterativegf|t', 'Gapfill all inactive reactions', { "default" => 0 } ],
+    [ 'targrxn|x:s@', 'Target reactions for iterative gapfilling (; delimiter)'],
+    [ 'rxnsensitivity|y', 'Flag indicates if sensitivity analysis of gapfill solutions should run'],
     [ 'timepersol:s', 'Maximum time spent per solution' ],
     [ 'timelimit:s', 'Maximum toal time' ],
-    [ 'media|m:s', 'Media formulation for FBA' ],
+    [ 'media|m:s', 'Media formulation for FBA (default is complete media)' ],
     [ 'mediaws:s', 'Workspace with media formulation' ],
     [ 'addlcpd|c:s@', 'Additional compounds (; delimiter)' ],
     [ 'numsol:i', 'Number of solutions desired', {"default" => 1} ],
@@ -90,9 +93,9 @@ my $specs = [
     [ 'biomasstranspen:s', 'Penalty for biomass transport reactions', {"default" => 1} ],
     [ 'singletranspen:s', 'Penalty for single transport reactions', {"default" => 1} ],
     [ 'transpen:s', 'Penalty for transport reactions', {"default" => 1} ],
-	[ 'probrxn=s', 'ID of probabilistic reactions' ],
-	[ 'probanno=s', 'ID of probabilistic annotation' ],
-    [ 'probannows:s', 'Workspace with probabilistic annotation' ],
+	[ 'probrxn=s', 'ID of probabilistic reaction object' ],
+	[ 'probanno=s', 'ID of probabilistic annotation object' ],
+    [ 'probannows:s', 'Workspace with probabilistic annotation or probabilistic reaction' ],
     [ 'blacklist:s@', 'List of blacklisted reactions (; delimiter)' ],
     [ 'gauranteed:s@', 'List of gauranteed reactions (; delimiter)' ],
     [ 'allowedcmp:s@', 'List of allowed compartments (; delimiter)' ],
@@ -123,6 +126,12 @@ if (!defined($opt->{mediaws}) && defined($opt->{media})) {
 }
 if (defined($opt->{probanno}) && defined($opt->{probrxn})) {
     die "Attempt to pass probanno and probrxns objects in the same call. This is not allowed because probrxn is calcualted from probanno and could cause collisions";
+}
+if (defined($opt->{targrxn})) {
+	foreach my $terms (@{$opt->{targrxn}}) {
+		my $array = [split(/;/,$terms)];
+		push(@{$params->{target_reactions}},@{$array});
+	}
 }
 
 $params->{formulation} = {

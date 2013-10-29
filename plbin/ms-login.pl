@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Getopt::Long::Descriptive;
 use Term::ReadKey;
-use ModelSEED::Client::MSSeedSupport;
+use Bio::ModelSEED::MSSeedSupportServer::Client;
 use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
 #Defining globals describing behavior
 my $primaryArgs = ["Username"];
@@ -34,13 +34,13 @@ if (defined($opt->{password})) {
 	$pswd = get_pass();
 }
 my $newtoken;
-eval {
-	my $svr = ModelSEED::Client::MSSeedSupport->new();
+#eval {
+	my $svr = Bio::ModelSEED::MSSeedSupportServer::Client->new("http://bio-data-1.mcs.anl.gov/services/ms_fba");
 	$newtoken = $svr->kblogin({
 		kblogin => $user,
 		kbpassword => $pswd
 	});
-};
+#};
 if (!defined($newtoken)) {
 	print "Login failed. Now logged in as:\npublic\n";
 	unlink $ENV{HOME}."/.kbase_auth";

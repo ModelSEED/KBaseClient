@@ -6,4 +6,4 @@ fi
 cd `dirname ${SCRIPT_DIR}` > /dev/null
 SCRIPT_DIR=`pwd`;
 popd  > /dev/null
-perl $SCRIPT_DIR/../plbin/kbws-setjobstatus.pl "$@"
+perl $SCRIPT_DIR/../plbin/si-login.pl "$@"

@@ -45,6 +45,8 @@ gather:
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/Exceptions.pm $(THIS_DIR)/lib/Bio/KBase/Exceptions.pm ; \
 	fi
 	if [ -d $(THIS_DIR)/../MSSeedSupportServer ] ; then \
+		cp $(THIS_DIR)/../MSSeedSupportServer/scripts/ms-* $(THIS_DIR)/plbin/ ; \
+		cp $(THIS_DIR)/../MSSeedSupportServer/scripts/si-* $(THIS_DIR)/plbin/ ; \
 		rm -rf $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer ; \
 		mkdir $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer ; \
 		cp $(THIS_DIR)/../MSSeedSupportServer/lib/Bio/ModelSEED/MSSeedSupportServer/Client.pm $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer/Client.pm ; \

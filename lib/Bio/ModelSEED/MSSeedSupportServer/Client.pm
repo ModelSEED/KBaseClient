@@ -453,7 +453,7 @@ sub load_model_to_modelseed
 
 <pre>
 $params is a create_plantseed_job_params
-$output is a string
+$output is a JobObject
 create_plantseed_job_params is a reference to a hash where the following keys are defined:
 	username has a value which is a string
 	password has a value which is a string
@@ -463,6 +463,17 @@ create_plantseed_job_params is a reference to a hash where the following keys ar
 	genetic_code has a value which is a string
 	domain has a value which is a string
 	scientific_name has a value which is a string
+JobObject is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	type has a value which is a string
+	auth has a value which is a string
+	status has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+	queuetime has a value which is a string
+	starttime has a value which is a string
+	completetime has a value which is a string
+	owner has a value which is a string
+	queuecommand has a value which is a string
 
 </pre>
 
@@ -471,7 +482,7 @@ create_plantseed_job_params is a reference to a hash where the following keys ar
 =begin text
 
 $params is a create_plantseed_job_params
-$output is a string
+$output is a JobObject
 create_plantseed_job_params is a reference to a hash where the following keys are defined:
 	username has a value which is a string
 	password has a value which is a string
@@ -481,6 +492,17 @@ create_plantseed_job_params is a reference to a hash where the following keys ar
 	genetic_code has a value which is a string
 	domain has a value which is a string
 	scientific_name has a value which is a string
+JobObject is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	type has a value which is a string
+	auth has a value which is a string
+	status has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+	queuetime has a value which is a string
+	starttime has a value which is a string
+	completetime has a value which is a string
+	owner has a value which is a string
+	queuecommand has a value which is a string
 
 
 =end text
@@ -1139,6 +1161,54 @@ owner has a value which is a string
 genome has a value which is a string
 reactions has a value which is a reference to a list where each element is a string
 biomass has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 JobObject
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+type has a value which is a string
+auth has a value which is a string
+status has a value which is a string
+jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+queuetime has a value which is a string
+starttime has a value which is a string
+completetime has a value which is a string
+owner has a value which is a string
+queuecommand has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+type has a value which is a string
+auth has a value which is a string
+status has a value which is a string
+jobdata has a value which is a reference to a hash where the key is a string and the value is a string
+queuetime has a value which is a string
+starttime has a value which is a string
+completetime has a value which is a string
+owner has a value which is a string
+queuecommand has a value which is a string
 
 
 =end text

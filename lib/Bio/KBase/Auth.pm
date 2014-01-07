@@ -7,41 +7,49 @@ use strict;
 use Config::Simple;
 use MongoDB;
 
-our $VERSION = '0.6.0';
+our $VERSION = '0.7.0';
 
 our $ConfPath = glob "~/.kbase_config";
 
-if (defined($ENV{ KB_DEPLOYMENT_CONFIG })) {
-    if ( -r $ENV{ KB_DEPLOYMENT_CONFIG }) {
-	$ConfPath = $ENV{ KB_DEPLOYMENT_CONFIG };
+if (defined($ENV{ KB_CLIENT_CONFIG })) {
+    if ( -r $ENV{ KB_CLIENT_CONFIG }) {
+	$ConfPath = $ENV{ KB_CLIENT_CONFIG };
     } else {
-	die "\$ENV{KB_DEPLOYMENT_CONFIG} points to an unreadable file: ".$ENV{ KB_DEPLOYMENT_CONFIG };
+	die "\$ENV{KB_CLIENT_CONFIG} points to an unreadable file: ".$ENV{ KB_CLIENT_CONFIG };
     }
 }
 
 my $c = Config::Simple->new( filename => $ConfPath);
-our %Conf = $c ? $c->vars() : {};
-our %AuthConf = map { $_, $Conf{ $_} } grep /^authentication\./, keys( %Conf);
-our $AuthSvcHost = $Conf{'authentication.servicehost'} ?
-    $Conf{'authentication.servicehost'} : "https://nexus.api.globusonline.org/";
+our %Conf; # = $c ? $c->vars() : {};
+# The INI files squash multiline strings, unpack the client_secret
+# field if it is in there
+#if (defined( $Conf{'authentication.client_secret'})) {
+#    $Conf{'authentication.client_secret'} =~ s/\\n/\n/g;
+#}
+our %AuthConf;# = map { $_, $Conf{ $_} } grep /^authentication\./, keys( %Conf);
 
-our $AuthorizePath = $Conf{'authentication.authpath'} ?
-    $Conf{'authentication.authpath'} : "/goauth/token";
+our $AuthSvcHost; # = $Conf{'authentication.servicehost'} ?
+#    $Conf{'authentication.servicehost'} : "https://nexus.api.globusonline.org/";
 
-our $ProfilePath = $Conf{'authentication.profilepath'} ?
-    $Conf{'authentication.profilepath'} : "users";
+our $AuthorizePath; # = $Conf{'authentication.authpath'} ?
+#    $Conf{'authentication.authpath'} : "/goauth/token";
 
-our $RoleSvcURL = $Conf{'authentication.rolesvcurl'} ?
-    $Conf{'authentication.rolesvcurl'} : "https://kbase.us/services/authorization/Roles";
+our $ProfilePath;# = $Conf{'authentication.profilepath'} ?
+#    $Conf{'authentication.profilepath'} : "users";
+
+our $RoleSvcURL;# = $Conf{'authentication.rolesvcurl'} ?
+#    $Conf{'authentication.rolesvcurl'} : "https://kbase.us/services/authorization/Roles";
 
 # handle to a MongoDB Connection
 our $MongoDB = undef;
 
-eval {
-    if ($Conf{'authentication.mongodb'} ) {
-	$MongoDB = MongoDB::Connection->new( host => $Conf{'authentication.mongodb'});
-    }
-};
+LoadConfig();
+
+#eval {
+#    if ($Conf{'authentication.mongodb'} ) {
+#	$MongoDB = MongoDB::Connection->new( host => $Conf{'authentication.mongodb'});
+#    }
+#};
 
 if ($@) {
     die "Invalid MongoDB connection declared in ".$ConfPath." authentication.mongodb = ".
@@ -53,22 +61,35 @@ sub LoadConfig {
     my( $newConfPath) = $_[0] ? shift : $ConfPath; 
 
     my $c = Config::Simple->new( $newConfPath);
-    %Conf = $c ? $c->vars() : {};
-    %AuthConf = map { $_, $Conf{ $_} } grep /^authentication\./, keys( %Conf);
+    %Conf = $c ? $c->vars() : ();
+    if (defined( $Conf{'authentication.client_secret'})) {
+	$Conf{'authentication.client_secret'} =~ s/\\n/\n/g;
+    }
+
     $AuthSvcHost = $Conf{'authentication.servicehost'} ?
-	$Conf{'authentication.servicehost'} : $AuthSvcHost;
+	$Conf{'authentication.servicehost'} : "https://nexus.api.globusonline.org/";
     
     $AuthorizePath = $Conf{'authentication.authpath'} ?
-	$Conf{'authentication.authpath'} : $AuthorizePath;
+	$Conf{'authentication.authpath'} : "/goauth/token";
     
     $ProfilePath = $Conf{'authentication.profilepath'} ?
-	$Conf{'authentication.profilepath'} : $ProfilePath;
+	$Conf{'authentication.profilepath'} : "users";
     
     $RoleSvcURL = $Conf{'authentication.rolesvcurl'} ?
-	$Conf{'authentication.rolesvcurl'} : $RoleSvcURL;
+	$Conf{'authentication.rolesvcurl'} : "https://kbase.us/services/authorization/Roles";
 
-    $MongoDB = $Conf{'authentication.sessiondb'} ?
-	$Conf{'authentication.sessiondb'} : $MongoDB;
+    eval {
+	if ($Conf{'authentication.mongodb'} ) {
+	    $MongoDB = MongoDB::Connection->new( host => $Conf{'authentication.mongodb'});
+	}
+    };
+    
+    if ($@) {
+	die "Invalid MongoDB connection declared in ".$ConfPath." authentication.mongodb = ".
+	    $Conf{'authentication.mongodb'};
+    }
+
+    %AuthConf = map { $_, $Conf{ $_} } grep /^authentication\./, keys( %Conf);
 
 }
 
@@ -107,8 +128,8 @@ sub SetConfigs {
 		die "Parameter value for $key is not a legal value: ".$params{$key};
 	    }
 	    my $fullkey = "authentication." . $key;
-	    if ($params{$key} eq undef) {
-		if ($c->param($fullkey) ne undef) {
+	    if (! defined($params{$key})) {
+		if (defined($c->param($fullkey))) {
 		    $c->delete($fullkey);
 		}
 	    } else {
@@ -124,6 +145,31 @@ sub SetConfigs {
     }
     return( 1);   
 }
+
+
+# This function looks up the stashed kbase config file, and if it
+# exists it pulls out the user_id and token information and returns
+# the info.
+#
+sub GetConfigs {
+    my(%params) = @_;
+    my $c;
+    my $configs = {user_id=>'',token=>''};
+    eval {
+	$c = Config::Simple->new( filename => $ConfPath);
+	if ( $c ) {
+	    my $user  = $c->param('authentication.user_id');
+	    my $token = $c->param('authentication.token');
+	    if (defined($user))  { $configs->{user_id} = $user; } 
+	    if (defined($token)) { $configs->{token}   = $token; }
+	}
+    };
+    if ($@) {
+	die $@;
+    }
+    return $configs;
+}
+
 
 1;
 
@@ -193,6 +239,12 @@ Keys must be an alphanumeric string beginning with an alphabetic character.
 Values must be either a string(number) or an array reference of strings.
 
 The keys will be inserted into authentication section.
+
+=item B<GetConfigs()>
+
+This function looks up the stashed kbase config file, and if it exists it pulls out the user_id and
+token information and returns the info in a hash with keys 'user_id' and 'token' defined. If the user or
+token is not set, then the values for 'user_id' and 'token' are set to the empty string.
 
 =back
 

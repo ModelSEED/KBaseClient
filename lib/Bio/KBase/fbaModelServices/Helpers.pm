@@ -8,7 +8,7 @@ use Bio::KBase::fbaModelServices::Client;
 use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
 use parent qw(Exporter);
 our @EXPORT_OK = qw( fbaURL get_fba_client runFBACommand universalFBAScriptCode fbaTranslation roles_of_function );
-our $defaultURL = "http://kbase.us/services/fbaServices/";
+our $defaultURL = "https://kbase.us/services/KBaseFBAModeling";
 my $CurrentURL;
 
 sub get_fba_client {
@@ -60,6 +60,7 @@ sub universalFBAScriptCode {
     my $script = shift;
     my $primaryArgs = shift;
     my $translation = shift;
+    my $manpage = shift;
     $translation->{workspace} = "workspace";
     $translation->{auth} = "auth";
     #Setting arguments to "describe_options" function
@@ -77,7 +78,13 @@ sub universalFBAScriptCode {
     #Defining usage and options
 	my ($opt, $usage) = describe_options(@{$options});
 	if (defined($opt->{help})) {
-		print $usage;
+        if (defined($manpage)) {
+            print "SYNOPSIS\n      ".$usage;
+            print $manpage;
+        }
+        else {
+            print $usage;
+        }
 	    exit;
 	}
 	#Processing primary arguments

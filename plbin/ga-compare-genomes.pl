@@ -49,7 +49,7 @@ if (!defined($output)) {
     print join("\t",@{$columns})."\n";
     for (my $i=0; $i < @{$output->{function_comparisons}}; $i++) {
     	my $funccomp = $output->{function_comparisons}->[$i];
-    	my $items = [qw(role core subsystem class subclass number_genomes fraction_genomes)];
+    	my $items = [qw(role core subsytem primclass subclass number_genomes fraction_genomes)];
     	my $row = [];
     	foreach my $item (@{$items}) {
     		if (defined($funccomp->{$item})) {

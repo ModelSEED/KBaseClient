@@ -49,7 +49,7 @@ if (!defined($output)) {
     print join("\t",@{$columns})."\n";
     for (my $i=0; $i < @{$output->{reaction_comparisons}}; $i++) {
     	my $rxncmp = $output->{reaction_comparisons}->[$i];
-    	my $items = [qw(reaction compartment equation core role subsystem class subclass number_models fraction_models)];
+    	my $items = [qw(reaction compartment equation core role subsytem primclass subclass number_models fraction_models)];
     	my $row = [];
     	foreach my $item (@{$items}) {
     		if (defined($rxncmp->{$item})) {

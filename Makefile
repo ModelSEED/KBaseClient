@@ -27,6 +27,7 @@ gather:
 		cp $(THIS_DIR)/../workspace_service/lib/Bio/KBase/workspaceService/Helpers.pm $(THIS_DIR)/lib/Bio/KBase/workspaceService/Helpers.pm ; \
 	fi
 	if [ -d $(THIS_DIR)/../auth ] ; then \
+		cp $(THIS_DIR)/../auth/scripts/kbase-* $(THIS_DIR)/plbin/ ; \
 		rm -rf $(THIS_DIR)/lib/Bio/KBase/*.pm ; \
 		mkdir $(THIS_DIR)/lib/Bio/KBase/SSHAgent ; \
 		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/AuthUser.pm $(THIS_DIR)/lib/Bio/KBase/AuthUser.pm ; \
@@ -50,6 +51,13 @@ gather:
 		rm -rf $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer ; \
 		mkdir $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer ; \
 		cp $(THIS_DIR)/../MSSeedSupportServer/lib/Bio/ModelSEED/MSSeedSupportServer/Client.pm $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer/Client.pm ; \
+	fi
+	if [ -d $(THIS_DIR)/../workspace_deluxe ] ; then \
+		cp $(THIS_DIR)/../workspace_deluxe/scripts/ws-* $(THIS_DIR)/plbin/ ; \
+		rm -rf $(THIS_DIR)/lib/Bio/KBase/workspace ; \
+		mkdir $(THIS_DIR)/lib/Bio/KBase/workspace ; \
+		cp $(THIS_DIR)/../workspace_deluxe/lib/Bio/KBase/workspace/Client.pm $(THIS_DIR)/lib/Bio/KBase/workspace/Client.pm ; \
+		cp $(THIS_DIR)/../workspace_deluxe/lib/Bio/KBase/workspace/ScriptHelpers.pm $(THIS_DIR)/lib/Bio/KBase/workspace/ScriptHelpers.pm ; \
 	fi
 	if [ -d $(THIS_DIR)/../ModelSEED ] ; then \
 		rm -rf $(THIS_DIR)/lib/myRAST ; \

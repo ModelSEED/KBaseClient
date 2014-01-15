@@ -25,6 +25,7 @@ Module::Build->new(
         'Getopt::Long::Descriptive' => undef,
         'Text::Table' => undef,
         'JSON::RPC::Client' => undef,
+        'Config::Simple' => undef,
         'Object::Tiny::RW' => undef,
         'Term::ReadKey' => undef
     },

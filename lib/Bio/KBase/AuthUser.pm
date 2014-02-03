@@ -260,7 +260,7 @@ sub get {
 	    $nuser = from_json( decode_base64( $profile));
 	} else {
 
-	    $path = sprintf('%s/%s?custom_fields=*&fields=groups,username,email_validated,fullname,email',$path,$user_id);
+	    $path = sprintf('%s/%s?fields=groups,username,email_validated,fullname,email,custom_fields',$path,$user_id);
 	    
 	    # go_request will throw an error if it chokes and exit this eval block
 	    $nuser = $self->go_request( 'path' => $path, 'token' => $p{token});

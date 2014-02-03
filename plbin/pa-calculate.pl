@@ -7,7 +7,7 @@ use warnings;
 use Getopt::Long::Descriptive;
 use Bio::KBase::probabilistic_annotation::Client;
 use Bio::KBase::probabilistic_annotation::Helpers qw(get_probanno_client);
-use Bio::KBase::workspaceService::Helpers qw(auth workspace printObjectMeta);
+use Bio::KBase::workspace::ScriptHelpers qw(workspace);
 
 my $manpage =
 "
@@ -34,12 +34,11 @@ DESCRIPTION
       Options:
       -e, --showerror       Show any errors in execution
       -h, --help            Display this help message, ignore all arguments
-      -o, --overwrite       Overwrite existing RxnProbs object with same name
-      --probannows          ID of workspace where ProbAnno object is stored
-      -t, --templateid      ID of ModelTemplate object
+      -w, --probannows      ID of workspace where ProbAnno object is stored (default is the current workspace)
+      -t, --templateid      ID of ModelTemplate object (default is to use all reactions in the biochemistry)
       -m, --templatews      ID of workspace where ModelTemplate object is stored
       -v, --verbose         Print verbose messages
-      -w, --rxnprobsws      ID of workspace where RxnProbs object is saved
+      -r, --rxnprobsws      ID of workspace where RxnProbs object is to be saved (default is the current workspace)
 
 EXAMPLES
       Calculate reaction likelihoods from probabilistic annotation of E. coli
@@ -58,8 +57,8 @@ AUTHORS
 my $primaryArgs = [ "ProbAnno ID", "RxnProbs ID" ];
 my ( $opt, $usage ) = describe_options(
     'pa-calculate <' . join( "> <", @{$primaryArgs} ) . '> %o',
-    [ 'probannows|w=s', 'ID of workspace where ProbAnno object is stored', { "default" => workspace() } ],
-    [ 'rxnprobsws|w=s', 'ID of workspace where RxnProbs object is saved', { 'default' => workspace() } ],
+    [ 'probannows|w=s', 'ID of workspace where ProbAnno object is stored (default is the current workspace)', { "default" => workspace() } ],
+    [ 'rxnprobsws|r=s', 'ID of workspace where RxnProbs object is saved (default is the current workspace)', { 'default' => workspace() } ],
     [ 'templateid|t=s', "ID of ModelTemplate object", { "default" => undef } ],
     [ 'templatews|m=s', "ID of workspace where ModelTemplate object is stored", { "default" => undef } ],
     [ 'showerror|e:i', 'Show any errors in execution', { "default" => 0 } ],
@@ -100,7 +99,7 @@ my $translation = {
 };
 
 # Instantiate parameters for function.
-my $params = { auth => auth(), };
+my $params = { };
 foreach my $key ( keys( %{$translation} ) ) {
     if ( defined( $opt->{$key} ) ) {
 		$params->{ $translation->{$key} } = $opt->{$key};
@@ -113,7 +112,6 @@ if (!defined($output)) {
 	print "Calculating reaction probabilities failed!\n";
 	exit 1;
 } else {
-	print "Reaction probabilities successfully generated in workspace:";
-	printObjectMeta($output)
+	print "Reaction probabilities successfully calculated and saved in ".$output->[7]."/".$output->[1]."\n";
 }
 exit 0;

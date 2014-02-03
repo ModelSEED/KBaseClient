@@ -6,8 +6,8 @@
 ########################################################################
 use strict;
 use warnings;
-use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
-use Bio::KBase::fbaModelServices::Helpers qw(get_fba_client runFBACommand universalFBAScriptCode );
+use Bio::KBase::workspace::ScriptHelpers qw( printObjectInfo get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
+use Bio::KBase::fbaModelServices::ScriptHelpers qw(get_fba_client runFBACommand universalFBAScriptCode );
 #Defining globals describing behavior
 my $primaryArgs = ["Models (workspace/ID/abundance) or Filename"];
 my $servercommand = "models_to_community_model";
@@ -28,7 +28,7 @@ my ($opt,$params) = universalFBAScriptCode($specs,$script,$primaryArgs,$translat
 $params->{models} = [];
 if (defined($opt->{fromfile}) && $opt->{fromfile} == 1) {
 	if (!-e $opt->{"Models (workspace/ID/abundance) or Filename"}) {
-		print "Could not find input phenotype file!\n";
+		print "Could not find input model list file!\n";
 		exit();
 	}
 	open(my $fh, "<", $opt->{"Models (workspace/ID/abundance) or Filename"}) || return;
@@ -60,5 +60,5 @@ if (!defined($output)) {
 	print "Model merge failed!\n";
 } else {
 	print "Model merge successful:\n";
-	printObjectMeta($output);
+	printObjectInfo($output);
 }

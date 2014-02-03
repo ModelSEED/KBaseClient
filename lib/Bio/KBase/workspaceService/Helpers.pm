@@ -11,15 +11,11 @@ my $CurrentWorkspace;
 my $CurrentURL;
 
 sub get_ws_client {
-	my $url = shift;
-	if (!defined($url)) {
-		$url = workspaceURL();
-	}
-	if ($url eq "impl") {
+	if (workspaceURL() eq "impl") {
 		require "Bio/KBase/workspaceService/Impl.pm";
 		return Bio::KBase::workspaceService::Impl->new();
 	}
-	return Bio::KBase::workspaceService::Client->new($url);
+	return Bio::KBase::workspaceService::Client->new(workspaceURL());
 }
 
 sub auth {

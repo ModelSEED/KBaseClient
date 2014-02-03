@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 ########################################################################
-# Authors: Christopher Henry, Scott Devoid, Paul Frybarger
+# adpated for WS 0.1.0+ by Michael Sneddon, LBL
+# Original authors: Christopher Henry, Scott Devoid, Paul Frybarger
 # Contact email: chenry@mcs.anl.gov
 # Development location: Mathematics and Computer Science Division, Argonne National Lab
 ########################################################################
@@ -19,12 +20,14 @@ my $translation = {
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-delete <'.join("> <",@{$primaryArgs}).'> %o',
-    [ 'workspace|w:s', 'ID for workspace', {"default" => workspace()} ],
-    [ 'restore:s', 'Restore the specified deleted object', {"default" => workspace()} ],
-    [ 'showerror|e', 'Show any errors in execution',{"default"=>0}],
+    'ws-delete <'.join("> <",@{$primaryArgs}).'> %o',
+    [ 'workspace|w:s', 'ID or Name of workspace', {"default" => workspace()} ],
+    [ 'restore', 'Restore the specified deleted object', {"default" => 0} ],
+    [ 'showerror|e', 'Show full stack trace of any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]  
 );
+$usage = "\nNAME\n  ws-delete -- delete/undelete an object\n\nSYNOPSIS\n  ".$usage;
+$usage .= "\n";
 if (defined($opt->{help})) {
 	print $usage;
 	exit;
@@ -50,7 +53,7 @@ my $params = [{
 my $output;
 if ($opt->{restore}) {
 	if ($opt->{showerror} == 0){
-		eval { $serv->delete_objects($params); };
+		eval { $serv->undelete_objects($params); };
 		if($@) {
 			print "Cannot restore object!\n";
 			print STDERR $@->{message}."\n";
@@ -61,11 +64,11 @@ if ($opt->{restore}) {
 	} else {
 		$serv->delete_objects($params);
 	}
-	print "Object successfully deleted.\n";
+	print "Object successfully restored.\n";
 } else {
 	
 	if ($opt->{showerror} == 0){
-		eval { $serv->undelete_objects($params); };
+		eval { $serv->delete_objects($params); };
 		if($@) {
 			print "Cannot delete object!\n";
 			print STDERR $@->{message}."\n";
@@ -76,6 +79,6 @@ if ($opt->{restore}) {
 	} else {
 		$serv->undelete_objects($params);
 	}
-	print "Object successfully restored.\n";
+	print "Object successfully deleted.\n";
 }
 exit 0;

@@ -9,11 +9,15 @@ use warnings;
 use Getopt::Long::Descriptive;
 use Text::Table;
 use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
-$|=1;
+
 my $serv = get_ws_client();
 #Defining globals describing behavior
-my $primaryArgs = ["Job IDs (; delimiter or filename)"];
+my $primaryArgs = ["Job ID"];
 my $servercommand = "set_job_status";
+my $translation = {
+	"Job ID" => "jobid", 
+	status => "status",
+};
 #Defining usage and options
 my ($opt, $usage) = describe_options(
     'kbws-resetjob <'.join("> <",@{$primaryArgs}).'> %o',
@@ -34,65 +38,49 @@ foreach my $arg (@{$primaryArgs}) {
     	exit;
 	}
 }
-#Checking if input ID is actually a filename
-my $ids = [split(/;/,$opt->{$primaryArgs->[0]})];
-if ($ids->[0] !~ m/^job\.\d+$/ && -e $ids->[0]) {
-	open (my $file, "<", $ids->[0]) || die "Couldn't open ".$ids->[0]."!";
-	print $ids->[0]."\n";
-	$ids = []; 
-	while (my $line = <$file>) {
-		print $line."\n";
-		chomp($line);
-		push(@{$ids},$line);
-	}
-	close($file);
-}
+#Instantiating parameters
+my $params = {
+	auth => auth(),
+};
 #Retrieving current job status
-my $jobs;
+my $output;
 if ($opt->{showerror} == 0){
     eval {
-        $jobs = $serv->get_jobs({
-			auth => auth(),
-			jobids => $ids
-		});
+        $output = $serv->get_jobs($params);
     };
 }else{
-    $jobs = $serv->get_jobs({
-			auth => auth(),
-			jobids => $ids
-		});
+    $output = $serv->get_jobs($params);
 }
-if (!defined($jobs)) {
-	print "Failed to retrieve specified jobs!\n";
+if (!defined($output)) {
+	print "Could not reset job status!\n";
 }
-my $status = $opt->{status};
-if (defined($opt->{"delete"}) && $opt->{"delete"} == 1) {
-	$status = "delete";
-}
-for (my $i=0; $i < @{$jobs};$i++) {
-	#Calling the server
-	my $output = undef;
-	if ($opt->{showerror} == 0) {
-	    eval {
-	        $output = $serv->set_job_status({
-	        	jobid => $jobs->[$i]->{id},
-	        	status => $status,
-	        	auth => auth(),
-	        	currentStatus => $jobs->[$i]->{status}
-	        });
-	    };
-	} else {
-	    $output = $serv->set_job_status({
-        	jobid => $jobs->[$i]->{id},
-        	status => $status,
-        	auth => auth(),
-        	currentStatus => $jobs->[$i]->{status}
-        });
+foreach my $key (keys(%{$translation})) {
+	if (defined($opt->{$key})) {
+		$params->{$translation->{$key}} = $opt->{$key};
 	}
-	#Checking output and report results
-	if (!defined($output)) {
-		print "Could not reset job status!\n";
-	} else {
-	    print "Job status reset to ".$status." for job ".$jobs->[$i]->{id}."\n";
-	}	
+}
+if (defined($opt->{"delete"}) && $opt->{"delete"} == 1) {
+	$params->{status} = "delete";
+}
+for (my $i=0; $i < @{$output};$i++) {
+	if ($output->[$i]->{id} eq $params->{jobid}) {
+		$params->{currentStatus} = $output->[$i]->{status};
+		last;
+	}
+}
+#Calling the server
+$output = undef;
+if ($opt->{showerror} == 0){
+    eval {
+        $output = $serv->$servercommand($params);
+    };
+}else{
+    $output = $serv->$servercommand($params);
+}
+
+#Checking output and report results
+if (!defined($output)) {
+	print "Could not reset job status!\n";
+} else {
+    print "Job status reset to:\n".$params->{status}."\n";
 }

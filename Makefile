@@ -42,7 +42,7 @@ gather:
 		rm -rf $(THIS_DIR)/lib/Bio/KBase/fbaModelServices ; \
 		mkdir $(THIS_DIR)/lib/Bio/KBase/fbaModelServices ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/Client.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/Client.pm ; \
-		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/Helpers.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/Helpers.pm ; \
+		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/ScriptHelpers.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/ScriptHelpers.pm ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/Exceptions.pm $(THIS_DIR)/lib/Bio/KBase/Exceptions.pm ; \
 	fi
 	if [ -d $(THIS_DIR)/../MSSeedSupportServer ] ; then \
@@ -65,8 +65,14 @@ gather:
 		cp $(THIS_DIR)/../ModelSEED/lib/myRAST/ClientTHing.pm $(THIS_DIR)/lib/myRAST ; \
 	fi
 	if [ -d $(THIS_DIR)/../genome_annotation ] ; then \
-		rm -rf $(THIS_DIR)/lib/Bio/KBase/genome_annotation ; \
-		mkdir $(THIS_DIR)/lib/Bio/KBase/genome_annotation ; \
+		rm -rf $(THIS_DIR)/lib/Bio/KBase/GenomeAnnotation ; \
+		mkdir $(THIS_DIR)/lib/Bio/KBase/GenomeAnnotation ; \
+		cp $(THIS_DIR)/../genome_annotation/lib/Bio/KBase/GenomeAnnotation/Client.pm $(THIS_DIR)/lib/Bio/KBase/GenomeAnnotation/Client.pm ; \
+	fi
+	if [ -d $(THIS_DIR)/../user_and_job_state ] ; then \
+		rm -rf $(THIS_DIR)/lib/Bio/KBase/userandjobstate ; \
+		mkdir $(THIS_DIR)/lib/Bio/KBase/userandjobstate ; \
+		cp $(THIS_DIR)/../user_and_job_state/lib/Bio/KBase/userandjobstate/Client.pm $(THIS_DIR)/lib/Bio/KBase/userandjobstate/Client.pm ; \
 	fi
 				
 all: 

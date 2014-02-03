@@ -19,37 +19,30 @@ if (defined($ENV{ KB_CLIENT_CONFIG })) {
     }
 }
 
-my $c = Config::Simple->new( filename => $ConfPath);
-our %Conf; # = $c ? $c->vars() : {};
-# The INI files squash multiline strings, unpack the client_secret
-# field if it is in there
-#if (defined( $Conf{'authentication.client_secret'})) {
-#    $Conf{'authentication.client_secret'} =~ s/\\n/\n/g;
+# We will have to work this back into the server side config eventually, but lets patch up the current
+# mess ASAP - sychan 12/17/2013
+#if (defined($ENV{ KB_DEPLOYMENT_CONFIG })) {
+#    if ( -r $ENV{ KB_DEPLOYMENT_CONFIG }) {
+#	$ConfPath = $ENV{ KB_DEPLOYMENT_CONFIG };
+#    } else {
+#	die "\$ENV{KB_DEPLOYMENT_CONFIG} points to an unreadable file: ".$ENV{ KB_DEPLOYMENT_CONFIG };
+#    }
 #}
-our %AuthConf;# = map { $_, $Conf{ $_} } grep /^authentication\./, keys( %Conf);
 
-our $AuthSvcHost; # = $Conf{'authentication.servicehost'} ?
-#    $Conf{'authentication.servicehost'} : "https://nexus.api.globusonline.org/";
+my $c = Config::Simple->new( filename => $ConfPath);
 
-our $AuthorizePath; # = $Conf{'authentication.authpath'} ?
-#    $Conf{'authentication.authpath'} : "/goauth/token";
+our %Conf;
+our %AuthConf;
+our $AuthSvcHost;
+our $AuthorizePath;
 
-our $ProfilePath;# = $Conf{'authentication.profilepath'} ?
-#    $Conf{'authentication.profilepath'} : "users";
-
-our $RoleSvcURL;# = $Conf{'authentication.rolesvcurl'} ?
-#    $Conf{'authentication.rolesvcurl'} : "https://kbase.us/services/authorization/Roles";
+our $ProfilePath;
+our $RoleSvcURL;
 
 # handle to a MongoDB Connection
 our $MongoDB = undef;
 
 LoadConfig();
-
-#eval {
-#    if ($Conf{'authentication.mongodb'} ) {
-#	$MongoDB = MongoDB::Connection->new( host => $Conf{'authentication.mongodb'});
-#    }
-#};
 
 if ($@) {
     die "Invalid MongoDB connection declared in ".$ConfPath." authentication.mongodb = ".
@@ -188,7 +181,7 @@ This is a helper class that stores shared configuration information.
 
 =item B<$ConfPath>
 
-The path to the INI formatted configuration file. Defaults to ~/.kbase_config, can be overriden by the shell environment variable $KB_DEPLOYMENT_CONFIG. Configuration directives for the Bio::KBase::Auth, Bio::KBase::AuthToken and Bio::KBase::AuthUser classes are loaded from the "authentication" section of the INI file.
+The path to the INI formatted configuration file. Defaults to ~/.kbase_config, can be overriden by the shell environment variable $KB_CLIENT_CONFIG. Configuration directives for the Bio::KBase::Auth, Bio::KBase::AuthToken and Bio::KBase::AuthUser classes are loaded from the "authentication" section of the INI file.
 
 =item B<%Conf>
 

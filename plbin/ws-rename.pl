@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 ########################################################################
-# Authors: Christopher Henry, Scott Devoid, Paul Frybarger
+# adpated for WS 0.1.0+ by Michael Sneddon, LBL
+# Original authors: Christopher Henry, Scott Devoid, Paul Frybarger
 # Contact email: chenry@mcs.anl.gov
 # Development location: Mathematics and Computer Science Division, Argonne National Lab
 ########################################################################
@@ -17,14 +18,16 @@ my $servercommand = "rename_object";
 my $translation = {};
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-copy <'.join("> <",@{$primaryArgs}).'> %o',
+    'ws-rename <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'workspace|s:s', 'ID or Name of workspace containing object to rename', {"default" => workspace()} ],
-    [ 'showerror|e', 'Show any errors in execution',{"default"=>0}],
+    [ 'showerror|e', 'Show full stack trace of any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
 );
+$usage = "\nNAME\n  ws-rename -- rename an object\n\nSYNOPSIS\n  ".$usage;
+$usage .= "\n";
 if (defined($opt->{help})) {
 	print $usage;
-	exit 1;
+	exit 0;
 }
 #Processing primary arguments
 foreach my $arg (@{$primaryArgs}) {

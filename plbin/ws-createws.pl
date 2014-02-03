@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 ########################################################################
-# Authors: Christopher Henry, Scott Devoid, Paul Frybarger
+# adpated for WS 0.1.0+ by Michael Sneddon, LBL
+# Original authors: Christopher Henry, Scott Devoid, Paul Frybarger
 # Contact email: chenry@mcs.anl.gov
 # Development location: Mathematics and Computer Science Division, Argonne National Lab
 ########################################################################
@@ -12,20 +13,22 @@ use Bio::KBase::workspace::ScriptHelpers qw(get_ws_client parseWorkspaceInfo);
 
 my $serv = get_ws_client();
 #Defining globals describing behavior
-my $primaryArgs = ["Workspace ID"];
+my $primaryArgs = ["Workspace Name"];
 my $servercommand = "create_workspace";
 my $translation = {
-	"Workspace ID" => "workspace",
+	"Workspace Name" => "workspace",
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kb_createws <'.join("> <",@{$primaryArgs}).'> %o',
+    'ws-createws <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'description|d=s', 'Workspace description (1000 characters max)',{"default"=>''}],
     [ 'globalread|g=s', 'Set global read permissions (r=read,n=none)',{"default"=>'n'}],
-    [ 'showerror|e', 'Show any errors in execution',{"default"=>0}],
-    [ 'verbose|v', 'Print verbose messages' ],
+    [ 'showerror|e', 'Show full stack trace of any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ],
 );
+$usage = "\nNAME\n  ws-createws -- create a new workspace\n\nSYNOPSIS\n  ".$usage;
+$usage .= "\n";
+
 if (defined($opt->{help})) {
 	print $usage;
 	exit 0;

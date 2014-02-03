@@ -18,30 +18,30 @@ sub get_probanno_url {
             $set = $defaultURL;
         }
     	$currentURL = $set;
+		my $filename;
     	if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
-		    my $filename = "$ENV{HOME}/.kbase_probannoURL";
-		    open(my $fh, ">", $filename) || return;
-	    	print $fh $currentURL;
-	    	close($fh);
+			$filename = "$ENV{HOME}/.kbase_probannoURL";
     	} else {
-    	    $ENV{KB_PROBANNOURL} = $currentURL;
+			$filename = "/.kbase_probannoURL";
     	}
+	    open(my $fh, ">", $filename) || return;
+		print $fh $currentURL;
+		close($fh);
     } elsif (!defined($currentURL)) {
+		my $filename;
     	if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
-		    my $filename = "$ENV{HOME}/.kbase_probannoURL";
-		    if	( -e $filename ) {
-				open(my $fh, "<", $filename) || return;
-				$currentURL = <$fh>;
-				chomp $currentURL;
-				close($fh);
-	    	} else {
-	    		$currentURL = $defaultURL;
-	    	}
-    	} elsif (defined($ENV{KB_PROBANNOURL})) {
-	    	$currentURL = $ENV{KB_PROBANNOURL};
-	    } else {
+		    $filename = "$ENV{HOME}/.kbase_probannoURL";
+		} else {
+			$filename = "/.kbase_probannoURL";
+		}
+	    if	( -e $filename ) {
+			open(my $fh, "<", $filename) || return;
+			$currentURL = <$fh>;
+			chomp $currentURL;
+			close($fh);
+		} else {
 			$currentURL = $defaultURL;
-    	} 
+		}
     }
     return $currentURL;
 }

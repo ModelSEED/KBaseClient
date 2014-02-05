@@ -64,6 +64,9 @@ gather:
 		rm -rf $(THIS_DIR)/lib/myRAST ; \
 		mkdir $(THIS_DIR)/lib/myRAST ; \
 		cp $(THIS_DIR)/../ModelSEED/lib/myRAST/ClientTHing.pm $(THIS_DIR)/lib/myRAST ; \
+		rm -rf $(THIS_DIR)/lib/ModelSEED/Client ; \
+		mkdir $(THIS_DIR)/lib/ModelSEED/Client ; \
+		cp $(THIS_DIR)/../ModelSEED/lib/ModelSEED/Client/SAP.pm $(THIS_DIR)/lib/ModelSEED/Client/ ; \
 	fi
 	if [ -d $(THIS_DIR)/../genome_annotation ] ; then \
 		rm -rf $(THIS_DIR)/lib/Bio/KBase/GenomeAnnotation ; \

@@ -7,7 +7,7 @@ use warnings;
 use Getopt::Long::Descriptive;
 use Bio::KBase::probabilistic_annotation::Client;
 use Bio::KBase::probabilistic_annotation::Helpers qw(get_probanno_client);
-use Bio::KBase::workspaceService::Helpers qw(workspace printObjectMeta);
+use Bio::KBase::workspace::ScriptHelpers qw(workspace);
 
 my $manpage =
 "
@@ -30,7 +30,7 @@ DESCRIPTION
       object with the specified ID.
       
       The ProbAnno object can be used as input to gapfilling a metabolic model
-      using the --probanno option for the kbfba-gapfill command.
+      using the --probanno option for the fba-gapfill command.
       
       Options:
       -e, --showerror    Show any errors in execution
@@ -47,7 +47,7 @@ SEE ALSO
       pa-calculate
       pa-url
       pa-checkjob
-      kbfba-gapfill
+      fba-gapfill
       
 AUTHORS
       Matt Benedict, Mike Mundy

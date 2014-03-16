@@ -9,15 +9,16 @@ use warnings;
 use Getopt::Long::Descriptive;
 use Text::Table;
 use JSON -support_by_pp;
-use Bio::KBase::workspaceService::Helpers qw(printJobData auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
-my $serv = get_ws_client();
+use Bio::KBase::fbaModelServices::ScriptHelpers qw(getToken get_old_ws_client fbaURL get_fba_client runFBACommand universalFBAScriptCode fbaTranslation roles_of_function );
+
+my $serv = get_old_ws_client();
 #Defining globals describing behavior
 my $primaryArgs = ["Job ID"];
 my $servercommand = "get_jobs";
-my $script = "ws-getjob";
+my $script = "kbws-getjob";
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'ws-getjob <Job ID> %o',
+    'kbws-getjob <Job ID> %o',
     [ 'showerror|e', 'Use flag to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
 );
@@ -35,9 +36,9 @@ foreach my $arg (@{$primaryArgs}) {
 }
 #Instantiating parameters
 my $params = {
-	auth => auth(),
 	jobids => [$opt->{"Job ID"}]
 };
+$params->{auth} = getToken();
 #Calling the server
 my $output;
 if ($opt->{showerror} == 0){

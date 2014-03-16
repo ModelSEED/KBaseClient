@@ -5,7 +5,6 @@ use warnings;
 use Getopt::Long::Descriptive;
 use Bio::KBase::probabilistic_annotation::Client;
 use Bio::KBase::probabilistic_annotation::Helpers qw(get_probanno_client);
-use Bio::KBase::workspaceService::Helpers qw(workspace printObjectMeta);
 
 my $manpage =
 "

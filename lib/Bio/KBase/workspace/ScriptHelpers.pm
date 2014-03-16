@@ -7,7 +7,7 @@ use Exporter;
 use Config::Simple;
 use Data::Dumper;
 use parent qw(Exporter);
-our @EXPORT_OK = qw(loadTableFile printJobData getToken getUser get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceInfo parseWorkspaceMeta printObjectMeta printWorkspaceMeta parseObjectInfo printObjectInfo);
+our @EXPORT_OK = qw(loadTableFile printJobData getToken getUser get_ws_client workspace workspaceURL getObjectRef parseObjectMeta parseWorkspaceInfo parseWorkspaceMeta printObjectMeta printWorkspaceMeta parseObjectInfo printObjectInfo);
 
 our $defaultURL = "https://kbase.us/services/ws";
 our $localhostURL = "http://127.0.0.1:7058";
@@ -60,34 +60,44 @@ sub getKBaseCfg {
 	return $cfg;
 }
 
+
 sub workspace {
-	my $newWs = shift;
-	my $currentWs;
-	if (defined($newWs)) {
-		$currentWs = $newWs;
-		if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
-			my $cfg = getKBaseCfg();
-			$cfg->param("workspace_deluxe.workspace",$newWs);
-			$cfg->save();
-			$cfg->close();
-		} elsif ($ENV{KB_WORKSPACEURL}) {
-			$ENV{KB_WORKSPACE} = $currentWs;
-		}
-	} else {
-		if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
-			my $cfg = getKBaseCfg();
-			$currentWs = $cfg->param("workspace_deluxe.workspace");
-			if (!defined($currentWs)) {
-				$cfg->param("workspace_deluxe.workspace","no_workspace_set");
-				$cfg->save();
-				$currentWs="no_workspace_set";
-			}
-			$cfg->close();
-		} else { #elsif (defined($ENV{KB_WORKSPACE})) {
-			$currentWs = $ENV{KB_WORKSPACE};
-		}
-	}
-	return $currentWs;
+        my $newWs = shift;
+        my $currentWs;
+        if (defined($newWs)) {
+                $currentWs = $newWs;
+                if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
+                        my $cfg = getKBaseCfg();
+                        $cfg->param("workspace_deluxe.workspace",$newWs);
+                        $cfg->save();
+                        $cfg->close();
+                } else {
+                        require "Bio/KBase/workspaceService/Client.pm";
+			my $oldws = Bio::KBase::workspaceService::Client->new("http://kbase.us/services/workspace");
+			$oldws->set_user_settings({
+					setting => "workspace",
+					value => $currentWs,
+					auth => getToken()
+				});
+                }
+        } else {
+                if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
+                        my $cfg = getKBaseCfg();
+                        $currentWs = $cfg->param("workspace_deluxe.workspace");
+                        if (!defined($currentWs)) {
+                                $cfg->param("workspace_deluxe.workspace","no_workspace_set");
+                                $cfg->save();
+                                $currentWs="no_workspace_set";
+                        }
+                        $cfg->close();
+                } else {
+			require "Bio/KBase/workspaceService/Client.pm";
+			my $oldws = Bio::KBase::workspaceService::Client->new("http://kbase.us/services/workspace");
+			my $settings = $oldws->get_user_settings({auth => getToken()});
+			$currentWs = $settings->{workspace};
+                }
+        }
+        return $currentWs;
 }
 
 
@@ -129,6 +139,28 @@ sub workspaceURL {
 	}
 	return $currentURL;
 }
+
+
+# given the strings passed to a script as an ws, object name, and version returns
+# the reference string of the object. The magic is that if, in the object name,
+# it is a reference to begin with, then that reference information overrides
+# what is passed in as other args or if there is a default workspace set.
+sub getObjectRef {
+	my($ws,$obj,$ver) = @_;
+	my $versionString = '';
+	if (defined($ver)) { if($ver ne '') { $versionString="/".$ver;} }
+	my @tokens = split(/\//, $obj);
+	if (scalar(@tokens)==1) {
+		return $ws."/".$obj.$versionString;
+	} elsif (scalar(@tokens)==2) {
+		return $tokens[0]."/".$tokens[1].$versionString;
+	} elsif (scalar(@tokens)==3) {
+		return $obj;
+	}
+	#should never get here!!!
+	return $ws."/".$obj.$versionString;
+}
+
 
 sub parseObjectMeta {
 	my $object = shift;

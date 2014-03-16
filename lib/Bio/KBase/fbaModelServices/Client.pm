@@ -83,15 +83,15 @@ sub new
     #
     # We create an auth token, passing through the arguments that we were (hopefully) given.
 
-    #{
-	#my $token = Bio::KBase::AuthToken->new(@args);
+    {
+	my $token = Bio::KBase::AuthToken->new(@args);
 	
-	#if (!$token->error_message)
-	#{
-	    $self->{token} = $args[0];
-	    $self->{client}->{token} = $args[0];
-	#}
-    #}
+	if (!$token->error_message)
+	{
+	    $self->{token} = $token->token;
+	    $self->{client}->{token} = $token->token;
+	}
+    }
 
     my $ua = $self->{client}->ua;	 
     my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
@@ -1816,132 +1816,6 @@ sub get_biochemistry
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_biochemistry",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_biochemistry',
-				       );
-    }
-}
-
-
-
-=head2 get_ETCDiagram
-
-  $output = $obj->get_ETCDiagram($input)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$input is a get_ETCDiagram_params
-$output is an ETCDiagramSpecs
-get_ETCDiagram_params is a reference to a hash where the following keys are defined:
-	model has a value which is a fbamodel_id
-	workspace has a value which is a workspace_id
-	media has a value which is a media_id
-	mediaws has a value which is a workspace_id
-	auth has a value which is a string
-fbamodel_id is a string
-workspace_id is a string
-media_id is a string
-ETCDiagramSpecs is a reference to a hash where the following keys are defined:
-	nodes has a value which is a reference to a list where each element is an ETCNodes
-	media has a value which is a string
-	growth has a value which is a string
-	organism has a value which is a string
-ETCNodes is a reference to a hash where the following keys are defined:
-	resp has a value which is a string
-	y has a value which is an int
-	x has a value which is an int
-	width has a value which is an int
-	height has a value which is an int
-	shape has a value which is a string
-	label has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$input is a get_ETCDiagram_params
-$output is an ETCDiagramSpecs
-get_ETCDiagram_params is a reference to a hash where the following keys are defined:
-	model has a value which is a fbamodel_id
-	workspace has a value which is a workspace_id
-	media has a value which is a media_id
-	mediaws has a value which is a workspace_id
-	auth has a value which is a string
-fbamodel_id is a string
-workspace_id is a string
-media_id is a string
-ETCDiagramSpecs is a reference to a hash where the following keys are defined:
-	nodes has a value which is a reference to a list where each element is an ETCNodes
-	media has a value which is a string
-	growth has a value which is a string
-	organism has a value which is a string
-ETCNodes is a reference to a hash where the following keys are defined:
-	resp has a value which is a string
-	y has a value which is an int
-	x has a value which is an int
-	width has a value which is an int
-	height has a value which is an int
-	shape has a value which is a string
-	label has a value which is a string
-
-
-=end text
-
-=item Description
-
-This function retrieves an ETC diagram for the input model operating in the input media condition
-    The model must grow on the specified media in order to return a working ETC diagram
-
-=back
-
-=cut
-
-sub get_ETCDiagram
-{
-    my($self, @args) = @_;
-
-# Authentication: optional
-
-    if ((my $n = @args) != 1)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_ETCDiagram (received $n, expecting 1)");
-    }
-    {
-	my($input) = @args;
-
-	my @_bad_arguments;
-        (ref($input) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"input\" (value was \"$input\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_ETCDiagram:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_ETCDiagram');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "fbaModelServices.get_ETCDiagram",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'get_ETCDiagram',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_ETCDiagram",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_ETCDiagram',
 				       );
     }
 }
@@ -8169,6 +8043,147 @@ sub annotate_workspace_Genome
 
 
 
+=head2 gtf_to_genome
+
+  $output = $obj->gtf_to_genome($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a gtf_to_genome_params
+$output is an object_metadata
+gtf_to_genome_params is a reference to a hash where the following keys are defined:
+	contigset has a value which is a string
+	contigset_ws has a value which is a workspace_id
+	workspace has a value which is a workspace_id
+	genome_uid has a value which is a string
+	source_id has a value which is a string
+	source has a value which is a string
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	taxonomy has a value which is a string
+	gtf_file has a value which is a string
+workspace_id is a string
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a gtf_to_genome_params
+$output is an object_metadata
+gtf_to_genome_params is a reference to a hash where the following keys are defined:
+	contigset has a value which is a string
+	contigset_ws has a value which is a workspace_id
+	workspace has a value which is a workspace_id
+	genome_uid has a value which is a string
+	source_id has a value which is a string
+	source has a value which is a string
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	taxonomy has a value which is a string
+	gtf_file has a value which is a string
+workspace_id is a string
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+
+=end text
+
+=item Description
+
+Loads a gtf file to a genome typed object in the workspace
+
+=back
+
+=cut
+
+sub gtf_to_genome
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function gtf_to_genome (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to gtf_to_genome:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'gtf_to_genome');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "fbaModelServices.gtf_to_genome",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'gtf_to_genome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method gtf_to_genome",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'gtf_to_genome',
+				       );
+    }
+}
+
+
+
 =head2 fasta_to_ProteinSet
 
   $output = $obj->fasta_to_ProteinSet($params)
@@ -9798,7 +9813,7 @@ sub import_template_fbamodel
 
 =head2 adjust_template_reaction
 
-  $output = $obj->adjust_template_reaction($params)
+  $modelMeta = $obj->adjust_template_reaction($params)
 
 =over 4
 
@@ -9808,7 +9823,7 @@ sub import_template_fbamodel
 
 <pre>
 $params is an adjust_template_reaction_params
-$output is a TemplateReaction
+$modelMeta is an object_metadata
 adjust_template_reaction_params is a reference to a hash where the following keys are defined:
 	templateModel has a value which is a template_id
 	workspace has a value which is a workspace_id
@@ -9827,15 +9842,23 @@ workspace_id is a string
 bool is an int
 compartment_id is a string
 complex_id is a string
-TemplateReaction is a reference to a hash where the following keys are defined:
-	id has a value which is a temprxn_id
-	compartment has a value which is a compartment_id
-	reaction has a value which is a reaction_id
-	complexes has a value which is a reference to a list where each element is a complex_id
-	direction has a value which is a string
-	type has a value which is a string
-temprxn_id is a string
-reaction_id is a string
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
 
 </pre>
 
@@ -9844,7 +9867,7 @@ reaction_id is a string
 =begin text
 
 $params is an adjust_template_reaction_params
-$output is a TemplateReaction
+$modelMeta is an object_metadata
 adjust_template_reaction_params is a reference to a hash where the following keys are defined:
 	templateModel has a value which is a template_id
 	workspace has a value which is a workspace_id
@@ -9863,15 +9886,23 @@ workspace_id is a string
 bool is an int
 compartment_id is a string
 complex_id is a string
-TemplateReaction is a reference to a hash where the following keys are defined:
-	id has a value which is a temprxn_id
-	compartment has a value which is a compartment_id
-	reaction has a value which is a reaction_id
-	complexes has a value which is a reference to a list where each element is a complex_id
-	direction has a value which is a string
-	type has a value which is a string
-temprxn_id is a string
-reaction_id is a string
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
 
 
 =end text
@@ -9933,7 +9964,7 @@ sub adjust_template_reaction
 
 =head2 adjust_template_biomass
 
-  $output = $obj->adjust_template_biomass($params)
+  $modelMeta = $obj->adjust_template_biomass($params)
 
 =over 4
 
@@ -9943,7 +9974,7 @@ sub adjust_template_reaction
 
 <pre>
 $params is an adjust_template_biomass_params
-$output is a TemplateBiomass
+$modelMeta is an object_metadata
 adjust_template_biomass_params is a reference to a hash where the following keys are defined:
 	templateModel has a value which is a template_id
 	workspace has a value which is a workspace_id
@@ -9983,31 +10014,23 @@ workspace_id is a string
 bool is an int
 compound_id is a string
 compartment_id is a string
-TemplateBiomass is a reference to a hash where the following keys are defined:
-	id has a value which is a tempbiomass_id
-	name has a value which is a string
-	type has a value which is a string
-	other has a value which is a string
-	protein has a value which is a string
-	dna has a value which is a string
-	rna has a value which is a string
-	cofactor has a value which is a string
-	energy has a value which is a string
-	cellwall has a value which is a string
-	lipid has a value which is a string
-	compounds has a value which is a reference to a list where each element is a TemplateBiomassCompounds
-tempbiomass_id is a string
-TemplateBiomassCompounds is a reference to a list containing 7 items:
-	0: (compound) a compound_id
-	1: (compartment) a compartment_id
-	2: (cpdclass) a string
-	3: (universal) a string
-	4: (coefficientType) a string
-	5: (coefficient) a string
-	6: (linkedCompounds) a reference to a list where each element is a reference to a list containing 2 items:
-		0: (coeffficient) a string
-		1: (compound) a compound_id
-
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
 
 </pre>
 
@@ -10016,7 +10039,7 @@ TemplateBiomassCompounds is a reference to a list containing 7 items:
 =begin text
 
 $params is an adjust_template_biomass_params
-$output is a TemplateBiomass
+$modelMeta is an object_metadata
 adjust_template_biomass_params is a reference to a hash where the following keys are defined:
 	templateModel has a value which is a template_id
 	workspace has a value which is a workspace_id
@@ -10056,31 +10079,23 @@ workspace_id is a string
 bool is an int
 compound_id is a string
 compartment_id is a string
-TemplateBiomass is a reference to a hash where the following keys are defined:
-	id has a value which is a tempbiomass_id
-	name has a value which is a string
-	type has a value which is a string
-	other has a value which is a string
-	protein has a value which is a string
-	dna has a value which is a string
-	rna has a value which is a string
-	cofactor has a value which is a string
-	energy has a value which is a string
-	cellwall has a value which is a string
-	lipid has a value which is a string
-	compounds has a value which is a reference to a list where each element is a TemplateBiomassCompounds
-tempbiomass_id is a string
-TemplateBiomassCompounds is a reference to a list containing 7 items:
-	0: (compound) a compound_id
-	1: (compartment) a compartment_id
-	2: (cpdclass) a string
-	3: (universal) a string
-	4: (coefficientType) a string
-	5: (coefficient) a string
-	6: (linkedCompounds) a reference to a list where each element is a reference to a list containing 2 items:
-		0: (coeffficient) a string
-		1: (compound) a compound_id
-
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+object_id is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
 
 
 =end text
@@ -16333,55 +16348,6 @@ auth has a value which is a string
 
 
 
-=head2 get_ETCDiagram_params
-
-=over 4
-
-
-
-=item Description
-
-Input parameters for the "get_ETCDiagram" function.
-
-        model_id model - ID of the model to retrieve ETC for
-        workspace_id workspace - ID of the workspace containing the model 
-        media_id media - ID of the media to retrieve ETC for
-        workspace_id mediaws - workpace containing the specified media
-        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-model has a value which is a fbamodel_id
-workspace has a value which is a workspace_id
-media has a value which is a media_id
-mediaws has a value which is a workspace_id
-auth has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-model has a value which is a fbamodel_id
-workspace has a value which is a workspace_id
-media has a value which is a media_id
-mediaws has a value which is a workspace_id
-auth has a value which is a string
-
-
-=end text
-
-=back
-
-
-
 =head2 import_probanno_params
 
 =over 4
@@ -18804,7 +18770,7 @@ auth has a value which is a string
 
 
 
-=head2 fasta_to_ProteinSet_params
+=head2 gtf_to_genome_params
 
 =over 4
 
@@ -18815,6 +18781,70 @@ auth has a value which is a string
 ********************************************************************************
 	Code relating to import and analysis of ProteinSets
    	********************************************************************************
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+contigset has a value which is a string
+contigset_ws has a value which is a workspace_id
+workspace has a value which is a workspace_id
+genome_uid has a value which is a string
+source_id has a value which is a string
+source has a value which is a string
+scientific_name has a value which is a string
+domain has a value which is a string
+genetic_code has a value which is an int
+taxonomy has a value which is a string
+gtf_file has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+contigset has a value which is a string
+contigset_ws has a value which is a workspace_id
+workspace has a value which is a workspace_id
+genome_uid has a value which is a string
+source_id has a value which is a string
+source has a value which is a string
+scientific_name has a value which is a string
+domain has a value which is a string
+genetic_code has a value which is an int
+taxonomy has a value which is a string
+gtf_file has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fasta_to_ProteinSet_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "fasta_to_ProteinSet" function.
+
+        string uid - user assigned ID for the protein set (optional)
+        string fasta - string with sequence data from fasta file (required argument)
+        workspace_id workspace - ID of workspace for storing objects (required argument)
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+        string name - name of the protein data (optional)
+        string sourceid - source ID of the protein data (optional)
+        string source - source of the protein data (optional)
+        string type - type of the protein set (optional)
 
 
 =item Definition

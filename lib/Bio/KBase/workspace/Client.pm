@@ -36,6 +36,7 @@ Size limits:
 TOs are limited to 1GB
 TO subdata is limited to 15MB
 TO provenance is limited to 1MB
+User provided metadata for workspaces and objects is limited to 16kB
 
 NOTE ON BINARY DATA:
 All binary data must be hex encoded prior to storage in a workspace. 
@@ -84,6 +85,74 @@ sub new
 
 
 
+=head2 ver
+
+  $ver = $obj->ver()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ver is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ver is a string
+
+
+=end text
+
+=item Description
+
+Returns the version of the workspace service.
+
+=back
+
+=cut
+
+sub ver
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 0)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function ver (received $n, expecting 0)");
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.ver",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'ver',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method ver",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'ver',
+				       );
+    }
+}
+
+
+
 =head2 create_workspace
 
   $info = $obj->create_workspace($params)
@@ -101,9 +170,11 @@ CreateWorkspaceParams is a reference to a hash where the following keys are defi
 	workspace has a value which is a Workspace.ws_name
 	globalread has a value which is a Workspace.permission
 	description has a value which is a string
+	meta has a value which is a Workspace.usermeta
 ws_name is a string
 permission is a string
-workspace_info is a reference to a list containing 8 items:
+usermeta is a reference to a hash where the key is a string and the value is a string
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -112,6 +183,7 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 ws_id is an int
 username is a string
 timestamp is a string
@@ -129,9 +201,11 @@ CreateWorkspaceParams is a reference to a hash where the following keys are defi
 	workspace has a value which is a Workspace.ws_name
 	globalread has a value which is a Workspace.permission
 	description has a value which is a string
+	meta has a value which is a Workspace.usermeta
 ws_name is a string
 permission is a string
-workspace_info is a reference to a list containing 8 items:
+usermeta is a reference to a hash where the key is a string and the value is a string
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -140,6 +214,7 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 ws_id is an int
 username is a string
 timestamp is a string
@@ -203,6 +278,105 @@ sub create_workspace
 
 
 
+=head2 alter_workspace_metadata
+
+  $obj->alter_workspace_metadata($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a Workspace.AlterWorkspaceMetadataParams
+AlterWorkspaceMetadataParams is a reference to a hash where the following keys are defined:
+	wsi has a value which is a Workspace.WorkspaceIdentity
+	new has a value which is a Workspace.usermeta
+	remove has a value which is a reference to a list where each element is a string
+WorkspaceIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	id has a value which is a Workspace.ws_id
+ws_name is a string
+ws_id is an int
+usermeta is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a Workspace.AlterWorkspaceMetadataParams
+AlterWorkspaceMetadataParams is a reference to a hash where the following keys are defined:
+	wsi has a value which is a Workspace.WorkspaceIdentity
+	new has a value which is a Workspace.usermeta
+	remove has a value which is a reference to a list where each element is a string
+WorkspaceIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	id has a value which is a Workspace.ws_id
+ws_name is a string
+ws_id is an int
+usermeta is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+=item Description
+
+Change the metadata associated with a workspace.
+
+=back
+
+=cut
+
+sub alter_workspace_metadata
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function alter_workspace_metadata (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to alter_workspace_metadata:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'alter_workspace_metadata');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.alter_workspace_metadata",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'alter_workspace_metadata',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return;
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method alter_workspace_metadata",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'alter_workspace_metadata',
+				       );
+    }
+}
+
+
+
 =head2 clone_workspace
 
   $info = $obj->clone_workspace($params)
@@ -221,13 +395,15 @@ CloneWorkspaceParams is a reference to a hash where the following keys are defin
 	workspace has a value which is a Workspace.ws_name
 	globalread has a value which is a Workspace.permission
 	description has a value which is a string
+	meta has a value which is a Workspace.usermeta
 WorkspaceIdentity is a reference to a hash where the following keys are defined:
 	workspace has a value which is a Workspace.ws_name
 	id has a value which is a Workspace.ws_id
 ws_name is a string
 ws_id is an int
 permission is a string
-workspace_info is a reference to a list containing 8 items:
+usermeta is a reference to a hash where the key is a string and the value is a string
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -236,6 +412,7 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 username is a string
 timestamp is a string
 lock_status is a string
@@ -253,13 +430,15 @@ CloneWorkspaceParams is a reference to a hash where the following keys are defin
 	workspace has a value which is a Workspace.ws_name
 	globalread has a value which is a Workspace.permission
 	description has a value which is a string
+	meta has a value which is a Workspace.usermeta
 WorkspaceIdentity is a reference to a hash where the following keys are defined:
 	workspace has a value which is a Workspace.ws_name
 	id has a value which is a Workspace.ws_id
 ws_name is a string
 ws_id is an int
 permission is a string
-workspace_info is a reference to a list containing 8 items:
+usermeta is a reference to a hash where the key is a string and the value is a string
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -268,6 +447,7 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 username is a string
 timestamp is a string
 lock_status is a string
@@ -348,7 +528,7 @@ WorkspaceIdentity is a reference to a hash where the following keys are defined:
 	id has a value which is a Workspace.ws_id
 ws_name is a string
 ws_id is an int
-workspace_info is a reference to a list containing 8 items:
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -357,10 +537,12 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 username is a string
 timestamp is a string
 permission is a string
 lock_status is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -375,7 +557,7 @@ WorkspaceIdentity is a reference to a hash where the following keys are defined:
 	id has a value which is a Workspace.ws_id
 ws_name is a string
 ws_id is an int
-workspace_info is a reference to a list containing 8 items:
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -384,10 +566,12 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 username is a string
 timestamp is a string
 permission is a string
 lock_status is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
 
 
 =end text
@@ -590,7 +774,7 @@ WorkspaceIdentity is a reference to a hash where the following keys are defined:
 	id has a value which is a Workspace.ws_id
 ws_name is a string
 ws_id is an int
-workspace_info is a reference to a list containing 8 items:
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -599,10 +783,12 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 username is a string
 timestamp is a string
 permission is a string
 lock_status is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -617,7 +803,7 @@ WorkspaceIdentity is a reference to a hash where the following keys are defined:
 	id has a value which is a Workspace.ws_id
 ws_name is a string
 ws_id is an int
-workspace_info is a reference to a list containing 8 items:
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -626,10 +812,12 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 username is a string
 timestamp is a string
 permission is a string
 lock_status is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
 
 
 =end text
@@ -2132,6 +2320,145 @@ sub get_object_history
 
 
 
+=head2 list_referencing_objects
+
+  $referrers = $obj->list_referencing_objects($object_ids)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$object_ids is a reference to a list where each element is a Workspace.ObjectIdentity
+$referrers is a reference to a list where each element is a reference to a list where each element is a Workspace.object_info
+ObjectIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	wsid has a value which is a Workspace.ws_id
+	name has a value which is a Workspace.obj_name
+	objid has a value which is a Workspace.obj_id
+	ver has a value which is a Workspace.obj_ver
+	ref has a value which is a Workspace.obj_ref
+ws_name is a string
+ws_id is an int
+obj_name is a string
+obj_id is an int
+obj_ver is an int
+obj_ref is a string
+object_info is a reference to a list containing 11 items:
+	0: (objid) a Workspace.obj_id
+	1: (name) a Workspace.obj_name
+	2: (type) a Workspace.type_string
+	3: (save_date) a Workspace.timestamp
+	4: (version) an int
+	5: (saved_by) a Workspace.username
+	6: (wsid) a Workspace.ws_id
+	7: (workspace) a Workspace.ws_name
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a Workspace.usermeta
+type_string is a string
+timestamp is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$object_ids is a reference to a list where each element is a Workspace.ObjectIdentity
+$referrers is a reference to a list where each element is a reference to a list where each element is a Workspace.object_info
+ObjectIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	wsid has a value which is a Workspace.ws_id
+	name has a value which is a Workspace.obj_name
+	objid has a value which is a Workspace.obj_id
+	ver has a value which is a Workspace.obj_ver
+	ref has a value which is a Workspace.obj_ref
+ws_name is a string
+ws_id is an int
+obj_name is a string
+obj_id is an int
+obj_ver is an int
+obj_ref is a string
+object_info is a reference to a list containing 11 items:
+	0: (objid) a Workspace.obj_id
+	1: (name) a Workspace.obj_name
+	2: (type) a Workspace.type_string
+	3: (save_date) a Workspace.timestamp
+	4: (version) an int
+	5: (saved_by) a Workspace.username
+	6: (wsid) a Workspace.ws_id
+	7: (workspace) a Workspace.ws_name
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a Workspace.usermeta
+type_string is a string
+timestamp is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+=item Description
+
+List objects that reference one or more objects.
+
+=back
+
+=cut
+
+sub list_referencing_objects
+{
+    my($self, @args) = @_;
+
+# Authentication: optional
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function list_referencing_objects (received $n, expecting 1)");
+    }
+    {
+	my($object_ids) = @args;
+
+	my @_bad_arguments;
+        (ref($object_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"object_ids\" (value was \"$object_ids\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to list_referencing_objects:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'list_referencing_objects');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.list_referencing_objects",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'list_referencing_objects',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method list_referencing_objects",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'list_referencing_objects',
+				       );
+    }
+}
+
+
+
 =head2 list_workspaces
 
   $workspaces = $obj->list_workspaces($params)
@@ -2265,10 +2592,17 @@ sub list_workspaces
 $params is a Workspace.ListWorkspaceInfoParams
 $wsinfo is a reference to a list where each element is a Workspace.workspace_info
 ListWorkspaceInfoParams is a reference to a hash where the following keys are defined:
+	perm has a value which is a Workspace.permission
+	owners has a value which is a reference to a list where each element is a Workspace.username
+	meta has a value which is a Workspace.usermeta
 	excludeGlobal has a value which is a Workspace.boolean
 	showDeleted has a value which is a Workspace.boolean
+	showOnlyDeleted has a value which is a Workspace.boolean
+permission is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
 boolean is an int
-workspace_info is a reference to a list containing 8 items:
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -2277,11 +2611,10 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 ws_id is an int
 ws_name is a string
-username is a string
 timestamp is a string
-permission is a string
 lock_status is a string
 
 </pre>
@@ -2293,10 +2626,17 @@ lock_status is a string
 $params is a Workspace.ListWorkspaceInfoParams
 $wsinfo is a reference to a list where each element is a Workspace.workspace_info
 ListWorkspaceInfoParams is a reference to a hash where the following keys are defined:
+	perm has a value which is a Workspace.permission
+	owners has a value which is a reference to a list where each element is a Workspace.username
+	meta has a value which is a Workspace.usermeta
 	excludeGlobal has a value which is a Workspace.boolean
 	showDeleted has a value which is a Workspace.boolean
+	showOnlyDeleted has a value which is a Workspace.boolean
+permission is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
 boolean is an int
-workspace_info is a reference to a list containing 8 items:
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -2305,11 +2645,10 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 ws_id is an int
 ws_name is a string
-username is a string
 timestamp is a string
-permission is a string
 lock_status is a string
 
 
@@ -2317,7 +2656,7 @@ lock_status is a string
 
 =item Description
 
-Early version of list_workspaces.
+List workspaces viewable by the user.
 
 =back
 
@@ -2523,13 +2862,20 @@ ListObjectsParams is a reference to a hash where the following keys are defined:
 	workspaces has a value which is a reference to a list where each element is a Workspace.ws_name
 	ids has a value which is a reference to a list where each element is a Workspace.ws_id
 	type has a value which is a Workspace.type_string
+	perm has a value which is a Workspace.permission
+	savedby has a value which is a reference to a list where each element is a Workspace.username
+	meta has a value which is a Workspace.usermeta
 	showDeleted has a value which is a Workspace.boolean
+	showOnlyDeleted has a value which is a Workspace.boolean
 	showHidden has a value which is a Workspace.boolean
 	showAllVersions has a value which is a Workspace.boolean
 	includeMetadata has a value which is a Workspace.boolean
 ws_name is a string
 ws_id is an int
 type_string is a string
+permission is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
 boolean is an int
 object_info is a reference to a list containing 11 items:
 	0: (objid) a Workspace.obj_id
@@ -2546,8 +2892,6 @@ object_info is a reference to a list containing 11 items:
 obj_id is an int
 obj_name is a string
 timestamp is a string
-username is a string
-usermeta is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -2561,13 +2905,20 @@ ListObjectsParams is a reference to a hash where the following keys are defined:
 	workspaces has a value which is a reference to a list where each element is a Workspace.ws_name
 	ids has a value which is a reference to a list where each element is a Workspace.ws_id
 	type has a value which is a Workspace.type_string
+	perm has a value which is a Workspace.permission
+	savedby has a value which is a reference to a list where each element is a Workspace.username
+	meta has a value which is a Workspace.usermeta
 	showDeleted has a value which is a Workspace.boolean
+	showOnlyDeleted has a value which is a Workspace.boolean
 	showHidden has a value which is a Workspace.boolean
 	showAllVersions has a value which is a Workspace.boolean
 	includeMetadata has a value which is a Workspace.boolean
 ws_name is a string
 ws_id is an int
 type_string is a string
+permission is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
 boolean is an int
 object_info is a reference to a list containing 11 items:
 	0: (objid) a Workspace.obj_id
@@ -2584,15 +2935,13 @@ object_info is a reference to a list containing 11 items:
 obj_id is an int
 obj_name is a string
 timestamp is a string
-username is a string
-usermeta is a reference to a hash where the key is a string and the value is a string
 
 
 =end text
 
 =item Description
 
-Early version of list_objects.
+List objects in one or more workspaces.
 
 =back
 
@@ -2948,7 +3297,7 @@ WorkspaceIdentity is a reference to a hash where the following keys are defined:
 	id has a value which is a Workspace.ws_id
 ws_name is a string
 ws_id is an int
-workspace_info is a reference to a list containing 8 items:
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -2957,10 +3306,12 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 username is a string
 timestamp is a string
 permission is a string
 lock_status is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -2978,7 +3329,7 @@ WorkspaceIdentity is a reference to a hash where the following keys are defined:
 	id has a value which is a Workspace.ws_id
 ws_name is a string
 ws_id is an int
-workspace_info is a reference to a list containing 8 items:
+workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
 	1: (workspace) a Workspace.ws_name
 	2: (owner) a Workspace.username
@@ -2987,10 +3338,12 @@ workspace_info is a reference to a list containing 8 items:
 	5: (user_permission) a Workspace.permission
 	6: (globalread) a Workspace.permission
 	7: (lockstat) a Workspace.lock_status
+	8: (metadata) a Workspace.usermeta
 username is a string
 timestamp is a string
 permission is a string
 lock_status is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
 
 
 =end text
@@ -4831,7 +5184,7 @@ sub get_jsonschema
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -4997,7 +5350,7 @@ sub translate_to_MD5_types
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -5102,7 +5455,7 @@ sub get_type_info
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -5203,7 +5556,7 @@ sub get_func_info
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -5240,6 +5593,190 @@ sub get_func_info
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_func_info",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_func_info',
+				       );
+    }
+}
+
+
+
+=head2 grant_module_ownership
+
+  $obj->grant_module_ownership($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a Workspace.GrantModuleOwnershipParams
+GrantModuleOwnershipParams is a reference to a hash where the following keys are defined:
+	mod has a value which is a Workspace.modulename
+	new_owner has a value which is a Workspace.username
+	with_grant_option has a value which is a Workspace.boolean
+modulename is a string
+username is a string
+boolean is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a Workspace.GrantModuleOwnershipParams
+GrantModuleOwnershipParams is a reference to a hash where the following keys are defined:
+	mod has a value which is a Workspace.modulename
+	new_owner has a value which is a Workspace.username
+	with_grant_option has a value which is a Workspace.boolean
+modulename is a string
+username is a string
+boolean is an int
+
+
+=end text
+
+=item Description
+
+Grant ownership of a module. You must have grant ability on the
+module.
+
+=back
+
+=cut
+
+sub grant_module_ownership
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function grant_module_ownership (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to grant_module_ownership:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'grant_module_ownership');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.grant_module_ownership",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'grant_module_ownership',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return;
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method grant_module_ownership",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'grant_module_ownership',
+				       );
+    }
+}
+
+
+
+=head2 remove_module_ownership
+
+  $obj->remove_module_ownership($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a Workspace.RemoveModuleOwnershipParams
+RemoveModuleOwnershipParams is a reference to a hash where the following keys are defined:
+	mod has a value which is a Workspace.modulename
+	old_owner has a value which is a Workspace.username
+modulename is a string
+username is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a Workspace.RemoveModuleOwnershipParams
+RemoveModuleOwnershipParams is a reference to a hash where the following keys are defined:
+	mod has a value which is a Workspace.modulename
+	old_owner has a value which is a Workspace.username
+modulename is a string
+username is a string
+
+
+=end text
+
+=item Description
+
+Remove ownership from a current owner. You must have the grant ability
+on the module.
+
+=back
+
+=cut
+
+sub remove_module_ownership
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function remove_module_ownership (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to remove_module_ownership:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'remove_module_ownership');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.remove_module_ownership",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'remove_module_ownership',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return;
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method remove_module_ownership",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'remove_module_ownership',
 				       );
     }
 }
@@ -5817,6 +6354,8 @@ Information about a workspace.
         permission user_permission - permissions for the authenticated user of
                 this workspace.
         permission globalread - whether this workspace is globally readable.
+        usermeta metadata - arbitrary user-supplied metadata about
+                the workspace.
 
 
 =item Definition
@@ -5824,7 +6363,7 @@ Information about a workspace.
 =begin html
 
 <pre>
-a reference to a list containing 8 items:
+a reference to a list containing 9 items:
 0: (id) a Workspace.ws_id
 1: (workspace) a Workspace.ws_name
 2: (owner) a Workspace.username
@@ -5833,6 +6372,7 @@ a reference to a list containing 8 items:
 5: (user_permission) a Workspace.permission
 6: (globalread) a Workspace.permission
 7: (lockstat) a Workspace.lock_status
+8: (metadata) a Workspace.usermeta
 
 </pre>
 
@@ -5840,7 +6380,7 @@ a reference to a list containing 8 items:
 
 =begin text
 
-a reference to a list containing 8 items:
+a reference to a list containing 9 items:
 0: (id) a Workspace.ws_id
 1: (workspace) a Workspace.ws_name
 2: (owner) a Workspace.username
@@ -5849,6 +6389,7 @@ a reference to a list containing 8 items:
 5: (user_permission) a Workspace.permission
 6: (globalread) a Workspace.permission
 7: (lockstat) a Workspace.lock_status
+8: (metadata) a Workspace.usermeta
 
 
 =end text
@@ -6433,6 +6974,7 @@ Input parameters for the "create_workspace" function.
         string description - A free-text description of the new workspace, 1000
                 characters max. Longer strings will be mercilessly and brutally
                 truncated.
+        usermeta meta - arbitrary user-supplied metadata for the workspace.
 
 
 =item Definition
@@ -6444,6 +6986,7 @@ a reference to a hash where the following keys are defined:
 workspace has a value which is a Workspace.ws_name
 globalread has a value which is a Workspace.permission
 description has a value which is a string
+meta has a value which is a Workspace.usermeta
 
 </pre>
 
@@ -6455,6 +6998,55 @@ a reference to a hash where the following keys are defined:
 workspace has a value which is a Workspace.ws_name
 globalread has a value which is a Workspace.permission
 description has a value which is a string
+meta has a value which is a Workspace.usermeta
+
+
+=end text
+
+=back
+
+
+
+=head2 AlterWorkspaceMetadataParams
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "alter_workspace_metadata" function.
+
+Required arguments:
+WorkspaceIdentity wsi - the workspace to be altered
+
+One or both of the following arguments are required:
+usermeta new - metadata to assign to the workspace. Duplicate keys will
+        be overwritten.
+list<string> remove - these keys will be removed from the workspace
+        metadata key/value pairs.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+wsi has a value which is a Workspace.WorkspaceIdentity
+new has a value which is a Workspace.usermeta
+remove has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+wsi has a value which is a Workspace.WorkspaceIdentity
+new has a value which is a Workspace.usermeta
+remove has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -6487,6 +7079,7 @@ Input parameters for the "clone_workspace" function.
         string description - A free-text description of the new workspace, 1000
                 characters max. Longer strings will be mercilessly and brutally
                 truncated.
+        usermeta meta - arbitrary user-supplied metadata for the workspace.
 
 
 =item Definition
@@ -6499,6 +7092,7 @@ wsi has a value which is a Workspace.WorkspaceIdentity
 workspace has a value which is a Workspace.ws_name
 globalread has a value which is a Workspace.permission
 description has a value which is a string
+meta has a value which is a Workspace.usermeta
 
 </pre>
 
@@ -6511,6 +7105,7 @@ wsi has a value which is a Workspace.WorkspaceIdentity
 workspace has a value which is a Workspace.ws_name
 globalread has a value which is a Workspace.permission
 description has a value which is a string
+meta has a value which is a Workspace.usermeta
 
 
 =end text
@@ -7105,10 +7700,19 @@ excludeGlobal has a value which is a Workspace.boolean
 Input parameters for the "list_workspace_info" function.
 
 Optional parameters:
+permission perm - filter workspaces by permission level. 'None' and
+        'readable' are ignored.
+list<username> owners - filter workspaces by owner.
+usermeta meta - filter workspaces by the user supplied metadata. NOTE:
+        only one key/value pair is supported at this time. A full map
+        is provided as input for the possibility for expansion in the
+        future.
 boolean excludeGlobal - if excludeGlobal is true exclude world
         readable workspaces. Defaults to false.
 boolean showDeleted - show deleted workspaces that are owned by the
         user.
+boolean showOnlyDeleted - only show deleted workspaces that are owned
+        by the user.
 
 
 =item Definition
@@ -7117,8 +7721,12 @@ boolean showDeleted - show deleted workspaces that are owned by the
 
 <pre>
 a reference to a hash where the following keys are defined:
+perm has a value which is a Workspace.permission
+owners has a value which is a reference to a list where each element is a Workspace.username
+meta has a value which is a Workspace.usermeta
 excludeGlobal has a value which is a Workspace.boolean
 showDeleted has a value which is a Workspace.boolean
+showOnlyDeleted has a value which is a Workspace.boolean
 
 </pre>
 
@@ -7127,8 +7735,12 @@ showDeleted has a value which is a Workspace.boolean
 =begin text
 
 a reference to a hash where the following keys are defined:
+perm has a value which is a Workspace.permission
+owners has a value which is a reference to a list where each element is a Workspace.username
+meta has a value which is a Workspace.usermeta
 excludeGlobal has a value which is a Workspace.boolean
 showDeleted has a value which is a Workspace.boolean
+showOnlyDeleted has a value which is a Workspace.boolean
 
 
 =end text
@@ -7217,8 +7829,18 @@ Parameters for the 'list_objects' function.
                         existing version.
                 
                 Optional arguments:
+                permission perm - filter objects by permission level. 'None' and
+                        'readable' are ignored.
+                list<username> savedby - filter objects by the user that saved or
+                        copied the object.
+                usermeta meta - filter objects by the user supplied metadata. NOTE:
+                        only one key/value pair is supported at this time. A full map
+                        is provided as input for the possibility for expansion in the
+                        future.
                 boolean showDeleted - show deleted objects in workspaces to which the
                         user has write access.
+                boolean showOnlyDeleted - only show deleted objects in workspaces to
+                        which the user has write access.
                 boolean showHidden - show hidden objects.
                 boolean showAllVersions - show all versions of each object that match
                         the filters rather than only the most recent version.
@@ -7236,7 +7858,11 @@ a reference to a hash where the following keys are defined:
 workspaces has a value which is a reference to a list where each element is a Workspace.ws_name
 ids has a value which is a reference to a list where each element is a Workspace.ws_id
 type has a value which is a Workspace.type_string
+perm has a value which is a Workspace.permission
+savedby has a value which is a reference to a list where each element is a Workspace.username
+meta has a value which is a Workspace.usermeta
 showDeleted has a value which is a Workspace.boolean
+showOnlyDeleted has a value which is a Workspace.boolean
 showHidden has a value which is a Workspace.boolean
 showAllVersions has a value which is a Workspace.boolean
 includeMetadata has a value which is a Workspace.boolean
@@ -7251,7 +7877,11 @@ a reference to a hash where the following keys are defined:
 workspaces has a value which is a reference to a list where each element is a Workspace.ws_name
 ids has a value which is a reference to a list where each element is a Workspace.ws_id
 type has a value which is a Workspace.type_string
+perm has a value which is a Workspace.permission
+savedby has a value which is a reference to a list where each element is a Workspace.username
+meta has a value which is a Workspace.usermeta
 showDeleted has a value which is a Workspace.boolean
+showOnlyDeleted has a value which is a Workspace.boolean
 showHidden has a value which is a Workspace.boolean
 showAllVersions has a value which is a Workspace.boolean
 includeMetadata has a value which is a Workspace.boolean
@@ -8111,6 +8741,96 @@ spec_def has a value which is a string
 module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 func_vers has a value which is a reference to a list where each element is a Workspace.func_string
 used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
+
+
+=end text
+
+=back
+
+
+
+=head2 GrantModuleOwnershipParams
+
+=over 4
+
+
+
+=item Description
+
+Parameters for the grant_module_ownership function.
+
+Required arguments:
+modulename mod - the module to modify.
+username new_owner - the user to add to the module's list of
+        owners.
+
+Optional arguments:
+boolean with_grant_option - true to allow the user to add owners
+        to the module.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+mod has a value which is a Workspace.modulename
+new_owner has a value which is a Workspace.username
+with_grant_option has a value which is a Workspace.boolean
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+mod has a value which is a Workspace.modulename
+new_owner has a value which is a Workspace.username
+with_grant_option has a value which is a Workspace.boolean
+
+
+=end text
+
+=back
+
+
+
+=head2 RemoveModuleOwnershipParams
+
+=over 4
+
+
+
+=item Description
+
+Parameters for the remove_module_ownership function.
+
+Required arguments:
+modulename mod - the module to modify.
+username old_owner - the user to remove from the module's list of
+        owners.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+mod has a value which is a Workspace.modulename
+old_owner has a value which is a Workspace.username
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+mod has a value which is a Workspace.modulename
+old_owner has a value which is a Workspace.username
 
 
 =end text

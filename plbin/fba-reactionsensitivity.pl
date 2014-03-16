@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use JSON;
 use Bio::KBase::workspace::ScriptHelpers qw( get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
-use Bio::KBase::fbaModelServices::ScriptHelpers qw(printJobData get_fba_client runFBACommand universalFBAScriptCode );
+use Bio::KBase::fbaModelServices::ScriptHelpers qw(fbaws printJobData get_fba_client runFBACommand universalFBAScriptCode );
 
 #Defining globals describing behavior
 my $primaryArgs = ["Model ID"];
@@ -37,9 +37,10 @@ DESCRIPTION
       reaction is removed. There are two different inputs you can provide to this function:
 
       1: You can provide a list of reactions (optionally with direction specified by + or -. By default both directions are tested)  Reactions
-         will be tested in the order in which they appear. To do this use --rxnstotest.
+         will be tested in the order in which they appear. To do this use --rxnstotest (note that you have to use the '=' syntax with this command
+         or parsing the option will fail).
 
-      --rxnstotest '+rxn00001;-rxn00002'
+      --rxnstotest='+rxn00001;-rxn00002'
 
       2: You can specify a Gapfill solution ID (GapfillUUID.solution.# where # is the solution number) and the sensitivity of removing each reaction
          will be tested. Gapfill reactions will be tested in the opposite order in which they were gapfilled unless --rxnprobs is specified.
@@ -60,8 +61,8 @@ DESCRIPTION
 
 EXAMPLES
 
-      > fba-reactionsensitivity --rxnstotest '+rxn00001;-rxn00002' MyModel
-      > fba-reactionsensitivity --gapfill 'GapfillID'.solution.0 MyModel
+      > fba-reactionsensitivity --rxnstotest='+rxn00001;-rxn00002' MyModel
+      > fba-reactionsensitivity --gapfill 'GapfillID'.gfsol.0 MyModel
 
 SEE ALSO
       fba-gapfill
@@ -75,14 +76,14 @@ AUTHORS
 
 #Defining usage and options
 my $specs = [
-    [ 'workspace|w:s', 'Workspace in which to save the RxnSensitivity object (default: current workspace)', { "default" => workspace() } ],
+    [ 'workspace|w:s', 'Workspace in which to save the RxnSensitivity object (default: current workspace)', { "default" => fbaws() } ],
     [ 'rxnsensid|r:s', 'ID for RxnSensitivity object to be outputted' ],
-    [ 'modelws:s', 'Workspace in which the input model is found (default: current workspace)', { "default" => workspace() } ],
+    [ 'modelws:s', 'Workspace in which the input model is found (default: current workspace)', { "default" => fbaws() } ],
     [ 'deleterxns', 'Delete nonconributing reactions before testing the next sensitivity of the others in the list' ],
     [ 'rxnstotest:s', 'Reactions to test the sensitivity for, in order to try them (;-delimited). Specify this or a gapfill solution ID. Use + or - to specify a direction, by default both directions are tested.' ],
     [ 'gapfill:s', 'Gapfill solution ID (UUID.solution.#). Specify this or a list of reactions to test.'],
     [ 'rxnprobs:s', 'RxnProbs object. If provided, reaction sensitivity is done with lowest-likelihood reactions first. Only applicable if a gapfill solution is provided.' ],
-    [ 'rxnprobsws:s', 'RxnProbs object workspace (default: current workspace)', { "default" => workspace() } ]
+    [ 'rxnprobsws:s', 'RxnProbs object workspace (default: current workspace)', { "default" => fbaws() } ]
     ];
 
 my ($opt,$params) = universalFBAScriptCode($specs,$script,$primaryArgs,$translation, $manpage);
@@ -102,6 +103,7 @@ if ( $ok == 0 ) {
 
 #Calling the server
 my $output = runFBACommand($params,$servercommand,$opt,1);
+
 #Checking output and report results
 if (!defined($output)) {
     print "Reaction sensitivity analysis failed.\n"

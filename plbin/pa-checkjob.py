@@ -98,6 +98,8 @@ if __name__ == "__main__":
         
     # Print all of the jobs in the list.
     for job in jobList:
-        print_job(job_info_dict(job))
+        info = job_info_dict(job)
+        if info['description'].split()[0] == 'pa-annotate': # Only show pa-annotate jobs
+            print_job(info)
             
     exit(0)

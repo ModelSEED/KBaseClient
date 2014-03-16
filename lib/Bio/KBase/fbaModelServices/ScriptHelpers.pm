@@ -7,10 +7,11 @@ use Getopt::Long::Descriptive;
 use Text::Table;
 use Bio::KBase::Auth;
 use Bio::KBase::fbaModelServices::Client;
+use Bio::KBase::workspaceService::Client;
 use Bio::KBase::workspace::ScriptHelpers qw(workspaceURL get_ws_client workspace parseObjectMeta parseWorkspaceMeta);
 use Exporter;
 use parent qw(Exporter);
-our @EXPORT_OK = qw( printJobData fbaURL get_fba_client runFBACommand universalFBAScriptCode fbaTranslation roles_of_function );
+our @EXPORT_OK = qw(getToken get_old_ws_client fbaws printJobData fbaURL get_fba_client runFBACommand universalFBAScriptCode fbaTranslation roles_of_function );
 
 our $defaultURL = "https://kbase.us/services/KBaseFBAModeling";
 our $localhostURL = "http://127.0.0.1:4043";
@@ -41,18 +42,65 @@ sub getToken {
 	return $token;
 }
 
+sub fbaws {
+	my $newWs = shift;
+	my $currentWs;
+	if (defined($newWs)) {
+		$currentWs = $newWs;
+		if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
+			my $cfg = getKBaseCfg();
+			$cfg->param("workspace_deluxe.workspace",$newWs);
+			$cfg->save();
+			$cfg->close();
+		} else {
+			my $client = get_old_ws_client();
+			$client->set_user_settings({
+				setting => "workspace",
+				value => $currentWs,
+				auth => getToken()
+			});
+		}
+	} else {
+		if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
+			my $cfg = getKBaseCfg();
+			$currentWs = $cfg->param("workspace_deluxe.workspace");
+			if (!defined($currentWs)) {
+				$cfg->param("workspace_deluxe.workspace","no_workspace_set");
+				$cfg->save();
+				$currentWs="no_workspace_set";
+			}
+			$cfg->close();
+		} else {
+			my $client = get_old_ws_client();
+			my $settings = $client->get_user_settings({auth => getToken()});
+			$currentWs = $settings->{workspace};
+		}
+	}
+	return $currentWs;
+}
+
+sub get_old_ws_client {
+	my $url = shift;
+	if (!defined($url)) {
+		$url = "http://kbase.us/services/workspace/";
+	}
+	my $client = Bio::KBase::workspaceService::Client->new($url);
+	#$client->{token} = getToken();
+	#$client->{client}->{token} = getToken();
+    return $client;
+}
+
 sub get_fba_client {
 	my $url = shift;
 	if (!defined($url)) {
 		$url = fbaURL();
 	}
 	if ($url eq "impl") {
+		$Bio::KBase::fbaModelServices::Server::CallContext = {token => getToken()};
 		require "Bio/KBase/fbaModelServices/Impl.pm";
-		return Bio::KBase::fbaModelServices::Impl->new({workspace => get_ws_client()});
+		return Bio::KBase::fbaModelServices::Impl->new();
 	}
 	my $client = Bio::KBase::fbaModelServices::Client->new(fbaURL());
-	$client->{token} = getToken();
-	$client->{client}->{token} = getToken();
     return $client;
 }
 

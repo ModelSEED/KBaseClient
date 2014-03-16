@@ -18,14 +18,6 @@ gather:
 		cp $(THIS_DIR)/../probabilistic_annotation/lib/Bio/KBase/probabilistic_annotation/Client.pm $(THIS_DIR)/lib/Bio/KBase/probabilistic_annotation/Client.pm ; \
 		cp $(THIS_DIR)/../probabilistic_annotation/lib/Bio/KBase/probabilistic_annotation/Helpers.pm $(THIS_DIR)/lib/Bio/KBase/probabilistic_annotation/Helpers.pm ; \
 	fi
-	if [ -d $(THIS_DIR)/../workspace_service ] ; then \
-		cp $(THIS_DIR)/../workspace_service/scripts/ws-* $(THIS_DIR)/plbin/ ; \
-		cp $(THIS_DIR)/../workspace_service/scripts/kbws-* $(THIS_DIR)/plbin/ ; \
-		rm -rf $(THIS_DIR)/lib/Bio/KBase/workspaceService ; \
-		mkdir $(THIS_DIR)/lib/Bio/KBase/workspaceService ; \
-		cp $(THIS_DIR)/../workspace_service/lib/Bio/KBase/workspaceService/Client.pm $(THIS_DIR)/lib/Bio/KBase/workspaceService/Client.pm ; \
-		cp $(THIS_DIR)/../workspace_service/lib/Bio/KBase/workspaceService/Helpers.pm $(THIS_DIR)/lib/Bio/KBase/workspaceService/Helpers.pm ; \
-	fi
 	if [ -d $(THIS_DIR)/../auth ] ; then \
 		cp $(THIS_DIR)/../auth/scripts/kbase-* $(THIS_DIR)/plbin/ ; \
 		rm -rf $(THIS_DIR)/lib/Bio/KBase/*.pm ; \
@@ -39,8 +31,12 @@ gather:
 		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/ga-* $(THIS_DIR)/plbin/ ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/fba-* $(THIS_DIR)/plbin/ ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/kbfba-* $(THIS_DIR)/plbin/ ; \
+		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/kbws-* $(THIS_DIR)/plbin/ ; \
 		rm -rf $(THIS_DIR)/lib/Bio/KBase/fbaModelServices ; \
 		mkdir $(THIS_DIR)/lib/Bio/KBase/fbaModelServices ; \
+		rm -rf $(THIS_DIR)/lib/Bio/KBase/workspaceService ; \
+		mkdir $(THIS_DIR)/lib/Bio/KBase/workspaceService ; \
+		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/workspaceService/Client.pm $(THIS_DIR)/lib/Bio/KBase/workspaceService/Client.pm ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/Client.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/Client.pm ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/ScriptHelpers.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/ScriptHelpers.pm ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/Exceptions.pm $(THIS_DIR)/lib/Bio/KBase/Exceptions.pm ; \

@@ -26,7 +26,7 @@ DESCRIPTION
       each role associated with the reaction) and likelihood scores.
       
       The RxnProbs object can be used as input to gapfilling a metabolic model
-      using the --probrxn option for the kbfba-gapfill command.  However, if 
+      using the --probrxn option for the fba-gapfill command.  However, if 
       you do this you must make sure that the same template model is used for
       gapfilling and for computing probabilities.  If you want to avoid this
       issue, we recommend using the ProbAnno object instead.
@@ -47,7 +47,7 @@ EXAMPLES
       
 SEE ALSO
       pa-annotate
-      kbfba-gapfill
+      fba-gapfill
       
 AUTHORS
       Matt Benedict, Mike Mundy

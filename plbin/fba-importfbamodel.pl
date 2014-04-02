@@ -141,6 +141,18 @@ foreach my $rxn (@{$data}) {
 			$rxn->[$headingColums->{compartment}],
 			$rxn->[$headingColums->{gpr}],
 		];
+		if (defined($headingColums->{name})) {
+			$rxnobj->[4] = $rxn->[$headingColums->{name}];
+		}
+		if (defined($headingColums->{enzyme})) {
+			$rxnobj->[5] = $rxn->[$headingColums->{enzyme}];
+		}
+		if (defined($headingColums->{pathway})) {
+			$rxnobj->[6] = $rxn->[$headingColums->{pathway}];
+		}
+		if (defined($headingColums->{reference})) {
+			$rxnobj->[7] = $rxn->[$headingColums->{reference}];
+		}
 		push(@{$params->{reactions}},$rxnobj);
 	}
 }
@@ -162,7 +174,7 @@ if (defined($opt->{compoundfile})) {
 	for (my $i=0;$i < @{$headings}; $i++) {
 		$headingColums->{$headings->[$i]} = $i;
 	}
-	my $reqheadings = ["id","charge","formula","name","aliases"];
+	my $reqheadings = ["id","charge","formula","name"];
 	my $error = 0;
 	foreach my $heading (@{$reqheadings}) {
 		if (!defined($headingColums->{$heading})) {
@@ -174,14 +186,16 @@ if (defined($opt->{compoundfile})) {
 		exit();
 	}
 	foreach my $cpd (@{$data}) {
-		if (@{$cpd} >= 5) {
+		if (@{$cpd} >= 4) {
 			my $cpdobj = [
 				$cpd->[$headingColums->{id}],
 				$cpd->[$headingColums->{charge}],
 				$cpd->[$headingColums->{formula}],
 				$cpd->[$headingColums->{name}],
-				$cpd->[$headingColums->{aliases}],
 			];
+			if (defined($headingColums->{aliases})) {
+				$cpdobj->[4] = $cpd->[$headingColums->{aliases}];
+			}
 			push(@{$params->{compounds}},$cpdobj);
 		}
 	}

@@ -31,7 +31,11 @@ gather:
 		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/ga-* $(THIS_DIR)/plbin/ ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/fba-* $(THIS_DIR)/plbin/ ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/kbfba-* $(THIS_DIR)/plbin/ ; \
-		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/kbws-* $(THIS_DIR)/plbin/ ; \
+		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/ws-* $(THIS_DIR)/plbin/ ; \
+		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/ws-jobs $(THIS_DIR)/plbin/kbws-jobs ; \
+		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/ws-getjob $(THIS_DIR)/plbin/kbws-getjob ; \
+		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/ws-checkjob $(THIS_DIR)/plbin/kbws-checkjob ; \
+		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/ws-resetjob $(THIS_DIR)/plbin/kbws-resetjob ; \
 		rm -rf $(THIS_DIR)/lib/Bio/KBase/fbaModelServices ; \
 		mkdir $(THIS_DIR)/lib/Bio/KBase/fbaModelServices ; \
 		rm -rf $(THIS_DIR)/lib/Bio/KBase/workspaceService ; \

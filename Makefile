@@ -43,6 +43,7 @@ gather:
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/workspaceService/Client.pm $(THIS_DIR)/lib/Bio/KBase/workspaceService/Client.pm ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/Client.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/Client.pm ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/ScriptHelpers.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/ScriptHelpers.pm ; \
+		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/ScriptConfig.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/ScriptConfig.pm ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/Exceptions.pm $(THIS_DIR)/lib/Bio/KBase/Exceptions.pm ; \
 	fi
 	
@@ -59,6 +60,7 @@ gather:
 		mkdir $(THIS_DIR)/lib/Bio/KBase/workspace ; \
 		cp $(THIS_DIR)/../workspace_deluxe/lib/Bio/KBase/workspace/Client.pm $(THIS_DIR)/lib/Bio/KBase/workspace/Client.pm ; \
 		cp $(THIS_DIR)/../workspace_deluxe/lib/Bio/KBase/workspace/ScriptHelpers.pm $(THIS_DIR)/lib/Bio/KBase/workspace/ScriptHelpers.pm ; \
+		cp $(THIS_DIR)/../workspace_deluxe/lib/Bio/KBase/workspace/ScriptConfig.pm $(THIS_DIR)/lib/Bio/KBase/workspace/ScriptConfig.pm ; \
 	fi
 	if [ -d $(THIS_DIR)/../ModelSEED ] ; then \
 		rm -rf $(THIS_DIR)/lib/myRAST ; \

@@ -51,7 +51,7 @@ sub new
     
     if (!defined($url))
     {
-	$url = 'http://kbase.us/services/ws/';
+	$url = 'https://kbase.us/services/ws/';
     }
 
     my $self = {
@@ -2459,6 +2459,313 @@ sub list_referencing_objects
 
 
 
+=head2 list_referencing_object_counts
+
+  $counts = $obj->list_referencing_object_counts($object_ids)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$object_ids is a reference to a list where each element is a Workspace.ObjectIdentity
+$counts is a reference to a list where each element is an int
+ObjectIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	wsid has a value which is a Workspace.ws_id
+	name has a value which is a Workspace.obj_name
+	objid has a value which is a Workspace.obj_id
+	ver has a value which is a Workspace.obj_ver
+	ref has a value which is a Workspace.obj_ref
+ws_name is a string
+ws_id is an int
+obj_name is a string
+obj_id is an int
+obj_ver is an int
+obj_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$object_ids is a reference to a list where each element is a Workspace.ObjectIdentity
+$counts is a reference to a list where each element is an int
+ObjectIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	wsid has a value which is a Workspace.ws_id
+	name has a value which is a Workspace.obj_name
+	objid has a value which is a Workspace.obj_id
+	ver has a value which is a Workspace.obj_ver
+	ref has a value which is a Workspace.obj_ref
+ws_name is a string
+ws_id is an int
+obj_name is a string
+obj_id is an int
+obj_ver is an int
+obj_ref is a string
+
+
+=end text
+
+=item Description
+
+List the number of times objects have been referenced.
+
+This count includes both provenance and object-to-object references
+and, unlike list_referencing_objects, includes objects that are
+inaccessible to the user.
+
+=back
+
+=cut
+
+sub list_referencing_object_counts
+{
+    my($self, @args) = @_;
+
+# Authentication: optional
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function list_referencing_object_counts (received $n, expecting 1)");
+    }
+    {
+	my($object_ids) = @args;
+
+	my @_bad_arguments;
+        (ref($object_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"object_ids\" (value was \"$object_ids\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to list_referencing_object_counts:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'list_referencing_object_counts');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.list_referencing_object_counts",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'list_referencing_object_counts',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method list_referencing_object_counts",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'list_referencing_object_counts',
+				       );
+    }
+}
+
+
+
+=head2 get_referenced_objects
+
+  $data = $obj->get_referenced_objects($ref_chains)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ref_chains is a reference to a list where each element is a Workspace.ref_chain
+$data is a reference to a list where each element is a Workspace.ObjectData
+ref_chain is a reference to a list where each element is a Workspace.ObjectIdentity
+ObjectIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	wsid has a value which is a Workspace.ws_id
+	name has a value which is a Workspace.obj_name
+	objid has a value which is a Workspace.obj_id
+	ver has a value which is a Workspace.obj_ver
+	ref has a value which is a Workspace.obj_ref
+ws_name is a string
+ws_id is an int
+obj_name is a string
+obj_id is an int
+obj_ver is an int
+obj_ref is a string
+ObjectData is a reference to a hash where the following keys are defined:
+	data has a value which is an UnspecifiedObject, which can hold any non-null object
+	info has a value which is a Workspace.object_info
+	provenance has a value which is a reference to a list where each element is a Workspace.ProvenanceAction
+	creator has a value which is a Workspace.username
+	created has a value which is a Workspace.timestamp
+	refs has a value which is a reference to a list where each element is a Workspace.obj_ref
+object_info is a reference to a list containing 11 items:
+	0: (objid) a Workspace.obj_id
+	1: (name) a Workspace.obj_name
+	2: (type) a Workspace.type_string
+	3: (save_date) a Workspace.timestamp
+	4: (version) an int
+	5: (saved_by) a Workspace.username
+	6: (wsid) a Workspace.ws_id
+	7: (workspace) a Workspace.ws_name
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a Workspace.usermeta
+type_string is a string
+timestamp is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
+ProvenanceAction is a reference to a hash where the following keys are defined:
+	time has a value which is a Workspace.timestamp
+	service has a value which is a string
+	service_ver has a value which is a string
+	method has a value which is a string
+	method_params has a value which is a reference to a list where each element is an UnspecifiedObject, which can hold any non-null object
+	script has a value which is a string
+	script_ver has a value which is a string
+	script_command_line has a value which is a string
+	input_ws_objects has a value which is a reference to a list where each element is a Workspace.obj_ref
+	resolved_ws_objects has a value which is a reference to a list where each element is a Workspace.obj_ref
+	intermediate_incoming has a value which is a reference to a list where each element is a string
+	intermediate_outgoing has a value which is a reference to a list where each element is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ref_chains is a reference to a list where each element is a Workspace.ref_chain
+$data is a reference to a list where each element is a Workspace.ObjectData
+ref_chain is a reference to a list where each element is a Workspace.ObjectIdentity
+ObjectIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	wsid has a value which is a Workspace.ws_id
+	name has a value which is a Workspace.obj_name
+	objid has a value which is a Workspace.obj_id
+	ver has a value which is a Workspace.obj_ver
+	ref has a value which is a Workspace.obj_ref
+ws_name is a string
+ws_id is an int
+obj_name is a string
+obj_id is an int
+obj_ver is an int
+obj_ref is a string
+ObjectData is a reference to a hash where the following keys are defined:
+	data has a value which is an UnspecifiedObject, which can hold any non-null object
+	info has a value which is a Workspace.object_info
+	provenance has a value which is a reference to a list where each element is a Workspace.ProvenanceAction
+	creator has a value which is a Workspace.username
+	created has a value which is a Workspace.timestamp
+	refs has a value which is a reference to a list where each element is a Workspace.obj_ref
+object_info is a reference to a list containing 11 items:
+	0: (objid) a Workspace.obj_id
+	1: (name) a Workspace.obj_name
+	2: (type) a Workspace.type_string
+	3: (save_date) a Workspace.timestamp
+	4: (version) an int
+	5: (saved_by) a Workspace.username
+	6: (wsid) a Workspace.ws_id
+	7: (workspace) a Workspace.ws_name
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a Workspace.usermeta
+type_string is a string
+timestamp is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
+ProvenanceAction is a reference to a hash where the following keys are defined:
+	time has a value which is a Workspace.timestamp
+	service has a value which is a string
+	service_ver has a value which is a string
+	method has a value which is a string
+	method_params has a value which is a reference to a list where each element is an UnspecifiedObject, which can hold any non-null object
+	script has a value which is a string
+	script_ver has a value which is a string
+	script_command_line has a value which is a string
+	input_ws_objects has a value which is a reference to a list where each element is a Workspace.obj_ref
+	resolved_ws_objects has a value which is a reference to a list where each element is a Workspace.obj_ref
+	intermediate_incoming has a value which is a reference to a list where each element is a string
+	intermediate_outgoing has a value which is a reference to a list where each element is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+Get objects by references from other objects.
+
+        NOTE: In the vast majority of cases, this method is not necessary and
+        get_objects should be used instead. 
+        
+        get_referenced_objects guarantees that a user that has access to an
+        object can always see a) objects that are referenced inside the object
+        and b) objects that are referenced in the object's provenance. This
+        ensures that the user has visibility into the entire provenance of the
+        object and the object's object dependencies (e.g. references).
+        
+        The user must have at least read access to the first object in each
+        reference chain, but need not have access to any further objects in
+        the chain, and those objects may be deleted.
+
+=back
+
+=cut
+
+sub get_referenced_objects
+{
+    my($self, @args) = @_;
+
+# Authentication: optional
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_referenced_objects (received $n, expecting 1)");
+    }
+    {
+	my($ref_chains) = @args;
+
+	my @_bad_arguments;
+        (ref($ref_chains) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ref_chains\" (value was \"$ref_chains\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_referenced_objects:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_referenced_objects');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.get_referenced_objects",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_referenced_objects',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_referenced_objects",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_referenced_objects',
+				       );
+    }
+}
+
+
+
 =head2 list_workspaces
 
   $workspaces = $obj->list_workspaces($params)
@@ -2595,12 +2902,15 @@ ListWorkspaceInfoParams is a reference to a hash where the following keys are de
 	perm has a value which is a Workspace.permission
 	owners has a value which is a reference to a list where each element is a Workspace.username
 	meta has a value which is a Workspace.usermeta
+	after has a value which is a Workspace.timestamp
+	before has a value which is a Workspace.timestamp
 	excludeGlobal has a value which is a Workspace.boolean
 	showDeleted has a value which is a Workspace.boolean
 	showOnlyDeleted has a value which is a Workspace.boolean
 permission is a string
 username is a string
 usermeta is a reference to a hash where the key is a string and the value is a string
+timestamp is a string
 boolean is an int
 workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
@@ -2614,7 +2924,6 @@ workspace_info is a reference to a list containing 9 items:
 	8: (metadata) a Workspace.usermeta
 ws_id is an int
 ws_name is a string
-timestamp is a string
 lock_status is a string
 
 </pre>
@@ -2629,12 +2938,15 @@ ListWorkspaceInfoParams is a reference to a hash where the following keys are de
 	perm has a value which is a Workspace.permission
 	owners has a value which is a reference to a list where each element is a Workspace.username
 	meta has a value which is a Workspace.usermeta
+	after has a value which is a Workspace.timestamp
+	before has a value which is a Workspace.timestamp
 	excludeGlobal has a value which is a Workspace.boolean
 	showDeleted has a value which is a Workspace.boolean
 	showOnlyDeleted has a value which is a Workspace.boolean
 permission is a string
 username is a string
 usermeta is a reference to a hash where the key is a string and the value is a string
+timestamp is a string
 boolean is an int
 workspace_info is a reference to a list containing 9 items:
 	0: (id) a Workspace.ws_id
@@ -2648,7 +2960,6 @@ workspace_info is a reference to a list containing 9 items:
 	8: (metadata) a Workspace.usermeta
 ws_id is an int
 ws_name is a string
-timestamp is a string
 lock_status is a string
 
 
@@ -2865,17 +3176,23 @@ ListObjectsParams is a reference to a hash where the following keys are defined:
 	perm has a value which is a Workspace.permission
 	savedby has a value which is a reference to a list where each element is a Workspace.username
 	meta has a value which is a Workspace.usermeta
+	after has a value which is a Workspace.timestamp
+	before has a value which is a Workspace.timestamp
 	showDeleted has a value which is a Workspace.boolean
 	showOnlyDeleted has a value which is a Workspace.boolean
 	showHidden has a value which is a Workspace.boolean
 	showAllVersions has a value which is a Workspace.boolean
 	includeMetadata has a value which is a Workspace.boolean
+	excludeGlobal has a value which is a Workspace.boolean
+	skip has a value which is an int
+	limit has a value which is an int
 ws_name is a string
 ws_id is an int
 type_string is a string
 permission is a string
 username is a string
 usermeta is a reference to a hash where the key is a string and the value is a string
+timestamp is a string
 boolean is an int
 object_info is a reference to a list containing 11 items:
 	0: (objid) a Workspace.obj_id
@@ -2891,7 +3208,6 @@ object_info is a reference to a list containing 11 items:
 	10: (meta) a Workspace.usermeta
 obj_id is an int
 obj_name is a string
-timestamp is a string
 
 </pre>
 
@@ -2908,17 +3224,23 @@ ListObjectsParams is a reference to a hash where the following keys are defined:
 	perm has a value which is a Workspace.permission
 	savedby has a value which is a reference to a list where each element is a Workspace.username
 	meta has a value which is a Workspace.usermeta
+	after has a value which is a Workspace.timestamp
+	before has a value which is a Workspace.timestamp
 	showDeleted has a value which is a Workspace.boolean
 	showOnlyDeleted has a value which is a Workspace.boolean
 	showHidden has a value which is a Workspace.boolean
 	showAllVersions has a value which is a Workspace.boolean
 	includeMetadata has a value which is a Workspace.boolean
+	excludeGlobal has a value which is a Workspace.boolean
+	skip has a value which is an int
+	limit has a value which is an int
 ws_name is a string
 ws_id is an int
 type_string is a string
 permission is a string
 username is a string
 usermeta is a reference to a hash where the key is a string and the value is a string
+timestamp is a string
 boolean is an int
 object_info is a reference to a list containing 11 items:
 	0: (objid) a Workspace.obj_id
@@ -2934,7 +3256,6 @@ object_info is a reference to a list containing 11 items:
 	10: (meta) a Workspace.usermeta
 obj_id is an int
 obj_name is a string
-timestamp is a string
 
 
 =end text
@@ -3219,10 +3540,15 @@ usermeta is a reference to a hash where the key is a string and the value is a s
 
 =item Description
 
-Get information about an object from the workspace.
+Get information about objects from the workspace.
 
 Set includeMetadata true to include the user specified metadata.
 Otherwise the metadata in the object_info will be null.
+
+This method will be replaced by the behavior of get_object_info_new
+in the future.
+
+@deprecated Workspace.get_object_info_new
 
 =back
 
@@ -3270,6 +3596,155 @@ sub get_object_info
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_object_info",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_object_info',
+				       );
+    }
+}
+
+
+
+=head2 get_object_info_new
+
+  $info = $obj->get_object_info_new($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a Workspace.GetObjectInfoNewParams
+$info is a reference to a list where each element is a Workspace.object_info
+GetObjectInfoNewParams is a reference to a hash where the following keys are defined:
+	objects has a value which is a reference to a list where each element is a Workspace.ObjectIdentity
+	includeMetadata has a value which is a Workspace.boolean
+	ignoreErrors has a value which is a Workspace.boolean
+ObjectIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	wsid has a value which is a Workspace.ws_id
+	name has a value which is a Workspace.obj_name
+	objid has a value which is a Workspace.obj_id
+	ver has a value which is a Workspace.obj_ver
+	ref has a value which is a Workspace.obj_ref
+ws_name is a string
+ws_id is an int
+obj_name is a string
+obj_id is an int
+obj_ver is an int
+obj_ref is a string
+boolean is an int
+object_info is a reference to a list containing 11 items:
+	0: (objid) a Workspace.obj_id
+	1: (name) a Workspace.obj_name
+	2: (type) a Workspace.type_string
+	3: (save_date) a Workspace.timestamp
+	4: (version) an int
+	5: (saved_by) a Workspace.username
+	6: (wsid) a Workspace.ws_id
+	7: (workspace) a Workspace.ws_name
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a Workspace.usermeta
+type_string is a string
+timestamp is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a Workspace.GetObjectInfoNewParams
+$info is a reference to a list where each element is a Workspace.object_info
+GetObjectInfoNewParams is a reference to a hash where the following keys are defined:
+	objects has a value which is a reference to a list where each element is a Workspace.ObjectIdentity
+	includeMetadata has a value which is a Workspace.boolean
+	ignoreErrors has a value which is a Workspace.boolean
+ObjectIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	wsid has a value which is a Workspace.ws_id
+	name has a value which is a Workspace.obj_name
+	objid has a value which is a Workspace.obj_id
+	ver has a value which is a Workspace.obj_ver
+	ref has a value which is a Workspace.obj_ref
+ws_name is a string
+ws_id is an int
+obj_name is a string
+obj_id is an int
+obj_ver is an int
+obj_ref is a string
+boolean is an int
+object_info is a reference to a list containing 11 items:
+	0: (objid) a Workspace.obj_id
+	1: (name) a Workspace.obj_name
+	2: (type) a Workspace.type_string
+	3: (save_date) a Workspace.timestamp
+	4: (version) an int
+	5: (saved_by) a Workspace.username
+	6: (wsid) a Workspace.ws_id
+	7: (workspace) a Workspace.ws_name
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a Workspace.usermeta
+type_string is a string
+timestamp is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+=item Description
+
+Get information about objects from the workspace.
+
+=back
+
+=cut
+
+sub get_object_info_new
+{
+    my($self, @args) = @_;
+
+# Authentication: optional
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_object_info_new (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_object_info_new:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_object_info_new');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.get_object_info_new",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_object_info_new',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_object_info_new",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_object_info_new',
 				       );
     }
 }
@@ -5783,6 +6258,101 @@ sub remove_module_ownership
 
 
 
+=head2 list_all_types
+
+  $return = $obj->list_all_types($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a Workspace.ListAllTypesParams
+$return is a reference to a hash where the key is a Workspace.modulename and the value is a reference to a hash where the key is a Workspace.typename and the value is a Workspace.typever
+ListAllTypesParams is a reference to a hash where the following keys are defined:
+	with_empty_modules has a value which is a Workspace.boolean
+boolean is an int
+modulename is a string
+typename is a string
+typever is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a Workspace.ListAllTypesParams
+$return is a reference to a hash where the key is a Workspace.modulename and the value is a reference to a hash where the key is a Workspace.typename and the value is a Workspace.typever
+ListAllTypesParams is a reference to a hash where the following keys are defined:
+	with_empty_modules has a value which is a Workspace.boolean
+boolean is an int
+modulename is a string
+typename is a string
+typever is a string
+
+
+=end text
+
+=item Description
+
+List all released types with released version from all modules. Return
+mapping from module name to mapping from type name to released type
+version.
+
+=back
+
+=cut
+
+sub list_all_types
+{
+    my($self, @args) = @_;
+
+# Authentication: optional
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function list_all_types (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to list_all_types:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'list_all_types');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.list_all_types",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'list_all_types',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method list_all_types",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'list_all_types',
+				       );
+    }
+}
+
+
+
 =head2 administer
 
   $response = $obj->administer($command)
@@ -5992,9 +6562,10 @@ an int
 =item Description
 
 A string used as a name for a workspace.
-Any string consisting of alphanumeric characters and "_" that is not an
-integer is acceptable. The name may optionally be prefixed with the
-workspace owner's user name and a colon, e.g. kbasetest:my_workspace.
+Any string consisting of alphanumeric characters and "_", ".", or "-"
+that is not an integer is acceptable. The name may optionally be
+prefixed with the workspace owner's user name and a colon, e.g.
+kbasetest:my_workspace.
 
 
 =item Definition
@@ -6354,6 +6925,7 @@ Information about a workspace.
         permission user_permission - permissions for the authenticated user of
                 this workspace.
         permission globalread - whether this workspace is globally readable.
+        lock_status lockstat - the status of the workspace lock.
         usermeta metadata - arbitrary user-supplied metadata about
                 the workspace.
 
@@ -6593,6 +7165,41 @@ objid has a value which is a Workspace.obj_id
 ver has a value which is a Workspace.obj_ver
 ref has a value which is a Workspace.obj_ref
 
+
+=end text
+
+=back
+
+
+
+=head2 ref_chain
+
+=over 4
+
+
+
+=item Description
+
+A chain of objects with references to one another.
+
+        An object reference chain consists of a list of objects where the nth
+        object possesses a reference, either in the object itself or in the
+        object provenance, to the n+1th object.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a Workspace.ObjectIdentity
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a Workspace.ObjectIdentity
 
 =end text
 
@@ -7707,6 +8314,10 @@ usermeta meta - filter workspaces by the user supplied metadata. NOTE:
         only one key/value pair is supported at this time. A full map
         is provided as input for the possibility for expansion in the
         future.
+timestamp after - only return workspaces that were modified after this
+        date.
+timestamp before - only return workspaces that were modified before
+        this date.
 boolean excludeGlobal - if excludeGlobal is true exclude world
         readable workspaces. Defaults to false.
 boolean showDeleted - show deleted workspaces that are owned by the
@@ -7724,6 +8335,8 @@ a reference to a hash where the following keys are defined:
 perm has a value which is a Workspace.permission
 owners has a value which is a reference to a list where each element is a Workspace.username
 meta has a value which is a Workspace.usermeta
+after has a value which is a Workspace.timestamp
+before has a value which is a Workspace.timestamp
 excludeGlobal has a value which is a Workspace.boolean
 showDeleted has a value which is a Workspace.boolean
 showOnlyDeleted has a value which is a Workspace.boolean
@@ -7738,6 +8351,8 @@ a reference to a hash where the following keys are defined:
 perm has a value which is a Workspace.permission
 owners has a value which is a reference to a list where each element is a Workspace.username
 meta has a value which is a Workspace.usermeta
+after has a value which is a Workspace.timestamp
+before has a value which is a Workspace.timestamp
 excludeGlobal has a value which is a Workspace.boolean
 showDeleted has a value which is a Workspace.boolean
 showOnlyDeleted has a value which is a Workspace.boolean
@@ -7837,6 +8452,10 @@ Parameters for the 'list_objects' function.
                         only one key/value pair is supported at this time. A full map
                         is provided as input for the possibility for expansion in the
                         future.
+                timestamp after - only return objects that were created after this
+                        date.
+                timestamp before - only return objects that were created before this
+                        date.
                 boolean showDeleted - show deleted objects in workspaces to which the
                         user has write access.
                 boolean showOnlyDeleted - only show deleted objects in workspaces to
@@ -7847,6 +8466,12 @@ Parameters for the 'list_objects' function.
                 boolean includeMetadata - include the user provided metadata in the
                         returned object_info. If false (0 or null), the default, the
                         metadata will be null.
+                boolean excludeGlobal - exclude objects in global workspaces. This
+                        parameter only has an effect when filtering by types alone.
+                int skip - skip the first X objects. Maximum value is 2^31, skip values
+                        < 0 are treated as 0, the default.
+                int limit - limit the output to X objects. Default and maximum value
+                        is 10000. Limit values < 1 are treated as 10000, the default.
 
 
 =item Definition
@@ -7861,11 +8486,16 @@ type has a value which is a Workspace.type_string
 perm has a value which is a Workspace.permission
 savedby has a value which is a reference to a list where each element is a Workspace.username
 meta has a value which is a Workspace.usermeta
+after has a value which is a Workspace.timestamp
+before has a value which is a Workspace.timestamp
 showDeleted has a value which is a Workspace.boolean
 showOnlyDeleted has a value which is a Workspace.boolean
 showHidden has a value which is a Workspace.boolean
 showAllVersions has a value which is a Workspace.boolean
 includeMetadata has a value which is a Workspace.boolean
+excludeGlobal has a value which is a Workspace.boolean
+skip has a value which is an int
+limit has a value which is an int
 
 </pre>
 
@@ -7880,11 +8510,16 @@ type has a value which is a Workspace.type_string
 perm has a value which is a Workspace.permission
 savedby has a value which is a reference to a list where each element is a Workspace.username
 meta has a value which is a Workspace.usermeta
+after has a value which is a Workspace.timestamp
+before has a value which is a Workspace.timestamp
 showDeleted has a value which is a Workspace.boolean
 showOnlyDeleted has a value which is a Workspace.boolean
 showHidden has a value which is a Workspace.boolean
 showAllVersions has a value which is a Workspace.boolean
 includeMetadata has a value which is a Workspace.boolean
+excludeGlobal has a value which is a Workspace.boolean
+skip has a value which is an int
+limit has a value which is an int
 
 
 =end text
@@ -7940,6 +8575,56 @@ id has a value which is a Workspace.obj_name
 workspace has a value which is a Workspace.ws_name
 instance has a value which is an int
 auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 GetObjectInfoNewParams
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "get_object_info_new" function.
+
+        Required arguments:
+        list<ObjectIdentity> objects - the objects for which the information
+                should be fetched
+        
+        Optional arguments:
+        boolean includeMetadata - include the object metadata in the returned
+                information. Default false.
+        boolean ignoreErrors - Don't throw an exception if an object cannot
+                be accessed; return null for that object's information instead.
+                Default false.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+objects has a value which is a reference to a list where each element is a Workspace.ObjectIdentity
+includeMetadata has a value which is a Workspace.boolean
+ignoreErrors has a value which is a Workspace.boolean
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+objects has a value which is a reference to a list where each element is a Workspace.ObjectIdentity
+includeMetadata has a value which is a Workspace.boolean
+ignoreErrors has a value which is a Workspace.boolean
 
 
 =end text
@@ -8150,6 +8835,46 @@ a string
 =item Description
 
 A type definition name in a KIDL typespec.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 typever
+
+=over 4
+
+
+
+=item Description
+
+A version of a type. 
+Specifies the version of the type  in a single string in the format
+[major].[minor]:
+
+major - an integer. The major version of the type. A change in the
+        major version implies the type has changed in a non-backwards
+        compatible way.
+minor - an integer. The minor version of the type. A change in the
+        minor version implies that the type has changed in a way that is
+        backwards compatible with previous type definitions.
 
 
 =item Definition
@@ -8831,6 +9556,45 @@ old_owner has a value which is a Workspace.username
 a reference to a hash where the following keys are defined:
 mod has a value which is a Workspace.modulename
 old_owner has a value which is a Workspace.username
+
+
+=end text
+
+=back
+
+
+
+=head2 ListAllTypesParams
+
+=over 4
+
+
+
+=item Description
+
+Parameters for list_all_types function.
+
+Optional arguments:
+boolean with_empty_modules - include empty module names, optional flag,
+        default value is false.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+with_empty_modules has a value which is a Workspace.boolean
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+with_empty_modules has a value which is a Workspace.boolean
 
 
 =end text

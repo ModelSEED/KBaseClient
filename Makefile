@@ -44,6 +44,7 @@ gather:
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/Client.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/Client.pm ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/ScriptHelpers.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/ScriptHelpers.pm ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/ScriptConfig.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/ScriptConfig.pm ; \
+		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/fbaModelServices/ClientConfig.pm $(THIS_DIR)/lib/Bio/KBase/fbaModelServices/ClientConfig.pm ; \
 		cp $(THIS_DIR)/../KBaseFBAModeling/lib/Bio/KBase/Exceptions.pm $(THIS_DIR)/lib/Bio/KBase/Exceptions.pm ; \
 	fi
 	

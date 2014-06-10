@@ -49,7 +49,7 @@ sub get_fba_client {
 	if ($url eq "impl") {
 		$Bio::KBase::fbaModelServices::Server::CallContext = {token => getToken()};
 		require "Bio/KBase/fbaModelServices/Impl.pm";
-		return Bio::KBase::fbaModelServices::Impl->new();
+		return Bio::KBase::fbaModelServices::Impl->new({"workspace-url" => workspaceURL()});
 	}
 	return Bio::KBase::fbaModelServices::Client->new($url);
 }
@@ -59,12 +59,11 @@ sub fbaURL {
 	my $currentURL;
 	if (defined($newUrl)) {
 		if ($newUrl eq "default") {
-			print "TEST!";
-			$newUrl = $Bio::KBase::workspace::ScriptConfig::FBAprodURL;
+			$newUrl = $Bio::KBase::fbaModelServices::ScriptConfig::FBAprodURL;
 		} elsif ($newUrl eq "localhost") {
-			$newUrl = $Bio::KBase::workspace::ScriptConfig::FBAlocalURL;
+			$newUrl = $Bio::KBase::fbaModelServices::ScriptConfig::FBAlocalURL;
 		} elsif ($newUrl eq "dev") {
-			$newUrl = $Bio::KBase::workspace::ScriptConfig::FBAdevURL;
+			$newUrl = $Bio::KBase::fbaModelServices::ScriptConfig::FBAdevURL;
 		}
 		Bio::KBase::fbaModelServices::ClientConfig::SetConfig({url => $newUrl});
 		$currentURL = $newUrl;
@@ -80,8 +79,8 @@ sub universalFBAScriptCode {
     my $primaryArgs = shift;
     my $translation = shift;
     my $manpage = shift;
-    $translation->{workspace} = "workspace";
-    #$translation->{auth} = "auth";
+    my $command_param = shift;
+    my $in_fh;
     #Setting arguments to "describe_options" function
     my $options = [];
     if (@{$primaryArgs} > 0) {
@@ -95,7 +94,27 @@ sub universalFBAScriptCode {
     push(@{$options},[ 'help|h|?', 'Print this usage information' ]);
     #Defining usage and options
 	my ($opt, $usage) = describe_options(@{$options});
-	if (defined($opt->{help})) {
+	#Reading any piped data
+	if ( -p \*STDIN) {
+		my $in_fh = \*STDIN;
+		my $data;
+		{
+		    local $/;
+		    undef $/;
+		    $data = <$in_fh>;
+		    
+		}
+		if ($command_param->{primary}->{type} eq "json") {
+			my $json = JSON::XS->new;
+			$data = $json->decode($data);
+		}
+		$opt->{$command_param->{primary}->{dest}} = {data => $data,type => "data"};
+	}
+	#Reading data from files
+	#TODO
+    $translation->{workspace} = "workspace";
+    #$translation->{auth} = "auth";
+    if (defined($opt->{help})) {
         if (defined($manpage)) {
             print "SYNOPSIS\n      ".$usage;
             print $manpage;

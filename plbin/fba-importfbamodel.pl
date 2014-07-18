@@ -218,7 +218,7 @@ if (defined($opt->{sbml}) && $opt->{sbml} == 1) {
 			if (defined($headingColums->{aliases})) {
 				$cpdobj->[4] = $cpd->[$headingColums->{aliases}];
 			}
-			print $cpdobj->[0]."\n";
+			print $cpdobj->[4]."\n";
 			push(@{$params->{compounds}},$cpdobj);
 		}
 	}

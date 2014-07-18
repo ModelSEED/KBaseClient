@@ -6,35 +6,33 @@
 ########################################################################
 use strict;
 use warnings;
-use Bio::KBase::workspace::ScriptHelpers qw(get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
+use Bio::KBase::workspace::ScriptHelpers qw(printObjectInfo printJobData get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
 use Bio::KBase::fbaModelServices::ScriptHelpers qw(fbaws get_fba_client runFBACommand universalFBAScriptCode );
 #Defining globals describing behavior
-my $primaryArgs = ["FBAModel ID","Format (html,sbml,json,cytoseed,readable)"];
-my $servercommand = "export_fbamodel";
-my $script = "fba-exportfbamodel";
+my $primaryArgs = ["Pangenome ID","Genome one","Genome two"];
+my $servercommand = "pangenome_to_proteome_comparison";
+my $script = "ga-protcomp-from-pangenome";
 my $translation = {
-	"Format (html,sbml,json,cytoseed,readable)" => "format",
-	"FBAModel ID" => "model",
-	"fba" => "fbas",
+	"Pangenome ID" => "pangenome",
+	"Genome one" => "genomeone",
+	"Genome two" => "genometwo",
+	pangenomews => "pangenome_workspace",
 	workspace => "workspace",
-	auth => "auth",
+	outid => "outputid" 
 };
 #Defining usage and options
 my $specs = [
-    [ 'workspace|w:s', 'Workspace with model', { "default" => fbaws() } ],
-    [ 'fba|f:s@', 'FBA associated with model (; delimiter)', { "default" => []} ]
+    [ 'outid=s', 'Workspace with pangenome object' ],
+    [ 'pangenomews=s', 'Workspace with pangenome object' ],
+    [ 'workspace|w=s', 'Workspace to save FBA results', { "default" => fbaws() } ],
 ];
 my ($opt,$params) = universalFBAScriptCode($specs,$script,$primaryArgs,$translation);
-if (defined($opt->{fbas})) {
-	foreach my $fba (@{$opt->{fbas}}) {
-		push(@{$params->{fbas}},split(/;/,$fba));
-	}
-}
 #Calling the server
 my $output = runFBACommand($params,$servercommand,$opt);
 #Checking output and report results
 if (!defined($output)) {
-	print "FBAModel export failed!\n";
+	print "Generation of protein comparison failed!\n";
 } else {
-	print $output;
+	print "Generation of protein comparison successful:\n";
+	printObjectInfo($output);
 }

@@ -79,6 +79,7 @@ gather:
 	if [ -d $(THIS_DIR)/../kb_seed ] ; then \
 		rm -rf $(THIS_DIR)/lib/Bio/KBase/CDMI ; \
 		mkdir $(THIS_DIR)/lib/Bio/KBase/CDMI ; \
+		cp $(THIS_DIR)/../kb_seed/lib/Bio/KBase/CDMI/Client.pm $(THIS_DIR)/lib/Bio/KBase/CDMI/Client.pm ; \
 		cp $(THIS_DIR)/../kb_seed/lib/Bio/KBase/CDMI/CDMIClient.pm $(THIS_DIR)/lib/Bio/KBase/CDMI/CDMIClient.pm ; \
 	fi
 	if [ -d $(THIS_DIR)/../idserver ] ; then \

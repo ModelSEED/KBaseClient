@@ -1802,6 +1802,185 @@ sub get_object
 
 
 
+=head2 get_object_provenance
+
+  $data = $obj->get_object_provenance($object_ids)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$object_ids is a reference to a list where each element is a Workspace.ObjectIdentity
+$data is a reference to a list where each element is a Workspace.ObjectProvenanceInfo
+ObjectIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	wsid has a value which is a Workspace.ws_id
+	name has a value which is a Workspace.obj_name
+	objid has a value which is a Workspace.obj_id
+	ver has a value which is a Workspace.obj_ver
+	ref has a value which is a Workspace.obj_ref
+ws_name is a string
+ws_id is an int
+obj_name is a string
+obj_id is an int
+obj_ver is an int
+obj_ref is a string
+ObjectProvenanceInfo is a reference to a hash where the following keys are defined:
+	info has a value which is a Workspace.object_info
+	provenance has a value which is a reference to a list where each element is a Workspace.ProvenanceAction
+	creator has a value which is a Workspace.username
+	created has a value which is a Workspace.timestamp
+	refs has a value which is a reference to a list where each element is a Workspace.obj_ref
+object_info is a reference to a list containing 11 items:
+	0: (objid) a Workspace.obj_id
+	1: (name) a Workspace.obj_name
+	2: (type) a Workspace.type_string
+	3: (save_date) a Workspace.timestamp
+	4: (version) an int
+	5: (saved_by) a Workspace.username
+	6: (wsid) a Workspace.ws_id
+	7: (workspace) a Workspace.ws_name
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a Workspace.usermeta
+type_string is a string
+timestamp is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
+ProvenanceAction is a reference to a hash where the following keys are defined:
+	time has a value which is a Workspace.timestamp
+	service has a value which is a string
+	service_ver has a value which is a string
+	method has a value which is a string
+	method_params has a value which is a reference to a list where each element is an UnspecifiedObject, which can hold any non-null object
+	script has a value which is a string
+	script_ver has a value which is a string
+	script_command_line has a value which is a string
+	input_ws_objects has a value which is a reference to a list where each element is a Workspace.obj_ref
+	resolved_ws_objects has a value which is a reference to a list where each element is a Workspace.obj_ref
+	intermediate_incoming has a value which is a reference to a list where each element is a string
+	intermediate_outgoing has a value which is a reference to a list where each element is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$object_ids is a reference to a list where each element is a Workspace.ObjectIdentity
+$data is a reference to a list where each element is a Workspace.ObjectProvenanceInfo
+ObjectIdentity is a reference to a hash where the following keys are defined:
+	workspace has a value which is a Workspace.ws_name
+	wsid has a value which is a Workspace.ws_id
+	name has a value which is a Workspace.obj_name
+	objid has a value which is a Workspace.obj_id
+	ver has a value which is a Workspace.obj_ver
+	ref has a value which is a Workspace.obj_ref
+ws_name is a string
+ws_id is an int
+obj_name is a string
+obj_id is an int
+obj_ver is an int
+obj_ref is a string
+ObjectProvenanceInfo is a reference to a hash where the following keys are defined:
+	info has a value which is a Workspace.object_info
+	provenance has a value which is a reference to a list where each element is a Workspace.ProvenanceAction
+	creator has a value which is a Workspace.username
+	created has a value which is a Workspace.timestamp
+	refs has a value which is a reference to a list where each element is a Workspace.obj_ref
+object_info is a reference to a list containing 11 items:
+	0: (objid) a Workspace.obj_id
+	1: (name) a Workspace.obj_name
+	2: (type) a Workspace.type_string
+	3: (save_date) a Workspace.timestamp
+	4: (version) an int
+	5: (saved_by) a Workspace.username
+	6: (wsid) a Workspace.ws_id
+	7: (workspace) a Workspace.ws_name
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a Workspace.usermeta
+type_string is a string
+timestamp is a string
+username is a string
+usermeta is a reference to a hash where the key is a string and the value is a string
+ProvenanceAction is a reference to a hash where the following keys are defined:
+	time has a value which is a Workspace.timestamp
+	service has a value which is a string
+	service_ver has a value which is a string
+	method has a value which is a string
+	method_params has a value which is a reference to a list where each element is an UnspecifiedObject, which can hold any non-null object
+	script has a value which is a string
+	script_ver has a value which is a string
+	script_command_line has a value which is a string
+	input_ws_objects has a value which is a reference to a list where each element is a Workspace.obj_ref
+	resolved_ws_objects has a value which is a reference to a list where each element is a Workspace.obj_ref
+	intermediate_incoming has a value which is a reference to a list where each element is a string
+	intermediate_outgoing has a value which is a reference to a list where each element is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+Get object provenance from the workspace.
+
+=back
+
+=cut
+
+sub get_object_provenance
+{
+    my($self, @args) = @_;
+
+# Authentication: optional
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_object_provenance (received $n, expecting 1)");
+    }
+    {
+	my($object_ids) = @args;
+
+	my @_bad_arguments;
+        (ref($object_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"object_ids\" (value was \"$object_ids\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_object_provenance:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_object_provenance');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.get_object_provenance",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_object_provenance',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_object_provenance",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_object_provenance',
+				       );
+    }
+}
+
+
+
 =head2 get_objects
 
   $data = $obj->get_objects($object_ids)
@@ -5416,6 +5595,7 @@ type_string is a string
 ModuleVersions is a reference to a hash where the following keys are defined:
 	mod has a value which is a Workspace.modulename
 	vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	released_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 spec_version is an int
 
 </pre>
@@ -5434,6 +5614,7 @@ type_string is a string
 ModuleVersions is a reference to a hash where the following keys are defined:
 	mod has a value which is a Workspace.modulename
 	vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	released_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 spec_version is an int
 
 
@@ -5886,11 +6067,16 @@ TypeInfo is a reference to a hash where the following keys are defined:
 	type_def has a value which is a Workspace.type_string
 	description has a value which is a string
 	spec_def has a value which is a string
+	json_schema has a value which is a Workspace.jsonschema
+	parsing_structure has a value which is a string
 	module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 	type_vers has a value which is a reference to a list where each element is a Workspace.type_string
+	released_type_vers has a value which is a reference to a list where each element is a Workspace.type_string
 	using_func_defs has a value which is a reference to a list where each element is a Workspace.func_string
 	using_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
 	used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
+jsonschema is a string
 spec_version is an int
 func_string is a string
 
@@ -5907,11 +6093,16 @@ TypeInfo is a reference to a hash where the following keys are defined:
 	type_def has a value which is a Workspace.type_string
 	description has a value which is a string
 	spec_def has a value which is a string
+	json_schema has a value which is a Workspace.jsonschema
+	parsing_structure has a value which is a string
 	module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 	type_vers has a value which is a reference to a list where each element is a Workspace.type_string
+	released_type_vers has a value which is a reference to a list where each element is a Workspace.type_string
 	using_func_defs has a value which is a reference to a list where each element is a Workspace.func_string
 	using_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
 	used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
+jsonschema is a string
 spec_version is an int
 func_string is a string
 
@@ -5973,6 +6164,123 @@ sub get_type_info
 
 
 
+=head2 get_all_type_info
+
+  $return = $obj->get_all_type_info($mod)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$mod is a Workspace.modulename
+$return is a reference to a list where each element is a Workspace.TypeInfo
+modulename is a string
+TypeInfo is a reference to a hash where the following keys are defined:
+	type_def has a value which is a Workspace.type_string
+	description has a value which is a string
+	spec_def has a value which is a string
+	json_schema has a value which is a Workspace.jsonschema
+	parsing_structure has a value which is a string
+	module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	type_vers has a value which is a reference to a list where each element is a Workspace.type_string
+	released_type_vers has a value which is a reference to a list where each element is a Workspace.type_string
+	using_func_defs has a value which is a reference to a list where each element is a Workspace.func_string
+	using_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
+	used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
+type_string is a string
+jsonschema is a string
+spec_version is an int
+func_string is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$mod is a Workspace.modulename
+$return is a reference to a list where each element is a Workspace.TypeInfo
+modulename is a string
+TypeInfo is a reference to a hash where the following keys are defined:
+	type_def has a value which is a Workspace.type_string
+	description has a value which is a string
+	spec_def has a value which is a string
+	json_schema has a value which is a Workspace.jsonschema
+	parsing_structure has a value which is a string
+	module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	type_vers has a value which is a reference to a list where each element is a Workspace.type_string
+	released_type_vers has a value which is a reference to a list where each element is a Workspace.type_string
+	using_func_defs has a value which is a reference to a list where each element is a Workspace.func_string
+	using_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
+	used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
+type_string is a string
+jsonschema is a string
+spec_version is an int
+func_string is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_all_type_info
+{
+    my($self, @args) = @_;
+
+# Authentication: optional
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_all_type_info (received $n, expecting 1)");
+    }
+    {
+	my($mod) = @args;
+
+	my @_bad_arguments;
+        (!ref($mod)) or push(@_bad_arguments, "Invalid type for argument 1 \"mod\" (value was \"$mod\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_all_type_info:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_all_type_info');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.get_all_type_info",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_all_type_info',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_all_type_info",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_all_type_info',
+				       );
+    }
+}
+
+
+
 =head2 get_func_info
 
   $info = $obj->get_func_info($func)
@@ -5991,8 +6299,11 @@ FuncInfo is a reference to a hash where the following keys are defined:
 	func_def has a value which is a Workspace.func_string
 	description has a value which is a string
 	spec_def has a value which is a string
+	parsing_structure has a value which is a string
 	module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 	func_vers has a value which is a reference to a list where each element is a Workspace.func_string
+	released_func_vers has a value which is a reference to a list where each element is a Workspace.func_string
 	used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
 spec_version is an int
 type_string is a string
@@ -6010,8 +6321,11 @@ FuncInfo is a reference to a hash where the following keys are defined:
 	func_def has a value which is a Workspace.func_string
 	description has a value which is a string
 	spec_def has a value which is a string
+	parsing_structure has a value which is a string
 	module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 	func_vers has a value which is a reference to a list where each element is a Workspace.func_string
+	released_func_vers has a value which is a reference to a list where each element is a Workspace.func_string
 	used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
 spec_version is an int
 type_string is a string
@@ -6068,6 +6382,115 @@ sub get_func_info
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_func_info",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_func_info',
+				       );
+    }
+}
+
+
+
+=head2 get_all_func_info
+
+  $info = $obj->get_all_func_info($mod)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$mod is a Workspace.modulename
+$info is a reference to a list where each element is a Workspace.FuncInfo
+modulename is a string
+FuncInfo is a reference to a hash where the following keys are defined:
+	func_def has a value which is a Workspace.func_string
+	description has a value which is a string
+	spec_def has a value which is a string
+	parsing_structure has a value which is a string
+	module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	func_vers has a value which is a reference to a list where each element is a Workspace.func_string
+	released_func_vers has a value which is a reference to a list where each element is a Workspace.func_string
+	used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
+func_string is a string
+spec_version is an int
+type_string is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$mod is a Workspace.modulename
+$info is a reference to a list where each element is a Workspace.FuncInfo
+modulename is a string
+FuncInfo is a reference to a hash where the following keys are defined:
+	func_def has a value which is a Workspace.func_string
+	description has a value which is a string
+	spec_def has a value which is a string
+	parsing_structure has a value which is a string
+	module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+	func_vers has a value which is a reference to a list where each element is a Workspace.func_string
+	released_func_vers has a value which is a reference to a list where each element is a Workspace.func_string
+	used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
+func_string is a string
+spec_version is an int
+type_string is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_all_func_info
+{
+    my($self, @args) = @_;
+
+# Authentication: optional
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_all_func_info (received $n, expecting 1)");
+    }
+    {
+	my($mod) = @args;
+
+	my @_bad_arguments;
+        (!ref($mod)) or push(@_bad_arguments, "Invalid type for argument 1 \"mod\" (value was \"$mod\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_all_func_info:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_all_func_info');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Workspace.get_all_func_info",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_all_func_info',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_all_func_info",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_all_func_info',
 				       );
     }
 }
@@ -6663,10 +7086,12 @@ a string
 
 =item Description
 
-A time in the format YYYY-MM-DDThh:mm:ssZ, where Z is the difference
+A time in the format YYYY-MM-DDThh:mm:ssZ, where Z is either the
+character Z (representing the UTC timezone) or the difference
 in time to UTC in the format +/-HHMM, eg:
         2012-12-17T23:24:06-0500 (EST time)
         2013-04-03T08:56:32+0000 (UTC time)
+        2013-04-03T08:56:32Z (UTC time)
 
 
 =item Definition
@@ -8195,6 +8620,57 @@ metadata has a value which is a Workspace.object_metadata
 
 
 
+=head2 ObjectProvenanceInfo
+
+=over 4
+
+
+
+=item Description
+
+The provenance and supplemental info for an object.
+
+        object_info info - information about the object.
+        list<ProvenanceAction> provenance - the object's provenance.
+        username creator - the user that first saved the object to the
+                workspace.
+        timestamp created - the date the object was first saved to the
+                workspace.
+        list<obj_ref> - the references contained within the object.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+info has a value which is a Workspace.object_info
+provenance has a value which is a reference to a list where each element is a Workspace.ProvenanceAction
+creator has a value which is a Workspace.username
+created has a value which is a Workspace.timestamp
+refs has a value which is a reference to a list where each element is a Workspace.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+info has a value which is a Workspace.object_info
+provenance has a value which is a reference to a list where each element is a Workspace.ProvenanceAction
+creator has a value which is a Workspace.username
+created has a value which is a Workspace.timestamp
+refs has a value which is a reference to a list where each element is a Workspace.obj_ref
+
+
+=end text
+
+=back
+
+
+
 =head2 ObjectData
 
 =over 4
@@ -9221,6 +9697,8 @@ A set of versions from a module.
         modulename mod - the name of the module.
         list<spec_version> - a set or subset of versions associated with the
                 module.
+        list<spec_version> - a set or subset of released versions associated 
+                with the module.
 
 
 =item Definition
@@ -9231,6 +9709,7 @@ A set of versions from a module.
 a reference to a hash where the following keys are defined:
 mod has a value which is a Workspace.modulename
 vers has a value which is a reference to a list where each element is a Workspace.spec_version
+released_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 
 </pre>
 
@@ -9241,6 +9720,7 @@ vers has a value which is a reference to a list where each element is a Workspac
 a reference to a hash where the following keys are defined:
 mod has a value which is a Workspace.modulename
 vers has a value which is a reference to a list where each element is a Workspace.spec_version
+released_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 
 
 =end text
@@ -9370,9 +9850,16 @@ Information about a type
         type_string type_def - resolved type definition id.
         string description - the description of the type from spec file.
         string spec_def - reconstruction of type definition from spec file.
+        jsonschema json_schema - JSON schema of this type.
+        string parsing_structure - json document describing parsing structure of type 
+                in spec file including involved sub-types.
         list<spec_version> module_vers - versions of spec-files containing
                 given type version.
+        list<spec_version> released_module_vers - versions of released spec-files 
+                containing given type version.
         list<type_string> type_vers - all versions of type with given type name.
+        list<type_string> released_type_vers - all released versions of type with 
+                given type name.
         list<func_string> using_func_defs - list of functions (with versions)
                 referring to this type version.
         list<type_string> using_type_defs - list of types (with versions)
@@ -9390,8 +9877,12 @@ a reference to a hash where the following keys are defined:
 type_def has a value which is a Workspace.type_string
 description has a value which is a string
 spec_def has a value which is a string
+json_schema has a value which is a Workspace.jsonschema
+parsing_structure has a value which is a string
 module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 type_vers has a value which is a reference to a list where each element is a Workspace.type_string
+released_type_vers has a value which is a reference to a list where each element is a Workspace.type_string
 using_func_defs has a value which is a reference to a list where each element is a Workspace.func_string
 using_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
 used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
@@ -9406,8 +9897,12 @@ a reference to a hash where the following keys are defined:
 type_def has a value which is a Workspace.type_string
 description has a value which is a string
 spec_def has a value which is a string
+json_schema has a value which is a Workspace.jsonschema
+parsing_structure has a value which is a string
 module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 type_vers has a value which is a reference to a list where each element is a Workspace.type_string
+released_type_vers has a value which is a reference to a list where each element is a Workspace.type_string
 using_func_defs has a value which is a reference to a list where each element is a Workspace.func_string
 using_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
 used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
@@ -9432,10 +9927,16 @@ Information about a function
         func_string func_def - resolved func definition id.
         string description - the description of the function from spec file.
         string spec_def - reconstruction of function definition from spec file.
+        string parsing_structure - json document describing parsing structure of function 
+                in spec file including types of arguments.
         list<spec_version> module_vers - versions of spec files containing
                 given func version.
+        list<spec_version> released_module_vers - released versions of spec files 
+                containing given func version.
         list<func_string> func_vers - all versions of function with given type
                 name.
+        list<func_string> released_func_vers - all released versions of function 
+                with given type name.
         list<type_string> used_type_defs - list of types (with versions) 
                 referred to from this function version.
 
@@ -9449,8 +9950,11 @@ a reference to a hash where the following keys are defined:
 func_def has a value which is a Workspace.func_string
 description has a value which is a string
 spec_def has a value which is a string
+parsing_structure has a value which is a string
 module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 func_vers has a value which is a reference to a list where each element is a Workspace.func_string
+released_func_vers has a value which is a reference to a list where each element is a Workspace.func_string
 used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
 
 </pre>
@@ -9463,8 +9967,11 @@ a reference to a hash where the following keys are defined:
 func_def has a value which is a Workspace.func_string
 description has a value which is a string
 spec_def has a value which is a string
+parsing_structure has a value which is a string
 module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
+released_module_vers has a value which is a reference to a list where each element is a Workspace.spec_version
 func_vers has a value which is a reference to a list where each element is a Workspace.func_string
+released_func_vers has a value which is a reference to a list where each element is a Workspace.func_string
 used_type_defs has a value which is a reference to a list where each element is a Workspace.type_string
 
 

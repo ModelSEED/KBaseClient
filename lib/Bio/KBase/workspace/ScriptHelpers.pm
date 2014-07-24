@@ -4,7 +4,7 @@ use warnings;
 use Bio::KBase::workspace::Client;
 use Bio::KBase::workspace::ScriptConfig;
 use Bio::KBase::Auth;
-use Bio::KBase::userandjobstate::Client;
+#use Bio::KBase::userandjobstate::Client; #no longer needed
 use Exporter;
 use Config::Simple;
 use Data::Dumper;
@@ -55,11 +55,13 @@ sub getToken {
 	}
 	return $token;
 }
+
+# WARNING - IN IRIS, THIS ALWAYS RETURNS EMPTY STRING, NOT THE USER ID
 sub getUser {
 	my $user_id='';
 	my $kbConfPath = $Bio::KBase::Auth::ConfPath;
 	if (defined($ENV{KB_RUNNING_IN_IRIS})) {
-		
+		$user_id = "";
 	} elsif ( -e $kbConfPath ) {
 		my $cfg = new Config::Simple($kbConfPath);
 		$user_id = $cfg->param("authentication.user_id");
@@ -73,11 +75,11 @@ sub getKBaseCfg {
 	my $kbConfPath = $Bio::KBase::Auth::ConfPath;
 	if (!-e $kbConfPath) {
 		my $newcfg = new Config::Simple(syntax=>'ini') or die Config::Simple->error();
-		$newcfg->param("workspace_deluxe.url",$Bio::KBase::workspace::ScriptUrl::defaultURL);
+		$newcfg->param("workspace_deluxe.url",$Bio::KBase::workspace::ScriptConfig::defaultURL);
 		$newcfg->write($kbConfPath);
 		$newcfg->close();
 	}
-	my $cfg = new Config::Simple(filename=>$kbConfPath) or die Config::Simple->error();
+	my $cfg = new Config::Simple(filename=>$kbConfPath,syntax=>'ini') or die Config::Simple->error();
 	return $cfg;
 }
 
@@ -89,30 +91,32 @@ sub workspace {
                 $currentWs = $newWs;
 		# if we are on the file system, then save the workspace to the kbase config file
 		# prefixed by the user name
-                if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
+                #if (!defined($ENV{KB_RUNNING_IN_IRIS})) {  ### NOTE: IRIS NOW SUPPORTS CLIENT CFG FILE, SO NO CHECK NEEDED HERE
                         my $cfg = getKBaseCfg();
-			my $user_id = $cfg->param("authentication.user_id");
-			if (!defined($user_id)) { $user_id='public'; }
+			my $user_id = getUser(); #$cfg->param("authentication.user_id");
+			#Note: cfg lib will return ref to a list if the variable is not set!  make sure that the url isn't a ref
+			if (!defined($user_id) || (ref($user_id) ne '')) { $user_id='public'; }
                         $cfg->param("workspace_deluxe.$user_id-current-workspace",$newWs);
                         $cfg->save();
                         $cfg->close();
-                }
+                #}
 		# otherwise we are in an IRIS environment, so save using the UJS (in which case
 		# the user must be logged in)
-		else {
-			my $ujs = Bio::KBase::userandjobstate::Client->new();
-			$ujs->set_state("Workspace","current-workspace",$currentWs);
-                }
+		#else {
+		#	my $ujs = Bio::KBase::userandjobstate::Client->new();
+		#	$ujs->set_state("Workspace","current-workspace",$currentWs);
+                #}
         } else {
 		# if we are not running in IRIS, check the config file first to see if the ws is defined
-                if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
+                #if (!defined($ENV{KB_RUNNING_IN_IRIS})) { ### NOTE: IRIS NOW SUPPORTS CLIENT CFG FILE, SO NO CHECK NEEDED HERE
                         my $cfg = getKBaseCfg();
-			my $user_id = $cfg->param("authentication.user_id");
-			if (!defined($user_id)) { $user_id='public'; }
+			my $user_id = getUser(); #$cfg->param("authentication.user_id");
+			if (!defined($user_id) || (ref($user_id) ne '')) { $user_id='public'; }
                         $currentWs = $cfg->param("workspace_deluxe.$user_id-current-workspace");
 			# handle old config file style if that was not found, but save back in the
 			# new config style
-			if (!defined($currentWs)) {
+			#Note: cfg lib will return ref to a list if the variable is not set!  make sure that the url isn't a ref
+			if (!defined($currentWs) || (ref($currentWs) ne '')) {
 				$currentWs = $cfg->param("workspace_deluxe.workspace");
 				if (defined($currentWs)) {
 					$cfg->param("workspace_deluxe.$user_id-current-workspace",$currentWs);
@@ -120,28 +124,33 @@ sub workspace {
 					$cfg->save();
 				}
 				else {
+					print STDERR "\nWarning! Workspace has not been set!\nRun ws-workspace [WORKSPACE_NAME] to set your workspace.\n\n";
+					$currentWs = "";
+					
 					# if we could not find from the config file, then lookup from UJS and save it to our local config file
-					my $ujs = Bio::KBase::userandjobstate::Client->new();
-					eval { $currentWs = $ujs->get_state("Workspace","current-workspace",0); };
-					if($@ || !defined($currentWs)) {
-						print STDERR "\nWorkspace has not been set!\nRun ws-workspace [WORKSPACE_NAME] to set your workspace.\n\n";
-						exit 1;
-					}
-					$cfg->param("workspace_deluxe.$user_id-current-workspace",$currentWs);
-					$cfg->save();
+					#my $ujs = Bio::KBase::userandjobstate::Client->new();
+					#eval { $currentWs = $ujs->get_state("Workspace","current-workspace",0); };
+					#if($@ || !defined($currentWs)) {
+					#	print STDERR "\nWarning! Workspace has not been set!\nRun ws-workspace [WORKSPACE_NAME] to set your workspace.\n\n";
+					#	$currentWs = "";
+					#} else {
+					#	$cfg->param("workspace_deluxe.$user_id-current-workspace",$currentWs);
+					#	$cfg->save();
+					#}
 				}
 			}
                         $cfg->close();
-                }
+                #}
+		### NOTE: IRIS NOW SUPPORTS CLIENT CFG FILE, SO NO CHECK NEEDED HERE
 		# we are in IRIS, so we always lookup based on the UJS
-		else {
-			my $ujs = Bio::KBase::userandjobstate::Client->new();
-			eval { $currentWs = $ujs->get_state("Workspace","current-workspace",0); };
-			if($@ || !defined($currentWs)) {
-				print STDERR "\nWorkspace has not been set!\nRun ws-workspace [WORKSPACE_NAME] to set your workspace.\n\n";
-				exit 1;
-			}
-                }
+		#else {
+		#	my $ujs = Bio::KBase::userandjobstate::Client->new();
+		#	eval { $currentWs = $ujs->get_state("Workspace","current-workspace",0); };
+		#	if($@ || !defined($currentWs)) {
+		#		print STDERR "\nWarning! Workspace has not been set!\nRun ws-workspace [WORKSPACE_NAME] to set your workspace.\n\n";
+		#		$currentWs = "";
+		#	}
+                #}
         }
         return $currentWs;
 }
@@ -164,15 +173,15 @@ sub workspaceURL {
 		}
 		
 		# save the configured URL
-		if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
+		#if (!defined($ENV{KB_RUNNING_IN_IRIS})) { ### NOTE: IRIS NOW SUPPORTS CLIENT CFG FILE, SO NO CHECK NEEDED HERE
 			my $cfg = getKBaseCfg();
 			$cfg->param("workspace_deluxe.url",$newUrl);
 			$cfg->save();
 			$cfg->close();
-		} else {
-			my $ujs = Bio::KBase::userandjobstate::Client->new();
-			$ujs->set_state("Workspace","current-workspace-url",$newUrl);
-		}
+		#} else {
+		#	my $ujs = Bio::KBase::userandjobstate::Client->new();
+		#	$ujs->set_state("Workspace","current-workspace-url",$newUrl);
+		#}
 		
 		#return the url
 		$currentURL = $newUrl;
@@ -180,25 +189,26 @@ sub workspaceURL {
 		
 		# if we are on the file system, lookup the URL in the config file.  If that isn't possible,
 		# then we return the default URL
-		if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
+		#if (!defined($ENV{KB_RUNNING_IN_IRIS})) {
 			my $cfg = getKBaseCfg();
 			$currentURL = $cfg->param("workspace_deluxe.url");
-			if (!defined($currentURL)) {
-				$cfg->param("workspace_deluxe.url",$Bio::KBase::workspace::ScriptUrl::defaultURL);
+			#Note: cfg lib will return ref to a list if the variable is not set!  make sure that the url isn't a ref
+			if (!defined($currentURL) || (ref($currentURL) ne '')) {  
+				$cfg->param("workspace_deluxe.url",$Bio::KBase::workspace::ScriptConfig::defaultURL);
 				$cfg->save();
-				$currentURL=$Bio::KBase::workspace::ScriptUrl::defaultURL;
+				$currentURL=$Bio::KBase::workspace::ScriptConfig::defaultURL;
 			}
 			$cfg->close();
-		}
+		#}
 		# same thing in IRIS except we use the UJS to store the URL
-		else {
-			my $ujs = Bio::KBase::userandjobstate::Client->new();
-			eval { $currentURL = $ujs->get_state("Workspace","current-workspace-url",0); };
-			# if no URL was set, we just assume the default URL
-			if($@ || !defined($currentURL)) {
-				$currentURL = $Bio::KBase::workspace::ScriptConfig::defaultURL;
-			}
-		}
+		#else {
+		#	my $ujs = Bio::KBase::userandjobstate::Client->new();
+		#	eval { $currentURL = $ujs->get_state("Workspace","current-workspace-url",0); };
+		#	# if no URL was set, we just assume the default URL
+		#	if($@ || !defined($currentURL)) {
+		#		$currentURL = $Bio::KBase::workspace::ScriptConfig::defaultURL;
+		#	}
+		#}
 	}
 	return $currentURL;
 }

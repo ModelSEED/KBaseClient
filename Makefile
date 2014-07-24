@@ -23,6 +23,7 @@ gather:
 		rm -rf $(THIS_DIR)/lib/Bio/KBase/*.pm ; \
 		mkdir $(THIS_DIR)/lib/Bio/KBase/SSHAgent ; \
 		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/AuthUser.pm $(THIS_DIR)/lib/Bio/KBase/AuthUser.pm ; \
+		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/AuthConstants.pm $(THIS_DIR)/lib/Bio/KBase/AuthConstants.pm ; \
 		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/AuthToken.pm $(THIS_DIR)/lib/Bio/KBase/AuthToken.pm ; \
 		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/Auth.pm $(THIS_DIR)/lib/Bio/KBase/Auth.pm ; \
 		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/SSHAgent/*.pm $(THIS_DIR)/lib/Bio/KBase/SSHAgent/ ; \

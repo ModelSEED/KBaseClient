@@ -17,8 +17,8 @@ my $translation = {
 	genomews => "genome_workspace",
 	"Biomass equation" => "biomass",
 	modelid => "model",
+	outputid => "model",
 	workspace => "workspace",
-	auth => "auth",
 	ignoreerrors => "ignore_errors",
 };
 
@@ -96,7 +96,7 @@ AUTHORS
 #Defining usage and options
 my $specs = [
     [ 'sbml', 'Reactions file is in SBML format' ],
-    [ 'modelid|m:s', 'ID for imported model in workspace' ],
+    [ 'modelid|outputid|m:s', 'ID for imported model in workspace' ],
     [ 'compoundfile:s', 'Name of file with compound data' ],
     [ 'genomews:s', 'Workspace with genome object' ],
     [ 'ignoreerrors|i', 'Ignore errors encountered during load' ],
@@ -221,6 +221,7 @@ if (defined($opt->{sbml}) && $opt->{sbml} == 1) {
 		}
 	}
 }
+$params->{biomass} = [split(/;/,$params->{biomass})];
 #Calling the server
 my $output = runFBACommand($params,$servercommand,$opt);
 #Checking output and report results

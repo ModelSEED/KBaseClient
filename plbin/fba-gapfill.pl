@@ -16,19 +16,20 @@ my $translation = {
 	Model => "model",
 	modelws => "model_workspace",
 	modelout => "out_model",
+	outputid => "out_model",
 	gapfillid => "gapFill",
 	gapfillws => "gapFill_workspace",
 	workspace => "workspace",
-	auth => "auth",
-	overwrite => "overwrite",
-	nosubmit => "donot_submit_job",
 	intsol => "integrate_solution",
 	phenows => "phenotypeSet_workspace",
 	phenoid => "phenotypeSet",
 	timepersol => "timePerSolution",
 	timelimit => "totalTimeLimit",
 	iterativegf => "completeGapfill",
-	solver => "solver"
+	solver => "solver",
+	fastgapfill => "fastgapfill",
+	sourcemdl => "source_model",
+	sourcemdlws => "source_model_ws"
 };
 my $gfTranslation = {
 	rxnsensitivity => "sensitivity_analysis",
@@ -68,8 +69,11 @@ my $fbaTranslation = {
 };
 #Defining usage and options
 my $specs = [
-    [ 'modelout:s', 'ID for output model in workspace' ],
+    [ 'modelout|outputid:s', 'ID for output model in workspace' ],
+    [ 'sourcemdl=s', 'Source model to gapfill from' ],
+    [ 'sourcemdlws=s', 'Workspace of source model to gapfill from', { "default" => fbaws() }  ],
     [ 'intsol', 'Automatically integrate solution', { "default" => 0 } ],
+    [ 'longgapfill', 'Run a longer gapfilling but with a potentially better solution' ],
     [ 'iterativegf|t', 'Gapfill all inactive reactions', { "default" => 0 } ],
     [ 'targrxn|x:s@', 'Gapfill to activate these reactions only (; delimiter)'],
     [ 'rxnsensitivity|y', 'Flag indicates if sensitivity analysis of gapfill solutions should run'],
@@ -293,11 +297,22 @@ if (defined($opt->{uptakelim})) {
 }
 $params->{formulation}->{nobiomasshyp} = 1;
 #Calling the server
-my $output = runFBACommand($params,$servercommand,$opt);
-#Checking output and report results
-if (!defined($output)) {
-	print "Gapfilling queue failed!\n";
+if ($opt->{longgapfill}) {
+	my $output = runFBACommand($params,"queue_gapfill_model",$opt);
+	if (!defined($output)) {
+		print "Gapfilling queue failed!\n";
+	} else {
+		print "Gapfilling job queued:\n";
+		printJobData($output);
+	}
 } else {
-	print "Gapfilling job queued:\n";
-	printJobData($output);
+	$params->{fastgapfill} = 1;
+	my $output = runFBACommand($params,"gapfill_model",$opt);
+	if (!defined($output)) {
+		print "Gapfilling failed!\n";
+	} else {
+		print "Gapfilling successful!\n";
+		printObjectInfo($output);
+		print "Run fba-getgapfills or fba-integratesolution to print solution!\n";
+	}
 }

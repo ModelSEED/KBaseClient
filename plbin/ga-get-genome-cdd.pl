@@ -6,27 +6,30 @@
 ########################################################################
 use strict;
 use warnings;
-use Bio::KBase::workspace::ScriptHelpers qw(get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
+use Bio::KBase::workspace::ScriptHelpers qw(printObjectInfo printJobData get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
 use Bio::KBase::fbaModelServices::ScriptHelpers qw(fbaws get_fba_client runFBACommand universalFBAScriptCode );
 #Defining globals describing behavior
-my $primaryArgs = ["Phenotype simulation ID"];
-my $servercommand = "export_phenotypeSimulationSet";
-my $script = "fba-exportphenosim";
+my $primaryArgs = ["Genome ID"];
+my $servercommand = "domains_to_workspace";
+my $script = "ga-get_genome_cdd";
 my $translation = {
-	"Phenotype simulation ID" => "phenotypeSimulationSet",
-	workspace => "workspace",
+	outputid => "output_id",
+	"Genome ID" => "genome",
+	workspace => "workspace"
 };
+
 #Defining usage and options
 my $specs = [
-    [ 'workspace|w:s', 'Workspace with phenotype simulation set', { "default" => fbaws() } ]
+    [ 'outputid=s', 'ID for created domain object in workspace' ],
+    [ 'workspace|w=s', 'Workspace to save CDD object to', { "default" => fbaws() } ],
 ];
 my ($opt,$params) = universalFBAScriptCode($specs,$script,$primaryArgs,$translation);
 #Calling the server
 my $output = runFBACommand($params,$servercommand,$opt);
 #Checking output and report results
 if (!defined($output)) {
-	print STDERR "Phenotype simulation set export failed!\n";
+	print "Generation of domain object failed!\n";
 } else {
-	print STDERR "Phenotype simulation set export succeeded:\n";
-	print $output;
+	print "Generation of domain object successful:\n";
+	printObjectInfo($output);
 }

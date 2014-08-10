@@ -7,4 +7,7 @@ carton.lock
 .carton/
 MYMETA.*
 man/*
+_build/*
+configs/*
+Build
 MANIFEST.bak

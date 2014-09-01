@@ -7,7 +7,8 @@ use warnings;
 use Exporter;
 use parent qw(Exporter);
 our @EXPORT_OK = qw( get_probanno_url get_probanno_client );
-our $defaultURL = "http://kbase.us/services/probabilistic_annotation/";
+use Bio::KBase::probabilistic_annotation::Constants	qw(defaultURL);
+our $defaultURL = defaultURL();
 
 # Get the URL for the Probabilistic Annotation service.
 sub get_probanno_url {

@@ -73,10 +73,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # Get the list of jobs for the user.
-    auth = _read_inifile()
+    if 'KB_AUTH_USER_ID' in os.environ:
+        userID = os.environ.get('KB_AUTH_USER_ID')
+    else:
+        auth = _read_inifile()
+        userID = auth['user_id']
     ujsClient = UserAndJobState(args.ujsURL)
     try:
-        jobList = ujsClient.list_jobs([ auth['user_id'] ], 'RCE')
+        jobList = ujsClient.list_jobs([ userID ], 'RCE')
     except JobStateServerError as e:
         print e.message
         exit(1)

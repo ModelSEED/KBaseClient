@@ -45,6 +45,8 @@ my $translation = {
 	"Transcriptome sample" => "expsample",
 	"Full model" => "model",
 	modelws => "model_ws",
+	media => "media",
+	mediaws => "media_ws",	
 	transcriptws => "expsample_ws",
 	outputid => "output_id",
 	solver => "solver",
@@ -55,6 +57,8 @@ my $translation = {
 #Defining usage and options
 my $specs = [
     [ 'outputid=s', 'Name to be provided for output model' ],
+    [ 'media=s', 'Media for tissue model analysis' ],
+    [ 'mediaws=s', 'Workspace with media for analysis' ],
     [ 'modelws=s', 'Workspace where full model is located' ],
     [ 'transcriptws=s', 'Workspace with transcript data' ],
     [ 'activation=s', 'Coefficient for activating expressed reactions'],

@@ -28,6 +28,7 @@ my $translation = {
 	expsample => "expsample",
 	expsamplews => "expsample_ws",
 	booleanexp => "booleanexp",
+	solver => "solver",
 	biomass => "biomass"
 };
 my $fbaTranslation = {
@@ -54,6 +55,8 @@ my $fbaTranslation = {
 	tintlew => "tintle_w",
 	tintlek => "tintle_kappa",
 	modelws => "model_workspace",
+	regulome => "regulome",
+	regulomews => "regulome_workspace"
 };
 #Defining usage and options
 my $specs = [
@@ -74,6 +77,8 @@ my $specs = [
     [ 'expsamplews:s', 'Workspace with expression sample', { "default" => fbaws() } ],
     [ 'promconstraint|p:s', 'ID of PromConstraint' ],
     [ 'promconstraintws:s', 'Workspace with PromConstraint', { "default" => fbaws() } ],
+    [ 'regulome:s', 'ID of regulome' ],
+    [ 'regulomews:s', 'Workspace with regulome', { "default" => fbaws() } ],
     [ 'efluxsm:s', 'ID of ExpressionSample for E-Flux analysis' ],
     [ 'efluxsr:s', 'ID of ExpressionSeries for Improved E-Flux analysis (without this but with --efluxsm, the original E-Flux will be conducted.)' ],
     [ 'efluxws:s', 'Workspace with ExpressionSample/Series', { "default" => fbaws() } ],
@@ -97,7 +102,7 @@ my $specs = [
     [ 'findminmedia', 'Find minimal media' ],
     [ 'addtomodel', 'Add FBA to model' ],
     [ 'notes:s', 'Notes for flux balance analysis' ],
-    [ 'solver:s', 'Solver' ],
+    [ 'solver:s', 'Solver to use for FBA' ],
     [ 'workspace|w:s', 'Workspace to save FBA results', { "default" => fbaws() } ],
 ];
 my ($opt,$params) = universalFBAScriptCode($specs,$script,$primaryArgs,$translation);

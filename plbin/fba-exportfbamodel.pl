@@ -43,7 +43,6 @@ if (!defined($output)) {
 } elsif ($toshock == 0 && $params->{format} eq "excel") {
 	my $array = [split(/\t/,$output)];
 	$output = Bio::KBase::ObjectAPI::utilities::runexecutable("curl -H \"Authorization: OAuth ".getToken()."\" -X GET ".$array->[2]."?download > ".$params->{model}.".xls");
-	#print join("\n",@{$output})."\n";
 } else {
 	print $output."\n";
 }

@@ -1,7 +1,5 @@
 package Bio::KBase::AuthToken;
 
-use Bio::KBase::AuthConstants ':all';
-
 use strict;
 use warnings;
 use JSON;
@@ -13,6 +11,7 @@ use Convert::PEM;
 use MIME::Base64;
 use URI;
 use POSIX;
+use MongoDB;
 use DateTime;
 use Bio::KBase::SSHAgent::Agent;
 
@@ -34,8 +33,8 @@ our %Conf;
 
 our $VERSION = $Bio::KBase::Auth::VERSION;
 
-our @trust_token_signers = trust_token_signers;
-
+our @trust_token_signers = ( 'https://graph.api.go.sandbox.globuscs.info/goauth/keys/',
+			     'https://nexus.api.globusonline.org/goauth/keys');
 # Tokens (last time we checked) had a 24 hour lifetime, this value can be
 # used to add extra time to the lifetime of tokens. The unit is seconds.
 # This can be be overridden  with a parameter passed into the validate() function.

@@ -5,8 +5,7 @@ package Bio::KBase::Auth;
 # sychan 4/24/2012
 use strict;
 use Config::Simple;
-use URI;
-use Bio::KBase::AuthConstants qw(:kbase :globus);
+use MongoDB;
 
 our $VERSION = '0.7.0';
 
@@ -60,28 +59,20 @@ sub LoadConfig {
 	$Conf{'authentication.client_secret'} =~ s/\\n/\n/g;
     }
 
-    my $token_url = URI->new(globus_token_url);
-    my $profile_url = URI->new(globus_profile_url);
-
-    my $bare = $token_url->clone();
-    $bare->query(undef);
-    $bare->path('/');
-
     $AuthSvcHost = $Conf{'authentication.servicehost'} ?
-	$Conf{'authentication.servicehost'} : $bare->as_string;
+	$Conf{'authentication.servicehost'} : "https://nexus.api.globusonline.org/";
     
     $AuthorizePath = $Conf{'authentication.authpath'} ?
-	$Conf{'authentication.authpath'} : $token_url->path;
+	$Conf{'authentication.authpath'} : "/goauth/token";
     
     $ProfilePath = $Conf{'authentication.profilepath'} ?
-	$Conf{'authentication.profilepath'} : $profile_url->path;
+	$Conf{'authentication.profilepath'} : "users";
     
     $RoleSvcURL = $Conf{'authentication.rolesvcurl'} ?
-	$Conf{'authentication.rolesvcurl'} : role_service_url;
+	$Conf{'authentication.rolesvcurl'} : "https://kbase.us/services/authorization/Roles";
 
     eval {
 	if ($Conf{'authentication.mongodb'} ) {
-	    require MongoDB;
 	    $MongoDB = MongoDB::Connection->new( host => $Conf{'authentication.mongodb'});
 	}
     };

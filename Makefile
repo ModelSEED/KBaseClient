@@ -7,6 +7,18 @@ BIN_PERL = $(addprefix $(BIN_DIR)/,$(basename $(notdir $(SRC_PERL))))
 
 clean:
 	rm $(THIS_DIR)/bin/*
+
+auth:
+	if [ -d $(THIS_DIR)/../auth ] ; then \
+		cp $(THIS_DIR)/../auth/scripts/kbase-* $(THIS_DIR)/plbin/ ; \
+		rm -rf $(THIS_DIR)/lib/Bio/KBase/*.pm ; \
+		mkdir $(THIS_DIR)/lib/Bio/KBase/SSHAgent ; \
+		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/AuthUser.pm $(THIS_DIR)/lib/Bio/KBase/AuthUser.pm ; \
+		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/AuthConstants.pm $(THIS_DIR)/lib/Bio/KBase/AuthConstants.pm ; \
+		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/AuthToken.pm $(THIS_DIR)/lib/Bio/KBase/AuthToken.pm ; \
+		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/Auth.pm $(THIS_DIR)/lib/Bio/KBase/Auth.pm ; \
+		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/SSHAgent/*.pm $(THIS_DIR)/lib/Bio/KBase/SSHAgent/ ; \
+	fi
 	
 gather:
 	mkdir -p $(THIS_DIR)/lib/Bio
@@ -17,16 +29,6 @@ gather:
 		mkdir $(THIS_DIR)/lib/Bio/KBase/probabilistic_annotation ; \
 		cp $(THIS_DIR)/../probabilistic_annotation/lib/Bio/KBase/probabilistic_annotation/Client.pm $(THIS_DIR)/lib/Bio/KBase/probabilistic_annotation/Client.pm ; \
 		cp $(THIS_DIR)/../probabilistic_annotation/lib/Bio/KBase/probabilistic_annotation/Helpers.pm $(THIS_DIR)/lib/Bio/KBase/probabilistic_annotation/Helpers.pm ; \
-	fi
-	if [ -d $(THIS_DIR)/../auth ] ; then \
-		cp $(THIS_DIR)/../auth/scripts/kbase-* $(THIS_DIR)/plbin/ ; \
-		rm -rf $(THIS_DIR)/lib/Bio/KBase/*.pm ; \
-		mkdir $(THIS_DIR)/lib/Bio/KBase/SSHAgent ; \
-		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/AuthUser.pm $(THIS_DIR)/lib/Bio/KBase/AuthUser.pm ; \
-		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/AuthConstants.pm $(THIS_DIR)/lib/Bio/KBase/AuthConstants.pm ; \
-		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/AuthToken.pm $(THIS_DIR)/lib/Bio/KBase/AuthToken.pm ; \
-		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/Auth.pm $(THIS_DIR)/lib/Bio/KBase/Auth.pm ; \
-		cp $(THIS_DIR)/../auth/Bio-KBase-Auth/lib/Bio/KBase/SSHAgent/*.pm $(THIS_DIR)/lib/Bio/KBase/SSHAgent/ ; \
 	fi
 	if [ -d $(THIS_DIR)/../KBaseFBAModeling ] ; then \
 		cp $(THIS_DIR)/../KBaseFBAModeling/scripts/ga-* $(THIS_DIR)/plbin/ ; \
@@ -93,7 +95,12 @@ gather:
 		mkdir $(THIS_DIR)/lib/Bio/KBase/userandjobstate ; \
 		cp $(THIS_DIR)/../user_and_job_state/lib/Bio/KBase/userandjobstate/Client.pm $(THIS_DIR)/lib/Bio/KBase/userandjobstate/Client.pm ; \
 	fi
-				
+	if [ -d $(THIS_DIR)/../narrative_job_service ] ; then \
+		rm -rf $(THIS_DIR)/lib/Bio/KBase/NarrativeJobService ; \
+		mkdir $(THIS_DIR)/lib/Bio/KBase/NarrativeJobService ; \
+		cp $(THIS_DIR)/../narrative_job_service/lib/Bio/KBase/NarrativeJobService/Client.pm $(THIS_DIR)/lib/Bio/KBase/NarrativeJobService/Client.pm ; \
+	fi
+
 all: 
 	for src in $(SRC_PERL) ; do \
 		basefile=`basename $$src`; \

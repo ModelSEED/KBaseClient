@@ -491,7 +491,7 @@ sub validate {
 	    my $data = cache_get( \$SignerCache, $vars{'SigningSubject'});
 	    unless ($data) {
 		$client = LWP::UserAgent->new();
-		$client->ssl_opts(verify_hostname => 0);
+        #$client->ssl_opts(verify_hostname => 0);
 		$client->timeout(5);
 		$response = $client->get( $vars{'SigningSubject'});
 		if ($response->is_success) {

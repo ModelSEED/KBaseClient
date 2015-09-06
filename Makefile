@@ -56,7 +56,7 @@ gather:
 		cp $(THIS_DIR)/../MSSeedSupportServer/scripts/si-* $(THIS_DIR)/plbin/ ; \
 		rm -rf $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer ; \
 		mkdir $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer ; \
-		cp $(THIS_DIR)/../MSSeedSupportServer/lib/Bio/ModelSEED/MSSeedSupportServer/Client.pm $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer/Client.pm ; \
+		cp $(THIS_DIR)/../MSSeedSupportServer/lib/Bio/ModelSEED/MSSeedSupportServer/MSSeedSupportClient.pm $(THIS_DIR)/lib/Bio/ModelSEED/MSSeedSupportServer/MSSeedSupportClient.pm ; \
 	fi
 	if [ -d $(THIS_DIR)/../workspace_deluxe ] ; then \
 		cp $(THIS_DIR)/../workspace_deluxe/scripts/ws-* $(THIS_DIR)/plbin/ ; \

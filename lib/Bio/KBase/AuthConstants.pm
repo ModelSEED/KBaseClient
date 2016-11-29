@@ -2,7 +2,7 @@ package Bio::KBase::AuthConstants;
 
 use constant        globus_token_url   => "http://rast.nmpdr.org/goauth/token?grant_type=client_credentials";
 use constant        globus_profile_url   => "http://rast.nmpdr.org/users";
-use constant	    trust_token_signers => split(/\s+/, 'https://nexus.api.globusonline.org/goauth/keys https://graph.api.go.sandbox.globuscs.info/goauth/keys/ https://nexus.api.globusonline.org/goauth/keys');
+use constant	    trust_token_signers => split(/\s+/, 'http://rast.nmpdr.org/goauth/keys https://nexus.api.globusonline.org/goauth/keys https://graph.api.go.sandbox.globuscs.info/goauth/keys https://nexus.api.globusonline.org/goauth/keys');
 use constant	    role_service_url => 'https://kbase.us/services/authorization/Roles';
 
 use base 'Exporter';

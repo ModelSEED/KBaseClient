@@ -479,7 +479,7 @@ sub validate {
 	unless ($vars{'SigningSubject'} =~ /^\Q$Bio::KBase::Auth::AuthSvcHost\E/) {
 		if ($vars{'SigningSubject'} =~ m/(.+keys)\//) {
 			unless  ($trust_token_signers{$1}) {
-				#die "Token signed by unrecognized source: ".$vars{'SigningSubject'};
+				die "Token signed by unrecognized source: ".$vars{'SigningSubject'};
 			}
 		}
 	}

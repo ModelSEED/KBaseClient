@@ -1,17 +1,18 @@
 package Bio::KBase::AuthToken;
 
+use Bio::KBase::AuthConstants ':all';
+
 use strict;
 use warnings;
 use JSON;
 use Bio::KBase::Auth;
 use LWP::UserAgent;
-use Digest::SHA1 qw(sha1_base64);
+use Digest::SHA qw(sha1_base64);
 use Crypt::OpenSSL::RSA;
 use Convert::PEM;
 use MIME::Base64;
 use URI;
 use POSIX;
-use MongoDB;
 use DateTime;
 use Bio::KBase::SSHAgent::Agent;
 
@@ -33,8 +34,9 @@ our %Conf;
 
 our $VERSION = $Bio::KBase::Auth::VERSION;
 
-our @trust_token_signers = ( 'https://graph.api.go.sandbox.globuscs.info/goauth/keys/',
-			     'https://nexus.api.globusonline.org/goauth/keys');
+our @trust_token_signers = trust_token_signers;
+our %trust_token_signers = map { $_ => 1 } @trust_token_signers;
+
 # Tokens (last time we checked) had a 24 hour lifetime, this value can be
 # used to add extra time to the lifetime of tokens. The unit is seconds.
 # This can be be overridden  with a parameter passed into the validate() function.
@@ -220,7 +222,7 @@ sub token {
     # parse out token and set user_id
     eval {
 	$self->{'token'} = $token;
-	($self->{'user_id'}) = $token =~ /un=(\w+)/;
+	($self->{'user_id'}) = $token =~ /un=([^|]+)/;
 	unless ($self->{'user_id'}) {
 	    # Could this be a sessionid hash?
 	    unless ( $self->{token} =~ m/^[0-9a-fA-F]{64}$/) {
@@ -474,9 +476,10 @@ sub validate {
 	# signing subject has a URL that matches the URL for our
 	# Globus Nexus Rest service. A token that is signed by someone
 	# else isn't really that interesting to us.
-    #unless ( $vars{'SigningSubject'} =~ /^\Q$Bio::KBase::Auth::AuthSvcHost\E/) {
-    #    die "Token signed by unrecognized source: ".$vars{'SigningSubject'};
-    #}
+	unless ( ($vars{'SigningSubject'} =~ /^\Q$Bio::KBase::Auth::AuthSvcHost\E/) ||
+	         $trust_token_signers{$vars{SigningSubject}} ) {
+	    die "Token signed by unrecognized source: ".$vars{'SigningSubject'};
+	}
 	unless (length($vars{'sig'}) == 256) {
 	    die "Token has malformed signature field";
 	}
@@ -491,7 +494,7 @@ sub validate {
 	    my $data = cache_get( \$SignerCache, $vars{'SigningSubject'});
 	    unless ($data) {
 		$client = LWP::UserAgent->new();
-        #$client->ssl_opts(verify_hostname => 0);
+		$client->ssl_opts(verify_hostname => 0);
 		$client->timeout(5);
 		$response = $client->get( $vars{'SigningSubject'});
 		if ($response->is_success) {

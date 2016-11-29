@@ -476,9 +476,12 @@ sub validate {
 	# signing subject has a URL that matches the URL for our
 	# Globus Nexus Rest service. A token that is signed by someone
 	# else isn't really that interesting to us.
-	unless ( ($vars{'SigningSubject'} =~ /^\Q$Bio::KBase::Auth::AuthSvcHost\E/) ||
-	         $trust_token_signers{$vars{SigningSubject}} ) {
-	    die "Token signed by unrecognized source: ".$vars{'SigningSubject'};
+	unless ($vars{'SigningSubject'} =~ /^\Q$Bio::KBase::Auth::AuthSvcHost\E/) {
+		if ($vars{'SigningSubject'} =~ m/(.+keys)\//) {
+			unless  ($trust_token_signers{$1}) {
+				die "Token signed by unrecognized source: ".$vars{'SigningSubject'};
+			}
+		}
 	}
 	unless (length($vars{'sig'}) == 256) {
 	    die "Token has malformed signature field";

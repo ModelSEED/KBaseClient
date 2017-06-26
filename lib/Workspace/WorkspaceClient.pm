@@ -1,4 +1,4 @@
-package Bio::KBase::workspace::Client;
+package Workspace::WorkspaceClient;
 
 use JSON::RPC::Client;
 use POSIX;
@@ -21,7 +21,7 @@ our $VERSION = "0.1.0";
 
 =head1 NAME
 
-Bio::KBase::workspace::Client
+Workspace::WorkspaceClient
 
 =head1 DESCRIPTION
 
@@ -46,13 +46,9 @@ sub new
 {
     my($class, $url, @args) = @_;
     
-    if (!defined($url))
-    {
-	$url = 'https://kbase.us/services/ws/';
-    }
 
     my $self = {
-	client => Bio::KBase::workspace::Client::RpcClient->new,
+	client => Workspace::WorkspaceClient::RpcClient->new,
 	url => $url,
 	headers => [],
     };
@@ -96,12 +92,19 @@ sub new
     # We create an auth token, passing through the arguments that we were (hopefully) given.
 
     {
-	my $token = Bio::KBase::AuthToken->new(@args);
+	my %arg_hash2 = @args;
+	if (exists $arg_hash2{"token"}) {
+	    $self->{token} = $arg_hash2{"token"};
+	} elsif (exists $arg_hash2{"user_id"}) {
+	    my $token = Bio::KBase::AuthToken->new(@args);
+	    if (!$token->error_message) {
+	        $self->{token} = $token->token;
+	    }
+	}
 	
-	if (!$token->error_message)
+	if (exists $self->{token})
 	{
-	    $self->{token} = $token->token;
-	    $self->{client}->{token} = $token->token;
+	    $self->{client}->{token} = $self->{token};
 	}
     }
 
@@ -8126,10 +8129,10 @@ sub _validate_version {
         );
     }
     if ($sMinor > $cMinor) {
-        warn "New client version available for Bio::KBase::workspace::Client\n";
+        warn "New client version available for Workspace::WorkspaceClient\n";
     }
     if ($sMajor == 0) {
-        warn "Bio::KBase::workspace::Client version is $svr_version. API subject to change.\n";
+        warn "Workspace::WorkspaceClient version is $svr_version. API subject to change.\n";
     }
 }
 
@@ -10160,12 +10163,14 @@ An object and associated data required for saving.
         type_string type - the type of the object. Omit the version information
                 to use the latest version.
         UnspecifiedObject data - the object data.
-        One, and only one, of:
-                obj_name name - the name of the object.
-                obj_id objid - the id of the object to save over.
-        
         
         Optional arguments:
+        One of an object name or id. If no name or id is provided the name
+                will be set to 'auto' with the object id appended as a string,
+                possibly with -\d+ appended if that object id already exists as a
+                name.
+        obj_name name - the name of the object.
+        obj_id objid - the id of the object to save over.
         usermeta meta - arbitrary user-supplied metadata for the object,
                 not to exceed 16kb; if the object type specifies automatic
                 metadata extraction with the 'meta ws' annotation, and your
@@ -12207,7 +12212,7 @@ with_empty_modules has a value which is a Workspace.boolean
 
 =cut
 
-package Bio::KBase::workspace::Client::RpcClient;
+package Workspace::WorkspaceClient::RpcClient;
 use base 'JSON::RPC::Client';
 use POSIX;
 use strict;

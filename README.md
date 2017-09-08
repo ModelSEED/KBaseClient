@@ -48,7 +48,7 @@ source KBaseClient/user-env.sh
 
 7.) Try running the login command:
 
-kbws-login kbasetest -p "@Suite525"
+kbase-login kbasetest -p "@Suite525"
 
 MAINTENANCE
 
